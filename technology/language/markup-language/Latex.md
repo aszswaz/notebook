@@ -1,48 +1,27 @@
-## Latex数学公式排版代码
+# Latex
 
-Latex是\$\$（多行模式是\$\$\$\$）包裹的数学公式排版代码，例如：$\frac{x}{y}$，多行模式如下：
-$$
-\frac{x}{y}
-$$
+## 安装
 
-## 日常使用的LaTex指令记录
+```bash
+$ sudo pacman -S texlive-most texlive-langchinese texstudio
+```
 
-### LaTex相关地址（来自维基百科、网友博客）：
+**texlive-most** 是 Latex 全部的工具包，**texlive-langchinese** 是 CTeX 宏集，用于给 Latex 提供中文支持，**texstudio** 是一款 Latex 的可视化编辑器
 
-[【转】LaTeX 符号命令大全](https://www.cnblogs.com/Coolxxx/p/5982439.html)
-[LaTeX命令、符号大全](https://www.cnblogs.com/yalphait/articles/8685586.html)
-[维基百科：数学公式](https://zh.wikipedia.org/wiki/Help:%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F)
-[LaTex各种命令，符号](http://blog.csdn.net/anxiaoxi45/article/details/39449445)
+中文文档编写示例：
 
-### 基本运算符
+```latex
+% CTeX 提供的文档基类：ctexart, ctexrep, ctexbook 和 ctexbeamer 来进行中文文档的编写，分别对应 LaTeX 的标准文档类 article, report, book 和 beamer
+\documentclass{ctexart}
+\begin{document}
+中文文档类测试。
+\end{document}
+```
 
-| 指令                  | 描述 | 效果                    |
-| --------------------- | ---- | ----------------------- |
-| \frac{x}{y}           | 分数 | $\frac{x}{y}$           |
-| a \cdot b             | 点乘 | $a \cdot b$             |
-| a \times b            | 叉乘 | $a \times b$            |
-| a \div b              | 除以 | $a \div b$              |
-| \sqrt{3}、\sqrt[n]{3} | 根号 | $\sqrt{3}、\sqrt[2]{3}$ |
+文件保存为 demo.tex 生成 demo.pdf：
 
-### 逻辑运算符
+```bash
+$ xelatex demo.tex
+```
 
-| 指令                            | 描述                                                         | 效果                                 |
-| ------------------------------- | ------------------------------------------------------------ | ------------------------------------ |
-| \lt,\le,\leq,\gt,\ge,\geq,\ne,\ | 小于、小于等于、大于、大于等于、不等于，这里特意加上\leq、\geq、\neq主要是为了提醒，实际上它们与\le、\ge、\ne没有什么区别 | $\lt,\le,\leq,\gt,\ge,\geq,\ne,\neq$ |
-| \oplus 或者 XOR                 | 逻辑异或                                                     | $p \oplus q, p XOR q$                |
-
-## 集合
-
-| 指令        | 描述         | 效果          |
-| ----------- | ------------ | ------------- |
-| \in，\notin | 属于，不属于 | $\in、\notin$ |
-| Z           | 正整数集     | $Z$           |
-| R           | 实数集       | $R$           |
-| Q           | 有理数集     | $Q$           |
-
-### 其他
-
-| 指令     | 描述                                                    | 效果         |
-| -------- | ------------------------------------------------------- | ------------ |
-| x        | 把指定的字母变为花体字，有大小写的区分，这里以小写x为例 | $x$          |
-| x^a、x_a | 上标、下标                                              | $x^a$、$x_a$ |
+<font color="red">注意：Latex 主要使用的指令集有 tex、latex、pdflatex、xelatex、xetex，只有 xelatex 和 xetex 支持 Unicode 字符，latex 是 tex 语言的拓展，不能直接使用 xetex 编译上述代码，因为 tex 中没有 \documentclass 和 \end</font>
