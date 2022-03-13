@@ -1,0 +1,42 @@
+# aszswaz
+workstation
+
+# 非公开文件
+private-*
+*-private.*
+private
+
+# python
+venv
+
+# 企业微信、微信
+WXWork
+WeChat Files
+
+# NoSQLBooster
+NoSQLBooster
+
+# jetbrains
+.idea
+*.iml
+
+# eclise
+.classpath
+.project
+
+# maven
+target
+
+# java
+*.jar
+*.class
+*.war
+
+# nodejs
+node_modules
+dist
+package-lock.json
+
+# python
+venv
+
