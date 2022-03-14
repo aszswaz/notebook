@@ -114,3 +114,17 @@ public static void demo(int a, int b) {
 ## 自变量和因变量
 
 **自变量**、**因变量**和**控制变量**主要用于指实验时各种会影响实验结果的因素，在实验中由于各项因素的不确定性与不可预测性，因此需先设定什么为人为可控制的控制变量，什么为实验主要目标之自变量。其目的是为了厘清哪些因素能使实验产生不同的结果而形成的概念。
+
+## 常用公式化简
+
+平方计算公式化简：
+$$
+\begin{eqnarray}
+(a - b)^2 &=& (a - b)(a - b) \nonumber \\
+&=& a(a - b) + (a - b)(-b) \nonumber \\
+&=& a^2 - ab - (a - b)b \nonumber \\
+&=& a^2 -ab - (ab - b^2) \nonumber \\
+&=& a^2 - ab - ab + b^2 \nonumber \\
+&=& a^2 + b^2 - 2ab \nonumber
+\end{eqnarray}
+$$
