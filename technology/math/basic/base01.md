@@ -101,7 +101,7 @@ public static void demo(int a, int b) {
 
 ## 向量
 
-响亮是指具有大小和方向的变量。
+向量是指具有大小和方向的变量。
 
 ## 常数
 
