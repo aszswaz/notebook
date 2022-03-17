@@ -40,3 +40,8 @@ package-lock.json
 # python
 venv
 
+# latex
+*.log
+*.dvi
+*.pdf
+*.aux

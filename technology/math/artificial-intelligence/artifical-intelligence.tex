@@ -1,0 +1,38 @@
+% 定义文档类型：中文文章
+\documentclass{ctexart}
+
+% 导入宏包
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+% 文档标题
+\title{人工智能-基础篇}
+\author{aszswaz}
+\date{2022-03-17}
+
+\begin{document}
+\maketitle
+
+\section{Rosenblatt 感知器}
+Rosenblatt 感知器是第一个从算法上完整描述的神经网络。假设 $w$ 为斜率、$t$ 为标准答案、$e$ 为误差、$a$ 为实数，感知器的流程图如下：\\
+% 绘制函数流程图
+\begin{tikzpicture}[
+    % 有圆角的长方形
+    squarednode/.style={rectangle, draw=black, minimum size=5mm, rounded corners}
+]
+    %Nodes
+    \node[squarednode]      (maintopic)                              {输入$x$};
+    \node[squarednode]      (gety)     [below=of maintopic]          {$y = w \cdot x$};
+    \node[squarednode]      (error)    [below=of gety]               {$t - y = e$};
+    \node[squarednode]      (neww)     [below=of error]              {$n = w + a \cdot e \cdot x$};
+    \node[squarednode]      (assgin)   [below=of neww]               {$w = n$};
+
+    %Lines
+    \draw[->] (maintopic)       -- (gety);
+    \draw[->] (gety)            -- (error);
+    \draw[->] (error)           -- (neww);
+    \draw[->] (neww)            -- (assgin);
+    \draw[->] (assgin.west)     .. controls +(left: 20mm) and +(left: 20mm) .. (gety.west);
+\end{tikzpicture}
+
+\end{document}
