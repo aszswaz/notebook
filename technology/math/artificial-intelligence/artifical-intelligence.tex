@@ -5,6 +5,7 @@
 \usepackage{tikz}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{geometry}
 
 % 一些包有多个模块，加载指定模块
 \usetikzlibrary{positioning}
@@ -13,22 +14,32 @@
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\lstset{frame=tb,
+% 自定义 Python 语法高亮样式
+\lstset{
 	language=Python,
+	% 上下边距
 	aboveskip=3mm,
 	belowskip=3mm,
+	% 字符串中的空格可见
 	showstringspaces=false,
+	% 设置列的对其方式
 	columns=flexible,
+	% 基础输出格式
 	basicstyle={\small\ttfamily},
+	% 显示行号
 	numbers=none,
 	numberstyle=\tiny\color{gray},
 	keywordstyle=\color{blue},
 	commentstyle=\color{dkgreen},
 	stringstyle=\color{mauve},
+	sensitive=true,
 	breaklines=true,
 	breakatwhitespace=true,
-	tabsize=3
+	tabsize=4,
+	frame=single
 }
+% 设置纸张为 A4，版心占页面长度的比例为80%
+\geometry{a4paper, scale=0.8}
 
 % 文档标题
 \title{人工智能-基础篇}
