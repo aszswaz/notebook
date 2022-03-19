@@ -5,3 +5,5 @@
 由于我对 Latex 生成的 PDF 文件不能复制行首空格这一点感到不爽，这会导致从 PDF 复制的代码不可以直接运行，因此涉及到 Python 代码的部分，我会把 Python 代码以单独的 py 文件保存。并把文件的超链接放在 tex 文件中。
 
 [manager.sh](./manager.sh) 脚本可以快速搭建 Python venv 环境，安装所需的依赖，以及编译所有的 tex 文件。
+
+[pdf.sh](./pdf.sh) 脚本用于快速生成指定的 tex 文件的 pdf 文件，并清理编译过程中生成的其他文件
