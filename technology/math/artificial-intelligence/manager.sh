@@ -17,4 +17,4 @@ pip freeze > "requirements.txt"
 for item in ./*.tex; do
     xelatex $item
 done
-rm -f *.log *.aux
+rm -f *.log *.aux *.out
