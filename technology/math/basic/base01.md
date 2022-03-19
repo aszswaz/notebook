@@ -119,13 +119,14 @@ public static void demo(int a, int b) {
 
 平方计算公式化简：
 $$
-\begin{eqnarray}
-(a - b)^2 &=& (a - b)(a - b) \nonumber \\
-&=& a(a - b) + (a - b)(-b) \nonumber \\
-&=& a^2 - ab - (a - b)b \nonumber \\
-&=& a^2 -ab - (ab - b^2) \nonumber \\
-&=& a^2 - ab - ab + b^2 \nonumber \\
-&=& a^2 + b^2 - 2ab \nonumber
-\end{eqnarray}
+\begin{aligned}
+(a - b)^2 & = (a - b)(a - b) \\
+          & = a(a - b) + (a - b)(-b) \\
+          & = a^2 - ab - (a - b)b \\
+          & = a^2 -ab - (ab - b^2) \\
+          & = a^2 - ab - ab + b^2 \\
+          & = a^2 + b^2 - 2ab
+\end{aligned}
 $$
 举一反三：$(a + b)^2 = a^2 + b^2 + 2ab$
+
