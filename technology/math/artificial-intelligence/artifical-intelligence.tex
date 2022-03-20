@@ -35,7 +35,9 @@
 \subsection{最基本的 Rosenblatt 感知器}
 Rosenblatt 感知器是第一个从算法上完整描述的神经网络，它向人们展示了计算机对函数的自适应调整的可能性。
 
-假设 $w$ 为斜率、$t$ 为标准答案、$e$ 为误差、$a$ 为学习率（$0 \le a \le 1$），感知器的流程图如下：
+假设坐标系中存在一个端点 $(x_1, y_1)$，求一条从坐标轴原点出发，经过该端点的一条直线，过程如下：
+
+设 $w$ 为直线的斜率、$e$ 为误差、$a$ 为学习率（$0 \le a \le 1$），计算流程流程如下：
 
 % 绘制 Rosenblatt 流程图
 \begin{center}
@@ -45,11 +47,11 @@ Rosenblatt 感知器是第一个从算法上完整描述的神经网络，它向
 			% 看不见的像素点，用来连接线，达到折线的效果
 			point/.style={coordinate, on grid}
 		]
-		\node[squarednode]      (maintopic)                                                 {输入$x$};
-		\node[squarednode]      (gety)          [below of=maintopic]                        {$y = w \cdot x$};
-		\node[squarednode]      (error)         [below of=gety]                             {$t - y = e$};
+		\node[squarednode]      (maintopic)                                                 {输入$x_1$};
+		\node[squarednode]      (gety)          [below of=maintopic]                        {$y = w \cdot x_1$};
+		\node[squarednode]      (error)         [below of=gety]                             {$y_1 - y = e$};
 		%Nodes
-		\node[squarednode]      (neww)          [below of=error]                            {$n = w + a \cdot e \cdot x$};
+		\node[squarednode]      (neww)          [below of=error]                            {$n = w + a \cdot e \cdot x_1$};
 		\node[squarednode]      (assgin)        [below of=neww]                             {$w = n$};
 		\node[point]            (point1)        [left of=assgin, node distance=2cm]         {point1};
 
@@ -65,34 +67,36 @@ Rosenblatt 感知器是第一个从算法上完整描述的神经网络，它向
 \end{center}
 \url{rosenblatt.py}
 
-Rosenblatt 感知器中，误差 $e$ 的计算公式为 $e = x^2w^2 + (-2xy) + y^2$，在坐标系中，它是一个开口向上的抛物线：$y = ax^2 + bx + c$。
+Rosenblatt 感知器中，误差 $e$ 的计算公式为 $e = x^2w^2 - 2xyw + y^2$，在坐标系中，它是一个开口向上的抛物线：$y = ax^2 + bx + c$。
 
 假设坐标系中，存在一个点：$x = 0.4, y = 0.68$，预测误差 $e$ 与斜率 $w$ 的关系为：
 
 $$
 	\begin{aligned}
-		e & = 0.16w^2 - 0.544 + 1.36 \\
-		  & = 0.16w^2 + 0.816
+		e & = 0.4^2 \times w^2 - 2 \times 0.4 \times 0.68 \times w + 0.68^2 \\
+		  & = 0.16w^2 - 0.544w + 0.4624
 	\end{aligned}
 $$
 
 \begin{center}
 	\begin{tikzpicture}
 		% 绘制一个大小为 5 * 5 网格线
-		\draw[help lines, color=gray!30] (0, 0) grid (5,5);
+		\draw[help lines, color=gray!30] (0, 0) grid (6 cm, 6 cm);
 		% 坐标轴原点
 		\draw[fill] (0, 0) node [left]{$O$} circle(.1);
 		% 绘制 y 轴和 x 轴
-		\draw[thick, ->] (0, 0) -- (5, 0) node[anchor = north west] {e};
-		\draw[thick, ->] (0, 0) -- (0, 5) node[anchor = south east] {w};
+		\draw[thick, ->] (0, 0) -- (6 cm, 0) node[anchor = north west] {w};
+		\draw[thick, ->] (0, 0) -- (0, 6 cm) node[anchor = south east] {e};
+
 		% 画 X 轴和 y 轴的刻度
-		\foreach \v in {1, ..., 4} {
+		\foreach \i/\x/\y in {1/0.5/0.1, 2/1.0/0.2, 3/1.5/0.3, 4/2.0/0.4, 5/2.5/0.5} {
 				% 这里是用一个短短的直线表示刻度的点
-				\draw (\v cm, 2pt) -- (\v cm, -2pt) node[anchor = north] {$\v$};
-				\draw (2pt, \v cm) -- (-2pt, \v cm) node[anchor = east] {$\v$};
+				\draw (\i, 2pt) -- (\i, -2pt) node[anchor = north] {\x};
+				\draw (2pt, \i) -- (-2pt, \i) node[anchor = east] {\y};
 			}
+
 		% 绘制函数在坐标轴上的抛物线
-        \draw[domain = -4 : 4] plot (\x, {0.16 * \x * \x + 0.816});
+        \draw[color=black, smooth, domain=0:6] plot (\x, {(0.16 * (\x / 2)^2 - 0.544 * (\x / 2) + 0.4624) * 10}) node [right] {$0.6w^2 - 0.544w + 0.4624$};
 	\end{tikzpicture}
 \end{center}
 
