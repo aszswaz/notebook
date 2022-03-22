@@ -1,0 +1,27 @@
+% 这个文件是用来定义其他 Latex 文档基本的、通用的样式的
+% 中文文档
+\documentclass{ctexart}
+
+% 使用超链接宏包
+\usepackage{hyperref}
+% 设置纸张的宏包
+\usepackage{geometry}
+% 用于绘图的宏包
+\usepackage{tikz}
+% 用于书写数学公式的宏包
+\usepackage{amsmath}
+
+% 定义纸张大小为 A4，内容所占区域为 95%
+\geometry{a4paper, scale=0.95}
+% 定义超链接样式
+\hypersetup{
+    CJKbookmarks=true, % 支持中文书签
+    colorlinks=true,
+    citecolor=blue,
+    linkcolor=blue,
+    urlcolor=blue,
+    breaklinks=true % 允许链接中的换行
+}
+
+%作者
+\author{aszswaz}
