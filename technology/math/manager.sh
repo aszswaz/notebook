@@ -13,8 +13,8 @@ source ./venv/bin/activate
 [ -e "./requirements.txt" ] && pip install -r "requirements.txt"
 # 生成或更新 requirements.txt 文件
 pip freeze > "requirements.txt"
-# 编译 tex 文件，生成 pdf 文件，并删除编译过程中生成的其他文件
-for item in ./*.tex; do
-    xelatex $item
+
+for item in $(find -name "*.tex"); do
+    xelatex -output-directory "$(dirname $1)" "$1"
 done
-rm -f *.log *.aux *.out
+find ! -path "*/venv/*" -name "*.log" -or -name "*.aux" -or -name "*.out" | xargs rm -rf
