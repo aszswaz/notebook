@@ -1,0 +1,9 @@
+# latex
+*.nav
+*.out
+*.pdf
+*.dvi
+*.snm
+*.toc
+*.vrb
+*.log
