@@ -12,11 +12,40 @@
 \subsection{\href{https://zh.wikipedia.org/wiki/\%E5\%AF\%BC\%E6\%95\%B0}{导数}}
 \textbf{导数}（英语：derivative）是微积分学中的一个概念。函数在某一点的导数是指这个函数在这一点附近的变化率。导数的本质是通过极限的概念对函数进行局部的线性逼近。
 
-导数是函数的局部性质。导数与斜率的概念有关，我们可以求两个端点连成的线段的斜率：
+导数是函数的局部性质。导数实际上是函数的切线的斜率，如图所示：
 
 \begin{center}
 	\begin{tikzpicture}
+		% 画函数抛物线
+		\draw (0, 0) .. controls (1, 1) and (2, 1) .. (3, 0);
+		\draw (3, 0) .. controls (4, -1) and (5, -1) .. (6, 0);
+		% 化函数抛物线的切线
+		\draw[green] (0, 1.38) -- (6, -0.73);
+		\filldraw[black] (2, 0.66) circle (1 pt);
 	\end{tikzpicture}
 \end{center}
+
+实际上这条切线是两个距离非常小的端点，确定的一条直线：
+
+\begin{center}
+	\begin{tikzpicture}
+		% 画函数抛物线，以及抛物线的切线
+		\draw (0, 0) .. controls (1, 1) and (2, 1) .. (3, 0);
+		\draw (3, 0) .. controls (4, -1) and (5, -1) .. (6, 0);
+		\draw[green] (0, 1.38) -- (6, -0.73);
+		\filldraw[black] (2, 0.66) circle (1 pt);
+
+		% 画函数局部放大图
+		\draw (2, 0.66) -- (4, 2);
+		\draw (2, 0.66) -- (4.5, 1);
+		\draw (4, 2) arc (125:485:0.5625);
+        \draw (3.825, 1.8) .. controls (4, 1.8) and (4.75, 1.3) .. (4.80, 1.225);
+        \filldraw[black] (4.1, 1.69) circle (1 pt);
+        \filldraw[black] (4.5, 1.45) circle (1 pt);
+        \draw[green] (3.85, 1.85) -- (4.825, 1.275);
+	\end{tikzpicture}
+\end{center}
+
+两个端点之间的线段，在距离非常小的情况下，也只是近似直线，但是实际上也还是存在一定的弧度。
 
 \end{document}
