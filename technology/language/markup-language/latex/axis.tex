@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,compat=1.9}
+
+\begin{document}
+
+% 2D 平面坐标轴
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = left,
+    xlabel = \(x\),
+    ylabel = {\(f(x)\)},
+]
+\addplot [
+    domain=-10:10,
+    samples=100,
+    color=red,
+]
+{x^2 - 2*x - 1};
+\addlegendentry{\(x^2 - 2x - 1\)}
+\addplot [
+    domain=-10:10,
+    samples=100,
+    color=blue,
+    ]
+    {x^2 + 2*x + 1};
+\addlegendentry{\(x^2 + 2x + 1\)}
+
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
