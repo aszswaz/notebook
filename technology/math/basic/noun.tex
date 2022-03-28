@@ -6,8 +6,12 @@
 \date{2022-03-22}
 
 \begin{document}
-\maketitle
+% 生成标题
+\maketitle\clearpage
+% 生成目录
+\tableofcontents
 
+\clearpage
 % 微积分学名词定义
 \section{微积分学}
 
@@ -67,14 +71,30 @@
 	\end{tikzpicture}
 \end{center}
 
+\textbf{导数的符号}：$f$ 在 $x_0$ 处的导数，记作 $f'(x_0)$、$\frac{\mathrm{d}f}{\mathrm{d}x}$ 或 $\frac{\mathrm{d}f}{\mathrm{d}x}|_{x=x_0}$
+
 \textbf{导数的特性：}
 
-1. 常数函数的导数永远都是 0。
+\begin{enumerate}
+    \item 常数函数的导数永远都是 0。
+    \item 幂函数的导数是把幂放到前面，再把幂减 1：$f'(x^a) = ax^{a-1}$
+\end{enumerate}
 
+\subsection{乘积法则}
+
+\textbf{乘积法则}（英语：Product rule），也称积定则、莱布尼兹法则，是数学中关于两个函数的积的导数的一个计算法则。
+
+若已知两个可导函数 $f'$、$g'$，则他们的积 $fg$ 的导数为：$(fg)' = f'g + fg'$。
+
+\clearpage
 \section{函数}
 
-\subsection{常数函数}
+\subsection{\href{https://zh.wikipedia.org/wiki/\%E5\%B8\%B8\%E6\%95\%B8\%E5\%87\%BD\%E6\%95\%B8}{常数函数}}
 
 \textbf{常数函数}又叫常函数、常值函数，是指值不发生改变的函数。比如，函数 $f(x) = 4$，因为 $f$ 映射任意的值到 4，因此 $f$ 是一个常数。对一个函数：$f: A \rightarrow B$，如果对 $A$ 内所有的 $x$ 和 $y$，都有 $f(x) = f(y)$，那么 $f$ 是一个常数函数。其中 $f(x) = 0$ 是零函数。
+
+\subsection{\href{https://zh.wikipedia.org/wiki/\%E5\%B9\%82\%E5\%87\%BD\%E6\%95\%B0}{幂函数}}
+
+\textbf{幂函数}（英语：Power function）是形如 $f(x) = x^a$ 的函数，$a$ 可以是自然数、有理数，也可以是任意实数或复数。
 
 \end{document}

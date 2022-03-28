@@ -12,17 +12,23 @@
 \usepackage{amsmath}
 % 用户设置字体的宏包
 \usepackage{fontspec}
+% 文档标题宏包
+\usepackage{titling}
+
+% 覆盖 \maketitle 的相关指令，达到首页标题居中的目的
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
 
 % 定义纸张大小为 A4，内容所占区域为 95%
 \geometry{a4paper, scale=0.95}
 % 定义超链接样式
 \hypersetup{
-    CJKbookmarks=true, % 支持中文书签
-    colorlinks=true,
-    citecolor=black,
-    linkcolor=black,
-    urlcolor=black,
-    breaklinks=true % 允许链接中的换行
+	CJKbookmarks=true, % 支持中文书签
+	colorlinks=true,
+	citecolor=black,
+	linkcolor=black,
+	urlcolor=black,
+	breaklinks=true % 允许链接中的换行
 }
 
 % 设置字体
