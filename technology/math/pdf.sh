@@ -8,10 +8,11 @@ cd $(dirname $0)
 ARGS=($@)
 TEX_FILE=$1
 
+# 带有目录的文档需要进行两次编译，大多数文档都是有目录的，所以全部文档都编译两次
 {
     xelatex -output-directory "$(dirname $TEX_FILE)" $TEX_FILE &&
-        echo -e "\033[32mPDF file grenerated successfully.\033[0m" &&
-        command -v okular >>/dev/null && okular "${TEX_FILE%.*}.pdf"
+        xelatex -output-directory "$(dirname $TEX_FILE)" $TEX_FILE &&
+        echo -e "\033[32mPDF file grenerated successfully.\033[0m"
 } || {
     echo -e "\033[31mPDF file generation failed.\033[0m" >&2
 }
