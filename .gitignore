@@ -45,3 +45,8 @@ venv
 *.dvi
 *.pdf
 *.aux
+*.nav
+*.out
+*.snm
+*.toc
+*.tln
