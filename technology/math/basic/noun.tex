@@ -1,4 +1,11 @@
+\documentclass{ctexart}
+
 \input{../style.tex}
+
+% 用于绘图的宏包
+\usepackage{tikz}
+% 用于书写数学公式的宏包
+\usepackage{amsmath}
 
 \usepackage{../latex-packages/axis}
 
@@ -7,11 +14,11 @@
 
 \begin{document}
 % 生成标题
-\maketitle\clearpage
+\maketitle\newpage
 % 生成目录
 \tableofcontents
 
-\clearpage
+\newpage
 % 微积分学名词定义
 \section{微积分学}
 
@@ -105,7 +112,7 @@
 	\item 一元二次函数 $ax^2 + bx + c$ 的导数为：$K = 2aw + b$。
 \end{enumerate}
 
-\clearpage
+\newpage
 \subsection{函数}
 
 \subsubsection{\href{https://zh.wikipedia.org/wiki/\%E5\%B8\%B8\%E6\%95\%B8\%E5\%87\%BD\%E6\%95\%B8}{常数函数}}

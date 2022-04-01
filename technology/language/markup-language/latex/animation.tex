@@ -1,3 +1,27 @@
-\documentclass{ctexart}
+\documentclass{ctexbeamer}
 
-\usepackage{animate}
+\usepackage{tikz}
+% \usepackage{verbatim}
+\usepackage[
+	autoplay,
+	loop
+]{animate}
+
+\begin{document}
+
+\begin{frame}
+	\begin{animateinline}[
+			begin={
+					\begin{tikzpicture}[blue,scale=1,line width=2pt]
+						\useasboundingbox[draw] (0,0)rectangle(4,4);
+					:	},
+						end={\end{tikzpicture}}
+		]{2}
+		\newframe \draw[->](0,0)--(1,1);
+		\newframe \draw[->](0,0)--(2,2);
+		\newframe \draw[->](0,0)--(3,3);
+		\draw[->](0,0)--(4,4);
+	\end{animateinline}
+\end{frame}
+
+\end{document}
