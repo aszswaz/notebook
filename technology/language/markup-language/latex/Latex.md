@@ -38,4 +38,4 @@ latex 需要通过 `\documentclass` 指定需要使用的文档类，latex 标�
 | proc     | 学术论文模板                                                 |
 | slides   | 幻灯片格式的文档类                                           |
 | moderncv | 主要用于个人简历                                             |
-| beamer   | 用于制作幻灯片                                               |
+| beamer   | 用于制作幻灯片，中文版：ctexbeamer                           |
