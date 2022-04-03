@@ -1,36 +1,30 @@
-\documentclass{ctexbeamer}
+\documentclass{ctexart}
 
 \usepackage{tikz}
+% 动画包
+% autoplay: 文档打开时自动播放
+% nomouse: 动画中禁用鼠标控制，默认是开启鼠标控制，鼠标移入动画区域，会有一层框架，双击会暂停动画
 \usepackage[
 	autoplay,
+	nomouse,
 	loop
 ]{animate}
 
-\title{animate 笔记}
-\date{2022-04-02}
-\author{aszswaz}
-\usetheme{CambridgeUS}
-
 \begin{document}
-\maketitle
 
-\section{坐标轴动画}
+The first animation.
 
-这是一段文本坐标轴动画的描述
-
-\begin{frame}
-	\begin{animateinline}[
-			begin={
-					\begin{tikzpicture}[blue,scale=1,line width=2pt]
-						\useasboundingbox[draw] (0,0)rectangle(4,4);
-					:	},
-						end={\end{tikzpicture}}
-		]{2}
-		\newframe \draw[->](0,0)--(1,1);
-		\newframe \draw[->](0,0)--(2,2);
-		\newframe \draw[->](0,0)--(3,3);
-		\draw[->](0,0)--(4,4);
-	\end{animateinline}
-\end{frame}
+\begin{animateinline}[
+		begin={
+				\begin{tikzpicture}[black, scale = 1,line width = 2pt]
+					\useasboundingbox[draw] (0, 0) rectangle(4, 4);
+					:   },
+					end={\end{tikzpicture}}
+	]{2}
+	\newframe \draw[->](0,0)--(1,1);
+	\newframe \draw[->](0,0)--(2,2);
+	\newframe \draw[->](0,0)--(3,3);
+	\newframe \draw[->](0,0)--(4,4);
+\end{animateinline}
 
 \end{document}
