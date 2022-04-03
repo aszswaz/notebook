@@ -480,3 +480,14 @@ $ sudo pacman -S iftop
 $ sudo iftop
 ```
 
+## peek
+
+将屏幕的指定区域录制为 GIF 图像：
+
+```bash
+$ sudo pacman -S peek
+$ peek
+```
+
+
+

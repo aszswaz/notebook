@@ -1,55 +1,28 @@
 # 特殊单词
 
-## leaves
+本文记录一些特殊的、需要注意的单词，特殊性质根据以下规则判断：
 
-**释义**
+1. 与中文用词习惯不符合的，比如 café
+2. 几个单词的组合词，比如 a number of
 
-n. 树叶（名词 leaf 的复数形式）
+## café
 
-v. 委托；离开；留给；遗留（动词 leave 的第三人称单数形式）
-
-用作名词：
-
-```english
-Sand and leaves trapped the water in the stream.
-沙子和叶子堵住了小河的水流。
-They find the body bur beneath a pile of leaves.
-他们在一堆树叶下面发现了那具尸体。
-```
-
-## security
-
-**释义**
-
-n. 安心，安全，安检
-
-例：
-
-```english
-Where is security?
-安检在哪里？
-```
-
-## bought
-
-**释义**
-
-动词：购买（buy的过去式）
-
-```english
-She bought a ticket to Paris.
-她购买了一张去巴黎的票。
-```
-
-名词：牛圈，活结，弯折，弯曲，活口，活套
-
-# café
+**音标**：['kæfeɪ]
 
 **释义**
 
 n. 咖啡店，咖啡馆
 
-<span style="color: red">coffee指的是咖啡或咖啡豆，不是咖啡店，而cafe仅仅指的是咖啡店</span>
+**注意事项**：
 
-<span style="color: green">café 最早来自法语，法语上面的一撇，表示重音，融入英语后保留了法语中的é，很多人现在也会把 café 直接写作 cafe</span>
+1. <span style="color: red">coffee 指的是咖啡或咖啡豆，不是咖啡店，而cafe仅仅指的是咖啡店</span>
 
+2. <span style="color: green">café 最早来自法语，法语上面的一撇，表示重音，融入英语后保留了法语中的é，很多人现在也会把 café 直接写作 cafe</span>
+
+## a number of
+
+**音标**：[ə 'nʌmbə əv]
+
+**释义**：
+
+一些；许多；若干
