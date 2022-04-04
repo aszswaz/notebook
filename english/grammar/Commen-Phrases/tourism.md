@@ -102,10 +102,24 @@ ma'am：夫人
 
 你现在在干什么？
 
-## Zoom in
+## Zoom in.
 
-缩小
+缩小。
 
-## Zoom out
+## Zoom out.
 
-放大
+放大。
+
+## Previous section.
+
+上一节
+
+## May as well be given.
+
+也可以给。
+
+例子：
+
+A frame number \<num\> may as well be given.
+
+也可以给出一个帧号 \<num\>。
