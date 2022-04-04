@@ -2,10 +2,13 @@
 
 \usepackage{tikz}
 % 动画包
-% autoplay: 文档打开时自动播放
-% nomouse: 动画中禁用鼠标控制，默认是开启鼠标控制，鼠标移入动画区域，会有一层框架，双击会暂停动画
+% autoplay：页面打开后开始动画。 还恢复播放先前暂停的动画。
+% autopause：页面关闭时暂停动画，而不是停止并将其倒回到默认帧。
+% nomouse：动画中禁用鼠标控制，默认是开启鼠标控制，鼠标移入动画区域，会有一层框架，双击会暂停动画
+% loop：动画到达终点后立即重新开始。
 \usepackage[
 	autoplay,
+	autopause,
 	nomouse,
 	loop
 ]{animate}
@@ -26,5 +29,22 @@ The first animation.
 	\newframe \draw[->](0,0)--(3,3);
 	\newframe \draw[->](0,0)--(4,4);
 \end{animateinline}
+
+\begin{animateinline}[
+		begin={
+				\begin{tikzpicture}[black, scale = 1,line width = 2pt]
+					\useasboundingbox[draw] (0, 0) rectangle(4, 4);
+					:   },
+					end={\end{tikzpicture}}
+	]{2}
+	\newframe \draw[->](0,0)--(1,1);
+	\newframe \draw[->](0,0)--(2,2);
+	\newframe \draw[->](0,0)--(3,3);
+	\newframe \draw[->](0,0)--(4,4);
+\end{animateinline}
+
+\newpage
+
+新的一页
 
 \end{document}
