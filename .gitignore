@@ -50,3 +50,9 @@ venv
 *.snm
 *.toc
 *.tln
+
+# Compressed file
+*.zip
+*.7z
+*.tar.gz
+*.gz

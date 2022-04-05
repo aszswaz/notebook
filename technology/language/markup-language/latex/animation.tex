@@ -17,34 +17,19 @@
 
 The first animation.
 
+% \begin{animateinline}[begin={...}, end={\end{...}}]{frame rate}
+% begin 和 end 是设置要使用的环境，frame rate 是每秒播放的帧
 \begin{animateinline}[
 		begin={
-				\begin{tikzpicture}[black, scale = 1,line width = 2pt]
-					\useasboundingbox[draw] (0, 0) rectangle(4, 4);
-					:   },
+				\begin{tikzpicture}[black, scale = 1,line width = 1pt]
+					\useasboundingbox[draw, line width = 0] (0, 0) rectangle(4, 4);
+					   },
 					end={\end{tikzpicture}}
-	]{2}
+	]{4}
 	\newframe \draw[->](0,0)--(1,1);
 	\newframe \draw[->](0,0)--(2,2);
 	\newframe \draw[->](0,0)--(3,3);
 	\newframe \draw[->](0,0)--(4,4);
 \end{animateinline}
-
-\begin{animateinline}[
-		begin={
-				\begin{tikzpicture}[black, scale = 1,line width = 2pt]
-					\useasboundingbox[draw] (0, 0) rectangle(4, 4);
-					:   },
-					end={\end{tikzpicture}}
-	]{2}
-	\newframe \draw[->](0,0)--(1,1);
-	\newframe \draw[->](0,0)--(2,2);
-	\newframe \draw[->](0,0)--(3,3);
-	\newframe \draw[->](0,0)--(4,4);
-\end{animateinline}
-
-\newpage
-
-新的一页
 
 \end{document}
