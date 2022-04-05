@@ -1,0 +1,25 @@
+\documentclass{ctexart}
+\usepackage[margin = 0.25in]{geometry}
+\usepackage{pgfplots}
+\pgfplotsset{width = 10cm, compat = 1.9}
+
+\begin{document}
+
+2D 和 3D 坐标轴图形演示
+
+% 2D 坐标轴图形
+\begin{tikzpicture}
+	\begin{axis}
+        \addplot[color = black] {x^2};
+	\end{axis}
+\end{tikzpicture}
+\hskip 5pt
+% 3D 坐标轴图形
+\begin{tikzpicture}
+	\begin{axis}
+		\addplot3[surf]
+		{exp(-x^2-y^2)*x};
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}

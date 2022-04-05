@@ -21,7 +21,7 @@ TEX_FILE=$1
 find ! -ipath "*/venv/*" \
     -name "*.out" -or -name "*.log" -or -name "*.aux" \
     -or -name "*.nav" -or -name "*.snm" -or -name "*.toc" -or -name "*.vrb" \
-    -or -name "*.tln"| xargs rm -rf
+    -or -name "*.tln" -or -name "*.auxlock" -or -name "*.md5" | xargs rm -rf
 
 # 在没有已经存在的 okular 的情况下，才创建一个 okular 实例，因为 okular 会在 pdf 更新时自动加载，但是浏览位置不会改变，这样可以省去每次更新 pdf 文件后，都要手动调整到原来的浏览位置
 if [[ ! $(ps aux) =~ 'okular' ]]; then
