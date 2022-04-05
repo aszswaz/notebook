@@ -27,7 +27,7 @@ def get_beans(counts):
 xs, ys = get_beans(100)
 
 # 设置坐标轴窗口
-plt.title("SIze-Toxicity Function", fontsize=12)
+plt.title("Size-Toxicity Function", fontsize=12)
 plt.xlabel("Bean SIze")
 plt.ylabel("Toxicity")
 

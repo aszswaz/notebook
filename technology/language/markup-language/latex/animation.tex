@@ -19,17 +19,21 @@ The first animation.
 
 % \begin{animateinline}[begin={...}, end={\end{...}}]{frame rate}
 % begin 和 end 是设置要使用的环境，frame rate 是每秒播放的帧
+% \useasboundingbox (0, 0) rectangle(4, 4); 的作用类似画布，指定动画的范围
 \begin{animateinline}[
 		begin={
 				\begin{tikzpicture}[black, scale = 1,line width = 1pt]
-					\useasboundingbox[draw, line width = 0] (0, 0) rectangle(4, 4);
-					   },
+					\useasboundingbox (0, 0) rectangle(4, 4);
+					},
 					end={\end{tikzpicture}}
-	]{4}
-	\newframe \draw[->](0,0)--(1,1);
-	\newframe \draw[->](0,0)--(2,2);
-	\newframe \draw[->](0,0)--(3,3);
-	\newframe \draw[->](0,0)--(4,4);
+	]{2}
+	% \newframe 表示创建新的帧，到再次遇到这个指令之前，所有绘制的推向都是这一帧的内容
+	\newframe;
+	\draw[->] (0, 0) -- (1, 1);
+	\draw[->] (0, 0) -- (1, 0);
+	\newframe \draw[->](0, 0) -- (2, 2);
+	\newframe \draw[->](0, 0) -- (3, 3);
+	\newframe \draw[->](0, 0) -- (4, 4);
 \end{animateinline}
 
 \end{document}

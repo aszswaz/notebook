@@ -50,6 +50,8 @@ venv
 *.snm
 *.toc
 *.tln
+*.auxlock
+*.md5
 
 # Compressed file
 *.zip
