@@ -6,10 +6,10 @@
 
 # 所有文件夹
 
-code-example 代码示例
+[english](english)：英语学习笔记
 
-technology 编译技术的学习笔记
+[journal](journal)：日记
 
-english 英语学习笔记
+[schedule](schedule)：日程表
 
-scripts 脚本工具
+[technology](technology)：编译技术的学习笔记
