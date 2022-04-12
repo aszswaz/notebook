@@ -168,6 +168,52 @@ $ sudo mount -t cifs //192.168.122.3/Users/username public -o user=username,pass
 
 public代表的是作为挂载点的宿主机文件夹
 
+## 主机对虚拟机开启所有端口的访问权限
+
+由于不存在网络安全问题，主机可以对虚拟机开放所有端口的访问权限：
+
+```bash
+# libvirt 就是 qemu/kvm 给虚拟机创建的防火墙区域，virbr0 就是虚拟机的网卡，注意 protocols 字段没有 tcp 和 udp
+$ sudo firewall-cmd --zone=libvirt --list-all
+libvirt (active)
+  target: ACCEPT
+  icmp-block-inversion: no
+  interfaces: virbr0
+  sources: 
+  services: dhcp dhcpv6 dns ssh tftp
+  ports: 
+  protocols: icmp ipv6-icmp
+  forward: no
+  masquerade: no
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules: 
+        rule priority="32767" reject
+# 开放 tcp 和 udp
+$ sudo firewall-cmd --zone=libvirt --add-protocols tcp
+$ sudo firewall-cmd --zone=libvirt --add-protocols udp
+# 查看操作结果
+$ sudo firewall-cmd --zone=libvirt --list-all
+libvirt (active)
+  target: ACCEPT
+  icmp-block-inversion: no
+  interfaces: virbr0
+  sources: 
+  services: dhcp dhcpv6 dns ssh tftp
+  ports: 
+  protocols: icmp ipv6-icmp tcp udp
+  forward: no
+  masquerade: no
+  forward-ports: 
+  source-ports: 
+  icmp-blocks: 
+  rich rules: 
+	rule priority="32767" reject
+```
+
+
+
 <font color="red">注意</font>
 
 1. 如果没有uid参数，挂载后，没有写权限
