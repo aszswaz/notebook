@@ -191,8 +191,9 @@ libvirt (active)
   rich rules: 
         rule priority="32767" reject
 # 开放 tcp 和 udp
-$ sudo firewall-cmd --zone=libvirt --add-protocols tcp
-$ sudo firewall-cmd --zone=libvirt --add-protocols udp
+$ sudo firewall-cmd --zone=libvirt --permanent --add-protocols tcp
+$ sudo firewall-cmd --zone=libvirt --permanent --add-protocols udp
+$ sudo firewall-cmd --reload
 # 查看操作结果
 $ sudo firewall-cmd --zone=libvirt --list-all
 libvirt (active)

@@ -221,7 +221,11 @@ $ go run demo.go
 
 ## 函数
 
-函数方面主要得知道：GO 语言的函数支持多个返回值，示例如下：
+函数方面主要得知道：
+
+**O 语言的函数支持多个返回值，示例如下：**
+
+main.go：
 
 ```go
 package main
@@ -241,6 +245,32 @@ func demo() (string, string) {
 	return "Hello", "Word"
 }
 ```
+
+**函数是属于包的，而不是属于单个文件的，示例如下：**
+
+main.go：
+
+```go
+package main
+
+func main() {
+    DemoFunc()
+}
+```
+
+demo.go：
+
+```go
+package main
+
+func DemoFunc() {
+    println("Hello World")
+}
+```
+
+**函数首字母大写表示这是一个公共函数，可以在其他包中使用，首字母小写表示私有函数，只能在同包下使用。**
+
+**func init() 作用是执行模块的初始化，程序运行过程中，只会执行一次。**
 
 ## 切片
 
@@ -600,3 +630,42 @@ errorMsg is:
     divider: 0
 ```
 
+## 包导入
+
+GO 的包导入机制，相对于 python、java，感觉很奇特。
+
+```bash
+# 首先需要把项目初始化为 go 模块，哪怕这个项目是作为一个完整的应用程序运行也是一样
+# example.com 为 git 服务器域名，比如 github.com
+# username 为 git 服务器的账户名称，如果该项目只是一个完整的应用程序，而不是作为一个框架供其他项目使用，那么就无需在意 username
+# project-name 为项目名称
+# 此外，example.com/username/project-name 也可以是单纯的模块名称，如果不提供库给其他项目使用，那么直接 go mod init modulename 即可
+$ go mod init example.com/username/project-name
+```
+
+然后在项目中创建以下文件：
+
+main.go：
+
+```go
+package main
+
+import "example.com/username/project-name/demo"
+
+func main() {
+    println("main: Hello World")
+    demo.Demo()
+}
+```
+
+demo/demo.go
+
+```go
+package demo
+
+func Demo() {
+    println("demo: Hello World")
+}
+```
+
+因此，现在的 GO 项目，除了还在使用 GOPATH 的老项目以外，都摒弃了 src 作为源文件根目录的方式。作为 Java 开发者有必要入乡随俗。
