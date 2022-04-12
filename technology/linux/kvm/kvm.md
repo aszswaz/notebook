@@ -43,6 +43,8 @@ $ sudo brctl addbr kvm-br
 # 使用 iproute2 配置网桥
 $ sudo ip addr add '192.168.122.1/24' dev kvm-br
 $ sudo ip link set kvm-br up
+# 配置 firewall，开启 NAT 功能
+...
 # 在网桥上启用 DHCP
 $ sudo dnsmasq --interface=kvm-br --bind-interfaces --dhcp-range=127.0.0.2,127.0.0.254
 # 启动虚拟机
@@ -55,6 +57,8 @@ $ sudo qemu-system-x86_64 \
     -enable-kvm \
     ./demo.qcow2
 ```
+
+[配置 firewall 开启 NAT 转发](../conventional/internet.md)
 
 # 常用命令
 
