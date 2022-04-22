@@ -72,3 +72,10 @@ $ sudo setcap cap_net_bind_service=+eip /path/to/application
 # 不再需要使用这个能力，可以使用以下命令来清除。
 $ sudo setcap -r /path/to/application
 ```
+
+## 端口转发
+
+```bash
+$ sudo firewall-cmd --zone=public --add-forward-port='port=8080:proto=tcp:toaddr=192.168.122.234:toport=8080' --permanent
+```
+
