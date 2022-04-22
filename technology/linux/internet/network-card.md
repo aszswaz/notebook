@@ -1,6 +1,4 @@
-# Linux 网络
-
-## 配置网卡
+# 配置网卡
 
 以网卡enp7s0为例：
 
@@ -38,13 +36,13 @@ DNS1="114.114.114.114"
 DNS2="8.8.8.8"
 ```
 
-## 网络共享
+# 网络共享
 
 现有机器A、机器B，能够公司交换机的网线只有一根，机器A有两个网卡：enp7s0、enp9s0，机器B网卡：enp0s20，还有一根自己购买的网线。首先将机器A的enp7s0网卡接入交换机的网线，再将A的enp9s0与B的enp0s20用网线对接，最后是进行两台机器上的网络配置。
 
 配置方案有两种：网络桥接、网络地址转换
 
-### 网络桥接（network bridging）
+## 网络桥接（network bridging）
 
 以下内容摘抄自[维基百科：桥接器](https://zh.wikipedia.org/wiki/%E6%A9%8B%E6%8E%A5%E5%99%A8)
 
@@ -112,7 +110,7 @@ DEVICE=bridge0
 $ sudo systemctl restart NetworkManager
 ```
 
-### 网络地址转换（**N**etwork **A**ddress **T**ranslation）
+## 网络地址转换（**N**etwork **A**ddress **T**ranslation）
 
 缩写：NAT，又称网络掩蔽、IP掩蔽。在[计算机网络](https://zh.wikipedia.org/wiki/計算機網絡)中是一种在IP[数据包](https://zh.wikipedia.org/wiki/封包)通过[路由器](https://zh.wikipedia.org/wiki/路由器)或[防火墙](https://zh.wikipedia.org/wiki/防火墙)时重写来源[IP地址](https://zh.wikipedia.org/wiki/IP地址)或目的IP地址的技术。这种技术被普遍使用在有多台主机但只通过一个公有IP地址访问[互联网](https://zh.wikipedia.org/wiki/網際網路)的[私有网络](https://zh.wikipedia.org/wiki/私有网络)中。它是一个方便且得到了广泛应用的技术。当然，NAT也让主机之间的通信变得复杂，导致了通信效率的降低。
 
@@ -229,73 +227,3 @@ $ sudo firewall-cmd --reload
 2. 操作firewalld进行NAT转发，需要关闭SELinux的时候，建议临时关闭就行，因为Docker运行容器需要用到SELinux，如果永久关闭SELinux，会直接导致docker无法启动容器
 2. 本示例中 enp7s0 是网络出口网卡，它的规则区域需要慎重选择，这直接影响到外来流量是否可以访问本机的特定端口，我一般把端口的开放规则配置在 public 区域，所以我把 enp7s0 网卡添加到 public 。
 
-## firewalld 防火墙
-
-### 开放一个TCP端口
-
-准备工作：
-
-```bash
-# 查看防火墙规则
-$ firewall-cmd --get-zones
-block dmz drop external home internal public trusted work
-# 查看当前防火墙启用的规则
-$ firewall-cmd --get-default-zone
-public
-```
-
-配置规则，开放端口，主要有两种方式，第一种：
-
-```bash
-# 在public规则中添加开放的端口
-$ sudo firewall-cmd --zone=public --add-port=10808/tcp
-# 目前的配置属于运行时配置，防火墙重启就会无效，需要进行持久化
-$ sudo firewall-cmd --runtime-to-permanent
-```
-
-第二种：
-
-```bash
-# 不同于第一种，这是创建一个永久配置，但是还没有被防火墙应用
-$ sudo firewall-cmd --permanent --zone=public --add-port=10809/tcp
-# 应用配置
-$ sudo firewall-cmd --reload
-```
-
-### 打印规则中的端口
-
-```bash
-$ sudo firewall-cmd --zone=public --list-port
-```
-
-### IP封禁
-
-指定IP，指定端口的规则：
-
-```bash
-# 客户端IP允许访问某个端口
-$ sudo firewall-cmd --permanent --add-rich-rule="rule family=ipv4 source address=127.0.0.1 port port=80 protocol=tcp accept" && sudo firewall-cmd --reload
-# 客户端IP禁止访问某个端口
-$ sudo firewall-cmd --permanent --add-rich-rule="rule family=ipv4 source address=127.0.0.1 port port=80 protocol=tcp reject" && sudo firewall-cmd --reload
-# 删除指定的访问规则
-$ sudo firewall-cmd --permanent --remove-rich-rule="rule family=ipv4 source address=127.0.0.1 port port=80 protocol=tcp accept" && sudo firewall-cmd --reload
-# 删除指定的封禁规则
-$ sudo firewall-cmd --permanent --remove-rich-rule="rule family=ipv4 source address=127.0.0.1 port port=80 protocol=tcp reject" && sudo firewall-cmd --reload
-```
-
-上述操作中 address 为IP，protocol 是协议：tcp、udp，accept 接受访问，reject 是拒绝访问。
-
-## 打开1024以下的端口
-
-1024以下的端口，在linux系统中，普通用户运行的程序是不能使用的，解决办法如下：
-
-1. 程序以root用户运行
-
-2. 给程序打开端口的权限
-
-    ```bash
-    # 给指定程序设置 CAP_NET_BIND_SERVICE 能力
-    $ sudo setcap cap_net_bind_service=+eip /path/to/application
-    # 不再需要使用这个能力，可以使用以下命令来清除。
-    $ sudo setcap -r /path/to/application
-    ```
