@@ -1,8 +1,8 @@
-### 在两台机器间，使用git同步代码
+# 在两台机器间，使用git同步代码
 
 机器A: windows系统（使用git bash进行操作，代码源，代码在该机器上编辑）       机器B：centos7（测试机，只需要拉取代码并编译运行）
 
-### 第一种方式
+## 第一种方式
 
 1.  B: 创建demo文件夹
 
@@ -41,7 +41,7 @@
 
 <span style="color: red">如果想要实现机器B从机器A clone代码，机器A首先得安装ssh server才可，windows系统不自带ssh server，无法使用ssh连接到windows的机器。该种方式只能clone或者pull代码，不能在机器A上进行push操作，因为git不知道机器B是否也进行了commit</span>
 
-### 第二种方式
+## 第二种方式
 
 1.  B: 创建demo文件夹
 
@@ -143,7 +143,7 @@
     Hello World Sever
     ```
 
-### 方式三
+## 方式三
 
 1.  机器A：开启git的服务端模式，监听默认端口9418
 
@@ -152,7 +152,7 @@
     # 如果需要在后台运行，可以使用git bash的nohup
     $ nohup git daemon --export-all --base-path=projectPath > /dev/null 2>&1 &
     # 开启write权限, 最后一个projectPath作用是告诉git在哪里寻找项目
-    $ git daemon --base-path=projectPath --export-all --enable=receive-pack --reuseaddr --informative-errors —verbose projectPath
+    $ git daemon --base-path=${projectPath} --export-all --enable=receive-pack --reuseaddr --informative-errors —-verbose ${projectPath}
     ```
 
 2.  机器B: 直接clone代码即可
@@ -162,3 +162,24 @@
     ```
 
 <span style="color: red">如果需要允许机器B可以进行push操作，需要在机器A的启动参数添加：--enable=receive-pack</span>
+
+### 将 git daemon 注册为服务
+
+#### Windows10
+
+git daemon 不符合 Windows 的服务规范，需要借助 [winsw](https://github.com/winsw/winsw) 包装为服务：
+
+git-daemon.xml：
+
+```xml
+<service>
+  <id>git-daemon</id>
+  <name>git-daemon</name>
+  <description>Simple git server.</description>
+  <!--<env name="DEMO" value="DEMO"/>-->
+  <executable>C:\Program Files\Git\cmd\git</executable>
+  <arguments>daemon --base-path=${projectPath} --export-all --enable=receive-pack --reuseaddr --informative-errors —-verbose ${projectPath}</arguments>
+  <log mode="roll"/>
+</service>
+```
+
