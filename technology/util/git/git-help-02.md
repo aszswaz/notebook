@@ -1,3 +1,5 @@
+# Git
+
 ## git mode change
 
 git 在记录文件的同时，也会记录文件的可执行权限。
@@ -55,7 +57,7 @@ $ git config --global core.fileMode
 
 <span style="color: red">如果无效，可能是仓库本身的 git config 覆盖了 git config --global</span>
 
-## 配置翻墙代理
+## 配置代理
 
 由于国内访问github很慢，需要对github进行翻墙，首先是配置http/https代理
 
