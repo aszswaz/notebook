@@ -292,7 +292,7 @@ static int decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame, FILE *
             av_perr(data_size);
             return EXIT_FAILURE;
         }
-        // 写出每个音频样本数据中，每个通道的数据
+        // 写出每个音频通道中，每个样本的数据，音频通道通常是两个，分别为左声道和右声道，也可能是一个单声道
         for (i = 0; i < frame->nb_samples; i++) {
             for (j = 0; j < dec_ctx->channels; j++) {
                 fwrite(frame->data[j] + data_size * i, 1, data_size, outfile);
