@@ -2,23 +2,19 @@
 
 一款开源的图像处理工具
 
+## 常用命令
+
+```bash
+# 播放 pcm 文件
+# -ar 音频（视频）帧率
+# -f 音频（视频）格式
+$ ffplay -ar 48000 -channels 2 -f s16le -i demo.pcm
 # 把pcm转换为mp3文件
-
-```bash
+# -acodec 解码器
 $ ffmpeg -y -f s16be -ac 2 -ar 41000 -acodec pcm_s16le -i demo.pcm demo.mp3
-```
-
-<span style="color: green">41000是音频的码率， pcm_s16le是pcm解码器</span>
-
-## 把wav文件转换为mp3文件
-
-```bash
-ffmpeg -i input.wav -f mp3 -acodec libmp3lame -y output.mp3
-```
-
-## m4a音频文件转换为AAC音频文件
-
-```bash
+# 把wav文件转换为mp3文件
+$ ffmpeg -i input.wav -f mp3 -acodec libmp3lame -y output.mp3
+# m4a音频文件转换为AAC音频文件
 $ ffmpeg -i example.m4a -acodec copy example.aac
 ```
 
