@@ -9,6 +9,10 @@
 # -ar 音频（视频）帧率
 # -f 音频（视频）格式
 $ ffplay -ar 48000 -channels 2 -f s16le -i demo.pcm
+# 从 mp4 中抽取音频
+# -vn 是丢弃视频内容
+# -acodec 是复制音频流
+$ ffmpeg -i demo.mp4 -vn -y -acodec copy demo.m4a
 # 把pcm转换为mp3文件
 # -acodec 解码器
 $ ffmpeg -y -f s16be -ac 2 -ar 41000 -acodec pcm_s16le -i demo.pcm demo.mp3

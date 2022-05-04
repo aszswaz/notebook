@@ -142,8 +142,6 @@ $ hexdump -C -n 512 example.bin
 $ sudo pacman -S typora
 ```
 
-原本的编辑器宽度太小，需要增加编辑器宽度。解压 files文件夹下的 [typora.tar.gz](../../files/typora.tar.gz)，把 themes 覆盖到 $HOME/.config/Typora/themes/，把 base-control.css 复制到 /usr/share/typora/resources/style。
-
 ## gawk，awk
 
 awk是一个模式扫描及处理语言。

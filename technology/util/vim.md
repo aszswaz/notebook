@@ -10,13 +10,13 @@
 
 一款基于 vimscript 的插件管理器，vim-plug 相比于 vunble，它支持异步安装插件，所以建议优先使用它。官方推荐在 neovim 中使用。
 
-github: [https://github.com/junegunn/vim-plug](https://github.com/junegunn/vim-plug)
+[github](https://github.com/junegunn/vim-plug)
 
 ### vundle
 
 这也是一款基于 vimscript 的插件管理器，但是它比较老旧，不过有些插件仍然只支持通过它进行安装。
 
-github: [https://github.com/VundleVim/Vundle.vim](https://github.com/VundleVim/Vundle.vim)
+[github](https://github.com/VundleVim/Vundle.vim)
 
 ## 常用指令
 
@@ -44,14 +44,16 @@ vim 的 tags 功能可以加载函数索引文件，为 C++/C 项目的函数跳
 ```bash
 # 需要使用 ctags 生成函数索引文件
 $ sudo pacman -S ctags
-# 递归扫描 src 文件夹中的所有文件，比如 .cpp 文件，或者 .c 文件
-$ ctags -R ./src
+# 扫描指定的文件夹或文件中的头文件，生成所有的函数、枚举、类等引用标签
+$ ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extras=+q \
+	/usr/include/c++ \
+	./src
 ```
 
 ctags 会在当前目录生成一个 tags 文件，在 vim 当中进行加载就行：
 
 ```vimscript
-:tags ./tags
+:set tags+=./tags
 ```
 
 在 vim 当中，使用 `Ctrl + ]` 快捷键就可以跳转到函数当中，`Ctrl + T` 跳转到原来的位置。
