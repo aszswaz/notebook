@@ -329,3 +329,202 @@ static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat samp
 }
 ```
 
+## 音频重采样
+
+```c++
+#include <iostream>
+
+extern "C" {
+#include <libavutil/opt.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/samplefmt.h>
+#include <libswresample/swresample.h>
+}
+
+// 设置音频音效为立体音效（双声道）
+#define SRC_CH_LAYOUT AV_CH_LAYOUT_STEREO
+#define DST_CH_LAYOUT AV_CH_LAYOUT_STEREO
+// 速率
+#define SRC_RATE 48000
+#define DST_RATE 44100
+// 采样率
+#define SRC_NB_SAMPLES 1024
+// 采样格式
+#define SRC_SAMPLE_FMT AV_SAMPLE_FMT_DBL
+#define DST_SAMPLE_FMT AV_SAMPLE_FMT_S16
+
+// 文件
+#define DST_FILE "/dev/shm/demo.pcm"
+
+/**
+ * 从 t 开始填充 dst 缓冲区
+ */
+static void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate, double *t);
+
+/**
+ * 检查采样格式是否支持打印
+ */
+static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat sample_fmt);
+
+int main(int argc, char **argv) {
+    // 数据缓存
+    uint8_t **src_data = nullptr, **dst_data = nullptr;
+    // 根据音效，获取音频声道数
+    int src_nb_channels = av_get_channel_layout_nb_channels(SRC_CH_LAYOUT);
+    int dst_nb_channels = av_get_channel_layout_nb_channels(DST_CH_LAYOUT);
+    // 数据缓存长度
+    int src_linesize = 0, dst_linesize = 0;
+    // 采样率
+    int dst_nb_samples = 0, max_dst_nb_samples = 0;
+    // 输出文件
+    FILE *dst_file = nullptr;
+    int dst_bufsize = 0;
+    // 采样器
+    SwrContext *swr_ctx = nullptr;
+
+    char buf[64];
+    double t;
+    int ret = 0;
+    // 目标采样格式信息
+    const char *fmt;
+
+    dst_file = fopen(DST_FILE, "wb");
+    if (!dst_file) {
+        perror(DST_FILE);
+        goto FINALLY;
+    }
+    // 创建俺重采样器
+    swr_ctx = swr_alloc();
+    if (!swr_ctx) {
+        ret = AVERROR(ENOMEM);
+        goto FINALLY;
+    }
+    // 设置输入流选项
+    ret = av_opt_set_channel_layout((void *)swr_ctx, "in_channel_layout", SRC_CH_LAYOUT, 0);
+    if (ret < 0) goto FINALLY;
+    ret = av_opt_set_int((void *)swr_ctx, "in_sample_rate", SRC_RATE, 0);
+    if (ret < 0) goto FINALLY;
+    ret = av_opt_set_sample_fmt((void *)swr_ctx, "in_sample_fmt", SRC_SAMPLE_FMT, 0);
+    if (ret < 0) goto FINALLY;
+
+    // 设置输出流选项
+    ret = av_opt_set_channel_layout((void *)swr_ctx, "out_channel_layout", DST_CH_LAYOUT, 0);
+    if (ret < 0) goto FINALLY;
+    ret = av_opt_set_int((void *) swr_ctx, "out_sample_rate", DST_RATE, 0);
+    if (ret < 0) goto FINALLY;
+    ret = av_opt_set_sample_fmt((void *) swr_ctx, "out_sample_fmt", DST_SAMPLE_FMT, 0);
+    if (ret < 0) goto FINALLY;
+
+    ret = swr_init(swr_ctx);
+    if (ret < 0) goto FINALLY;
+
+    // 分配输入源的样本缓冲区
+    ret = av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels, SRC_NB_SAMPLES, SRC_SAMPLE_FMT, 0);
+    if (ret < 0) goto FINALLY;
+
+    // 计算目标采样数
+    max_dst_nb_samples = dst_nb_samples = av_rescale_rnd(SRC_NB_SAMPLES, DST_RATE, SRC_RATE, AV_ROUND_UP);
+    // 分配目标样本缓冲区
+    ret = av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels, dst_nb_samples, DST_SAMPLE_FMT, 0);
+    if (ret < 0) goto FINALLY;
+
+    t = 0;
+    do {
+        // 合成音频
+        fill_samples((double *) src_data[0], SRC_NB_SAMPLES, src_nb_channels, SRC_RATE, &t);
+        // 计算目标样本数量
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(swr_ctx, SRC_RATE) + src_nb_channels, DST_RATE, SRC_RATE, AV_ROUND_UP);
+        // 重新获取目标采样缓冲区，避免内存溢出
+        if (dst_nb_samples > max_dst_nb_samples) {
+            av_freep(&dst_data[0]);
+            ret = av_samples_alloc(dst_data, &dst_linesize, dst_nb_channels, dst_nb_samples, DST_SAMPLE_FMT, 1);
+            if (ret < 0) break;
+            max_dst_nb_samples = dst_nb_samples;
+        }
+        // 转换为目标格式
+        ret = swr_convert(swr_ctx, dst_data, dst_nb_samples, (const uint8_t **) src_data, SRC_NB_SAMPLES);
+        if (ret < 0) goto FINALLY;
+        dst_bufsize = av_samples_get_buffer_size(&dst_linesize, dst_nb_channels, ret, DST_SAMPLE_FMT, 1);
+        if (dst_bufsize < 0) {
+            ret = dst_bufsize;
+            goto FINALLY;
+        }
+        printf("t:%f in:%d out:%d\n", t, SRC_NB_SAMPLES, ret);
+        fwrite((const void *)dst_data[0], 1, dst_bufsize, dst_file);
+    } while (t < 10);
+
+    ret = get_format_from_sample_fmt(&fmt, DST_SAMPLE_FMT);
+    if (ret < 0) goto FINALLY;
+    // 打印采样信息
+    av_get_channel_layout_string(buf, sizeof(buf), dst_nb_channels, DST_CH_LAYOUT);
+    fprintf(stderr, "Resampling succeeded. Play the output file with the command:\n"
+            "ffplay -f %s -channel_layout %s -channels %d -ar %d %s\n",
+            fmt, buf, dst_nb_channels, DST_RATE, DST_FILE);
+
+FINALLY:
+    if (dst_file) fclose(dst_file);
+    if (src_data) {
+        av_freep(&src_data[0]);
+        av_freep(&src_data);
+    }
+    if (dst_data) {
+        av_freep(&dst_data[0]);
+        av_freep(&dst_data);
+    }
+    if (swr_ctx) swr_free(&swr_ctx);
+
+    if (ret < 0) {
+        char av_err_buf[AV_ERROR_MAX_STRING_SIZE];
+        av_strerror(ret, (char *)&av_err_buf, AV_ERROR_MAX_STRING_SIZE);
+        fprintf(stderr, "\033[91m%s\033[0m\n", av_err_buf);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static void fill_samples(double *dst, int nb_samples, int nb_channels, int sample_rate, double *t) {
+    int i, j;
+    double tincr = 1.0 / sample_rate, *dstp = dst;
+    const double c = 2 * M_PI * 440.0;
+
+    // 生成频率为 440 Hz 的正弦音
+    for (i = 0; i < nb_samples; i++) {
+        // 声音数据设置为正弦音
+        dstp[0] = sin(c * *t);
+        // 将所有声道都设置为一个音
+        for (j = 1; j < nb_channels; j++) dstp[j] = dstp[0];
+        dstp += nb_channels;
+        *t += tincr;
+    }
+}
+
+static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat sample_fmt) {
+    uint64_t i;
+    struct sample_fmt_entry {
+        enum AVSampleFormat sample_fmt;
+        const char *fmt_be, *fmt_le;
+    } sample_fmt_entries[] = {
+        { AV_SAMPLE_FMT_U8,  "u8",    "u8"    },
+        { AV_SAMPLE_FMT_S16, "s16be", "s16le" },
+        { AV_SAMPLE_FMT_S32, "s32be", "s32le" },
+        { AV_SAMPLE_FMT_FLT, "f32be", "f32le" },
+        { AV_SAMPLE_FMT_DBL, "f64be", "f64le" },
+    };
+    *fmt = nullptr;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(sample_fmt_entries); i++) {
+        struct sample_fmt_entry *entry = &sample_fmt_entries[i];
+        if (sample_fmt == entry->sample_fmt) {
+            *fmt = AV_NE(entry->fmt_be, entry->fmt_le);
+            return 0;
+        }
+    }
+
+    fprintf(stderr,
+            "Sample format %s not supported as output format\n",
+            av_get_sample_fmt_name(sample_fmt));
+    return AVERROR(EINVAL);
+}
+```
+
