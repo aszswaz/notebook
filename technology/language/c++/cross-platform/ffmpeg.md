@@ -344,10 +344,10 @@ extern "C" {
 // 设置音频音效为立体音效（双声道）
 #define SRC_CH_LAYOUT AV_CH_LAYOUT_STEREO
 #define DST_CH_LAYOUT AV_CH_LAYOUT_STEREO
-// 速率
+// 采样率，每秒采样 N 次
 #define SRC_RATE 48000
 #define DST_RATE 44100
-// 采样率
+// 单次采样（生成）的样本总数
 #define SRC_NB_SAMPLES 1024
 // 采样格式
 #define SRC_SAMPLE_FMT AV_SAMPLE_FMT_DBL
@@ -374,12 +374,12 @@ int main(int argc, char **argv) {
     int dst_nb_channels = av_get_channel_layout_nb_channels(DST_CH_LAYOUT);
     // 数据缓存长度
     int src_linesize = 0, dst_linesize = 0;
-    // 采样率
+    // 目标音频采样率
     int dst_nb_samples = 0, max_dst_nb_samples = 0;
     // 输出文件
     FILE *dst_file = nullptr;
     int dst_bufsize = 0;
-    // 采样器
+    // 重采样器
     SwrContext *swr_ctx = nullptr;
 
     char buf[64];
