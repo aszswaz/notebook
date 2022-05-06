@@ -36,7 +36,7 @@ $ git push --set-upstream origin ${branchname}
 # 显示本地分支与远程分支的关联关系
 $ git branch -vv
 # 刷新远程分支列表
-$ git remote update origin --prune
+$ git remote update --prune
 # 从别的分支检出指定的文件
 $ git checkout ${branchname} -- ${filename}
 ```
