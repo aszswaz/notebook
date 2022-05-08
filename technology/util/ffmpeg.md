@@ -54,7 +54,8 @@ Input #0, mp3, from '兄弟抱一下.mp3':
 修复IDV3：
 
 ```bash
-$ ffmpeg -i 兄弟抱一下.mp3 -metadata title="兄弟抱一下" -metadata album="兄弟抱一下" -metadata genre="怀旧" -metadata artist="庞龙" 兄弟抱一下-backup.mp3
+# 由于输入文件是 MP3，输出文件也是 MP3，设置 -acodec copy 可以跳过编码和解码步骤
+$ ffmpeg -i 兄弟抱一下.mp3 -metadata title="兄弟抱一下" -metadata album="兄弟抱一下" -metadata genre="怀旧" -metadata artist="庞龙" -acodec copy 兄弟抱一下-backup.mp3
 ...
 # 查看修改后的文件
 $ ffprobe 兄弟抱一下-backup.mp3
