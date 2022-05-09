@@ -39,6 +39,10 @@ whatis [var]
 ptype [var]
 # 查看变量声明位置
 info variables [var]
+# 追踪变量，每执行一步都会打印变量
+display [var]
+# [number] 是当前正在追踪变量的序号，序号可以通过 info display 查看
+undisplay [number]
 ```
 
 ## 导出字符串到文件
