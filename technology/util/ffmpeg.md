@@ -11,15 +11,17 @@
 $ ffplay -ar 48000 -channels 2 -f s16le -i demo.pcm
 # 从 mp4 中抽取音频
 # -vn 是丢弃视频内容
-# -acodec 是复制音频流
+# -acodec copy 是复制音频流
 $ ffmpeg -i demo.mp4 -vn -y -acodec copy demo.m4a
 # 把pcm转换为mp3文件
-# -acodec 解码器
+# -acodec 编解码器
 $ ffmpeg -y -f s16be -ac 2 -ar 41000 -acodec pcm_s16le -i demo.pcm demo.mp3
 # 把wav文件转换为mp3文件
 $ ffmpeg -i input.wav -f mp3 -acodec libmp3lame -y output.mp3
 # m4a音频文件转换为AAC音频文件
 $ ffmpeg -i example.m4a -acodec copy example.aac
+# 添加自定义标签
+$ ffmpeg -i demo.m4a -movflags use_metadata_tags -metdata tag="Hello World" output.m4a
 ```
 
 # 针对mp3的歌曲信息（IDV3 tag）进行修复
