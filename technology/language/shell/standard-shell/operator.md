@@ -271,8 +271,8 @@ fi
 
 | 运算符 | 说明 | 举例 |
 |-----------|--------|--------|
-| && | 逻辑的 AND | [[ $a -lt 100 && $b -gt 100 ]] 返回 false|
-| \|\| | 逻辑的 OR | [[ $a -lt 100 \|\|$b -gt 100 ]]返回 true |
+| && | 逻辑的 AND | [[  a -lt 100 && b -gt 100 ]] 返回 false |
+| \|\| | 逻辑的 OR | [[ a -lt 100 \|\| b -gt 100 ]]返回 true |
 
 逻辑运算符实例如下：
 
@@ -465,3 +465,56 @@ fi
 文件不为空
 文件存在
 ```
+
+## 三元运算符
+
+```shell
+# 简单语句
+[[ a < 0 ]] && echo "a < 0"
+# 文件测试
+-e demo.txt && echo "file demo.txt exists" || echo "The file demo.txt does not exist"
+# 配合块语句
+[[ a < 0 ]] && { echo "a < 0" && echo "true" }
+```
+
+# 字符串运算符
+
+## 删除指定字符
+
+```shell
+demo="demo.tar.gz"
+# 从左往右算，删除第一个“.”及其前边的字符串，结果是 tar.gz
+echo ${demo#*.}
+# 从左往右算，删除最后一个“.”及其前边的字符串，结果是 gz
+echo ${demo##*.}
+# 从右往左算，删除第一个“.”及其前面的字符串，结果是 demo.tar
+echo ${demo%.*}
+# 从右往左算，删除最后一个“.”及其前面的字符串，结果是 demo
+echo ${demo%%.*}
+```
+
+以上操作一般用于提取文件名，比如文件名是数字，需要改为“第N集”的形式，也就是去除文件后缀名：
+
+```shell
+for file in *.mp4; do
+	mv $file "XXX-第${file%.*}集.mp4"
+done
+```
+
+## 截取字符串
+
+```shell
+demo="Hello World"
+echo "${demo:0:5}"
+```
+
+## 替换字符串
+
+```shell
+demo="Hello World"
+# 通过正则表达式替换，这种正则表达式不支持正则表达式的拓展部分，比如\w、\s都是不支持的
+echo "${demo/[a-zA-Z]/a}"
+# “//”与“/”的不同之处在于，“/”只能匹配一次，“//”是全文匹配
+echo "${demo//[a-zA-Z]/a}"
+```
+
