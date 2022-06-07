@@ -11,10 +11,14 @@ curses 是一个[程序库](https://zh.wikipedia.org/wiki/库_(计算机))，它
 ```c
 #include <curses.h>
 #include <stdlib.h>
+#include <locale.h>
 
 int main() {
     // TUI 窗口句柄
     WINDOW *win = NULL;
+
+    // 设置窗口支持中文
+    setlocale(LC_ALL, "zh_CN.UTF-8");
 
     // 初始化窗口
     win = initscr();
@@ -22,7 +26,7 @@ int main() {
     noecho();
 
     // 添加文本
-    addstr("Hello World\n");
+    addstr("你好！世界！\n");
     // 在指定位置添加文本
     mvaddstr(1, 0, "Hello World\n");
     // 在指定的窗口添加文本
