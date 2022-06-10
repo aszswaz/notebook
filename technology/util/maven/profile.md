@@ -112,7 +112,7 @@
 $ mvn clean package -Dmaven.test.skip=true
 ```
 
-<span style="background-color: yellow">`<activeByDefault>true</activeByDefault>`配置的哪一个环境作为默认, 就是用哪一个</span>
+`<activeByDefault>true</activeByDefault>`配置的哪一个环境作为默认, 就是用哪一个
 
 **指定项目环境**
 
