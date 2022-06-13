@@ -8,7 +8,7 @@ built with gcc 11.2.0 (GCC)
 configuration: --prefix=/usr --disable-debug --disable-static --disable-stripping --enable-amf --enable-avisynth --enable-cuda-llvm --enable-lto --enable-fontconfig --enable-gmp --enable-gnutls --enable-gpl --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libdav1d --enable-libdrm --enable-libfreetype --enable-libfribidi --enable-libgsm --enable-libiec61883 --enable-libjack --enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore_amrnb --enable-libopencore_amrwb --enable-libopenjpeg --enable-libopus --enable-libpulse --enable-librav1e --enable-librsvg --enable-libsoxr --enable-libspeex --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libtheora --enable-libv4l2 --enable-libvidstab --enable-libvmaf --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxcb --enable-libxml2 --enable-libxvid --enable-libzimg --enable-nvdec --enable-nvenc --enable-shared --enable-version3
 libavutil      57. 17.100 / 57. 17.100
 libavcodec     59. 18.100 / 59. 18.100
-libavformat    59. 16.100 / 59. 16.100
+libavformat    59. 16.100 / 59. 16.1001
 libavdevice    59.  4.100 / 59.  4.100
 libavfilter     8. 24.100 /  8. 24.100
 libswscale      6.  4.100 /  6.  4.100
@@ -18,7 +18,7 @@ libpostproc    56.  3.100 / 56.  3.100
 
 
 
-## 编译并启动程序
+# 编译并启动程序
 
 首先从 [ffmpeg官网](https://ffmpeg.org/download.html) 下载源码，然后开始编译
 
@@ -36,13 +36,30 @@ set args -i ./demo.m4a -i ./demo.mp4 -codec copy -y /dev/shm/out.mp4
 # 开始调试程序...
 ```
 
-## main 函数中的主要调用
+# ffmpeg 源码中多次出现的变量
 
-第 4875 行 `ffmpeg_parse_options` 函数：
+```c
+// ffmpeg 的函数执行状态码，ret < 0 就表示该函数执行失败
+int ret;
+```
 
-解析传入参数、打开所有的输入文件、解析输入文件媒体信息、打开输出文件、初始化输出文件信息
 
-第 4897 行 `transcode` 函数：
 
-开始媒体流转换，这里是将音频文件和视频文件整合，并且由于制定了 `-codec copy` 所以不会对媒体流进行编解码，而是直接复制
+# ffmpeg 的执行步骤和源码的对应位置
+
+## 解析 argv 并打开所有 input 和 output
+
+文件：fftools/ffmpeg.c，函数：main，第 4874 行：
+
+```c
+ffmpeg_parse_options(argc, argv);
+```
+
+### 打开所有输入文件
+
+文件：fftools/ffmpeg_opt.c，函数：ffmpeg_parse_options，第 3463 行：
+
+```c
+ret = open_files(&octx.groups[GROUP_INFILE], "input", open_input_file);
+```
 
