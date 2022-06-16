@@ -39,6 +39,8 @@ $ git branch -vv
 $ git remote update --prune
 # 从别的分支检出指定的文件
 $ git checkout ${branchname} -- ${filename}
+# 重新检出当前分支，并丢弃所有没有提交的操作
+$ git checkout .
 ```
 
 ## 分支合并前, 检查是否存在合并冲突
