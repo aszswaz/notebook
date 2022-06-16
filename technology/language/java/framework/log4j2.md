@@ -9,7 +9,7 @@
     <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j-impl</artifactId>
-        <version>2.17.0</version>
+        <version>2.17.2</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
     <dependency>
