@@ -373,7 +373,7 @@ $ peek
 
 ## adb
 
-通过 ADB 安装 XAPK 和 APK
+通过 ADB 安装 XAPK 和 APK，Google Play 上的应用 APK 可在 [apkure](https://apkpure.com/) 上面找到
 
 ```bash
 # 首先解压 XAPK 文件
