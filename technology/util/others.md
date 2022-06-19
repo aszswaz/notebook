@@ -371,5 +371,21 @@ $ sudo pacman -S peek
 $ peek
 ```
 
+## adb
 
+通过 ADB 安装 XAPK 和 APK
+
+```bash
+# 首先解压 XAPK 文件
+$ unzip example.xapk
+# 通过 adb 将解压得到的 APK 文件安装到手机
+$ adb install-multiple *.apk
+# 如果同时链接多个设备，先查看设备信息
+$ adb devices -l
+List of devices attached
+XXXXXXXXXXXXXXXX       device usb:1-1.1 product:DEVICE02 model:DEVICE02 device:DEVICE transport_id:2
+XXXXXXXXXXXXXXXX       device usb:1-1.2 product:DEVICE01 model:DEVICE01 device:DEVICE transport_id:1
+# 假设将软件安装到 DEVICE02，需要指定设备的 transport_id
+$ adb -t 2 install-multiple *.apk
+```
 
