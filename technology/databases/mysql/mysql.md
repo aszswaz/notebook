@@ -1,5 +1,29 @@
 # mysql
 
+## 安装
+
+archlinux：
+
+```bash
+# linux 的各大软件仓库基本都不直接在提供 mysql 的软件包，在 archlinux 需要通过 aur 进行安装
+$ git clone https://aur.archlinux.org/mysql.git && cd mysql
+# 编译 mysql 的时间有些久，半小时到一小时左右，编译完成后 makepkg 会自动执行安装
+$ makepkg -s -i --noconfirm
+# 创建 mysql 保存数据的文件夹，注意权限问题，如果权限不对，无法启动 mysql
+$ sudo mkdir /var/lib/mysql && sudo chown mysql:mysql /var/lib/mysql && sudo chmod u+rwx /var/lib/mysql
+# 使用 mysql 账户初始化数据库
+$ sudo -u mysql mysqld --initialize
+2022-06-27T06:29:34.354665Z 0 [Warning] [MY-010915] [Server] 'NO_ZERO_DATE', 'NO_ZERO_IN_DATE' and 'ERROR_FOR_DIVISION_BY_ZERO' sql modes should be used with strict mode. They will be merged with strict mode in a future release.
+2022-06-27T06:29:34.354712Z 0 [System] [MY-013169] [Server] /usr/bin/mysqld (mysqld 8.0.29) initializing of server in progress as process 55058
+2022-06-27T06:29:34.363909Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2022-06-27T06:29:35.267628Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2022-06-27T06:29:36.811173Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: W(<gqee,p58i
+# 上面输出的 log 中，“root@localhost: W(<gqee,p58i” 就表示 root 账户的初始密码为“W(<gqee,p58i”，登陆 mysql 修改密码
+$ mysql -u root '-pW(<gqee,p58i'
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+mysql> exit
+```
+
 ## 对于重复数据的处理
 
 ### 不存在则插入，存在则更新
