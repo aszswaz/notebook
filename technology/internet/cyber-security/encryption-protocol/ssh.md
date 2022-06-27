@@ -12,7 +12,7 @@
 # 生成rsa的公钥和私钥
 $ ssh-keygen
 # 把 ${HOME}/.ssh/id_rsa.pub 文件，上传到 ${HOME}/.ssh/authorized_keys 文件，如果已经存在这个文件，追加公钥
-$ ssh-copy-id ${HOME}/.ssh/id_rsa.pub example@example.com
+$ ssh-copy-id -i ${HOME}/.ssh/id_rsa example@example.com
 ```
 
 ```bash
