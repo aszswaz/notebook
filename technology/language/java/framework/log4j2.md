@@ -1,6 +1,6 @@
-# log4j2
+# log4j2-slf4j-impl
 
-## 原生log4j2使用
+**maven 配置**
 
 ```xml
 <dependencys>
@@ -11,20 +11,41 @@
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>2.17.2</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
-    <dependency>
-        <groupId>com.lmax</groupId>
-        <artifactId>disruptor</artifactId>
-    </dependency>
 </dependencys>
 ```
+
+The name of the log4j2 configuration file is **log4j2.xml**.
+
+Export the log to the console:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="warn">
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <Console name="console" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout
+                    pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} --- [%15.15t] %-40.40logger{1.} %-40M %-5L: %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+</configuration>
+```
+
+**Output log to file:**
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="warn">
     <properties>
         <!-- 项目名称 -->
-        <property name="PROJECT">data-manage-volume-warning</property>
+        <property name="PROJECT">${PROJECT}</property>
         <property name="BASE_PATH">logs/${PROJECT}</property>
         <!--编码-->
         <property name="CHARSET">UTF-8</property>
@@ -34,21 +55,18 @@
     <Appenders>
         <!-- 输出到控制台 -->
         <Console name="console" target="SYSTEM_OUT">
-            <!--输出日志的格式，使用SpringBoot配色（仅能在SpringBoot项目中使用） -->
+            <!--输出日志的格式-->
             <PatternLayout
-                    pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} --- [%15.15t] %-40.40c %-40M %-5L: %m%n"/>
+                    pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} --- [%15.15t] %-40.40logger{1.} %-40M %-5L: %m%n"/>
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
         </Console>
         <!--滚动随机访问文件-->
         <!--
         append: 如果为 true-默认值，记录将附加到文件末尾。设置为 false 时，将在写入新记录之前清除文件。
-
         fileName: 文件名称（路径）
-
         filePattern: 归档日志文件的文件名的模式。模式的格式应取决于所使用的 RolloverStrategu。
         DefaultRolloverStrategy 将接受与SimpleDateFormat兼容的日期/时间模式和/或代表整数计数器的％i。
         整数计数器允许指定填充，例如％3i 用于将计数器空格填充到 3 位，或者(通常更有用)％03i 用于将计数器零填充到 3 位。该模式还支持在运行时进行插值，因此任何查询(例如DateLookup都可以包含在该模式中)。
-
         immediateFlush: 设置为 true-默认值时，每次写操作后都会进行刷新。这将确保将数据写入磁盘，但可能会影响性能。
         -->
         <RollingRandomAccessFile name="debug-file" append="true" fileName="${BASE_PATH}/debug/debug.log"
@@ -158,54 +176,35 @@
             </DefaultRolloverStrategy>
             <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
         </RollingRandomAccessFile>
-        <!--将项目发生的重大错误信息，发送到邮件-->
-        <SMTP name="Mail" subject="server：${PROJECT}"
-              to="demo@example.com"
-              from="demo@example.com"
-              smtpProtocol="smtps" smtpHost="example.com" smtpPort="465" bufferSize="100" smtpDebug="false"
-              smtpPassword="demo" smtpUsername="demo@example.com">
-            <!--日志过滤-->
-            <Filters>
-                <ThresholdFilter level="ERROR" onMatch="NEUTRAL" onMismatch="DENY"/>
-                <!--控制邮件的发送频率，为每小时5封，最大每小时10封-->
-                <BurstFilter level="ERROR" rate="1" maxBurst="10" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </SMTP>
     </Appenders>
 
-    <!-- sync/async -->
     <Loggers>
-        <AsyncRoot level="info" includeLocation="true">
+        <Root level="debug">
             <AppenderRef ref="console"/>
             <AppenderRef ref="debug-file"/>
             <AppenderRef ref="info-file"/>
             <AppenderRef ref="warn-file"/>
             <AppenderRef ref="error-file"/>
-        </AsyncRoot>
+        </Root>
     </Loggers>
 
 </configuration>
 ```
 
-## 在SpringBoot 项目中适用log4j2
+# spring-boot-start-log4j2
 
-### 在SpringBoot项目中，配置log4j2使用SpringBoot的配色方案
+SpringBoot 默认的日志框架是 logback，但是官方也提供 log4j2 的包装，相比普通的 log4j2，SpringBoot 版本的 log4j2 提供了非常丰富的 ASCII 颜色配置
+
+**maven 配置：**
 
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-log4j2</artifactId>
 </dependency>
-<!-- 异步框架 log4j2 异步日志需要 -->
-<!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
-<dependency>
-    <groupId>com.lmax</groupId>
-    <artifactId>disruptor</artifactId>
-    <version>3.4.4</version>
-</dependency>
 ```
 
-log4j2.xml
+**log4j2.xml：**
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -224,7 +223,7 @@ log4j2.xml
         <Console name="console" target="SYSTEM_OUT">
             <!--输出日志的格式，使用SpringBoot配色（仅能在SpringBoot项目中使用） -->
             <PatternLayout
-                    pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx"/>
+                    pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40logger{1.}}{cyan} %clr{:}{faint} %m%n%xwEx"/>
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
         </Console>
         <!--滚动随机访问文件-->
@@ -348,14 +347,46 @@ log4j2.xml
 
     <!-- sync/async -->
     <Loggers>
-        <AsyncRoot level="debug" includeLocation="true">
+        <Root level="debug">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="info-file"/>
+            <AppenderRef ref="warn-file"/>
+            <AppenderRef ref="error-file"/>
+        </Root>
+    </Loggers>
+
+</configuration>
+```
+
+# Asynchronous log
+
+**maven：**
+
+```xml
+<!-- 异步框架 log4j2 异步日志需要 -->
+<!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
+<dependency>
+    <groupId>com.lmax</groupId>
+    <artifactId>disruptor</artifactId>
+    <version>3.4.4</version>
+</dependency>
+```
+
+**Log4j2** can cooperate with disruptor to achieve the effect of asynchronous log. Just replace "\<Root\>" with "\<AsyncRoot\>" to use.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="warn">
+    ...
+    <!-- sync/async -->
+    <Loggers>
+        <AsyncRoot level="debug">
             <AppenderRef ref="console"/>
             <AppenderRef ref="info-file"/>
             <AppenderRef ref="warn-file"/>
             <AppenderRef ref="error-file"/>
         </AsyncRoot>
     </Loggers>
-
 </configuration>
 ```
 

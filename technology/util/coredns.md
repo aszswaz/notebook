@@ -15,8 +15,8 @@
 ```txt
 # 开启加密的DNS
 tls://.:1443 {
-	# 这是TLS证书的公钥和私钥
-    tls /etc/coredns/tls/public.pem /etc/coredns/tls/private.pem
+	# 这是TLS证书的公钥和私钥，如果不指定 /etc/coredns/tls/ca.pem，那么会时候系统中的 CA 证书校验服务器证书
+    tls /etc/coredns/tls/public.pem /etc/coredns/tls/private.pem /etc/coredns/tls/ca.pem
 
 	# 这里可以做IP和域名映射
     hosts {
