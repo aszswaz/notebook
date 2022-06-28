@@ -5,10 +5,10 @@
 首先制作一个CA机构的证书：
 
 ```bash
-# 生成CA认证机构的证书密钥key
-$ openssl genrsa -des3 -out ca.key 2048
+# 生成CA认证机构的证书密钥key，注意：启用 -des3 就需要强制输入私钥密码
+$ openssl genrsa -out ca.key 2048
 # 生成一个有效期为10年的证书
-$ openssl req -new -x509 -key ca.key -out ca.crt -days 3650
+$ openssl req -new -x509 -key ca.key -out ca.crt -days 3650 -subj "/CN=los.aszswaz.cn" -addext "subjectAltName = DNS:los.aszswaz.cn"
 Enter pass phrase for aszswaz-ca.key:
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
@@ -37,41 +37,11 @@ Email Address []:
 
 ```bash
 # 生成私钥
-$ openssl genrsa -des3 -out server.key 2048
-Generating RSA private key, 1024 bit long modulus (2 primes)
-.......+++++
-.......+++++
-e is 65537 (0x010001)
-# 两次输入密码
-Enter pass phrase for aszswaz-server.key:
-Verifying - Enter pass phrase for aszswaz-server.key:
-
+$ openssl genrsa -out server.key 2048
 # 生成证书请求文件
 $ openssl req -new -key server.key -out server.csr
-Enter pass phrase for aszswaz-server.key:
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-# 输入证书信息，不建议使用中文，会出现乱码的
-Country Name (2 letter code) [AU]:
-State or Province Name (full name) [Some-State]:
-Locality Name (eg, city) []:
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:
-Organizational Unit Name (eg, section) []:
-Common Name (e.g. server FQDN or YOUR name) []:
-Email Address []:
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:
-An optional company name []:
-
-# Chrome 浏览器需要验证 subjectAltName 拓展，其他浏览器不用
-$ vim openssl.ext
+# 设置证书拓展字段，subjectAltName 字段用于表示证书的域名信息，很多客户端采用该字段来验证证书的有效性
+$ nvim openssl.ext
 basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
