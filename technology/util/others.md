@@ -1,6 +1,6 @@
 # 命令行工具
 
-## tidy
+# tidy
 
 html 格式化工具
 
@@ -10,7 +10,7 @@ html 格式化工具
 $ sudo pacman -S tidy
 ```
 
-## zip
+# zip
 
 把文件压缩成zip
 
@@ -19,7 +19,7 @@ $ sudo pacman -S zip
 $ zip -r html.zip /home/html
 ```
 
-## unzip
+# unzip
 
 ```bash
 $ sudo pacman -S unzip
@@ -29,7 +29,7 @@ $ unzip -O UTF-8 html.zip
 
 解压zip文件
 
-## qalc
+# qalc
 
 ```bash
 $ sudo pacman -S qalc
@@ -55,7 +55,7 @@ $ qalc
 ans + 1 = 3
 ```
 
-## jq
+# jq
 
 json格式化工具
 
@@ -83,7 +83,7 @@ $ echo "[\"Hello World\"]" | jq "length"
 $ echo "{\"data\": [\"Hello World\"]}" | jq ".data|length"
 ```
 
-## perl-xml-xpath
+# perl-xml-xpath
 
 xml 的 xpath 解析工具
 
@@ -95,7 +95,7 @@ $ sudo pacman -S perl-xml-xpath
 $ xpath -q -e '/element' demo.xml
 ```
 
-## xmllint
+# xmllint
 
 XML 的格式化工具
 
@@ -110,7 +110,7 @@ $ xmllint --format -
 $ xmllint --format --encode UTF-8 -
 ```
 
-## hexdump
+# hexdump
 
 二进制文件查看工具，linux 系统自带，不需要安装
 
@@ -119,7 +119,7 @@ $ xmllint --format --encode UTF-8 -
 $ hexdump -C -n 512 example.bin
 ```
 
-## cmus
+# cmus
 
 一款命令行的音乐播放器，常用指令如下：
 
@@ -134,7 +134,7 @@ $ hexdump -C -n 512 example.bin
 | shift + c，r        | shift + c 是启用“继续播放”，r 是循环播放                     |
 | ctrl + r            | 切换“列表循环”或“单曲循环                                    |
 
-## typora
+# typora
 
 安装 typora
 
@@ -142,7 +142,7 @@ $ hexdump -C -n 512 example.bin
 $ sudo pacman -S typora
 ```
 
-## gawk，awk
+# gawk，awk
 
 awk是一个模式扫描及处理语言。
 
@@ -217,7 +217,7 @@ c: 1
 | NR       | 当前行的行号                                                 |
 | FNR      | 已读的行数                                                   |
 
-## netcat（nc）
+# netcat（nc）
 
 这是一款TCP、UDP代理工具，主要功能是把stdin流发送到目标服务器，archlinux官方仓库没有这个软件包，需要通过yay安装。
 
@@ -244,7 +244,7 @@ Host github.com
 
 %p: 是目标服务器端口号
 
-## shfmt
+# shfmt
 
 shell的格式化工具
 
@@ -264,7 +264,7 @@ $ shfmt -i 4 demo.sh
 
 -w：将结果写入文件而不是标准输出
 
-## valgrind
+# valgrind
 
 可用于C和C++程序的内存泄漏检测工具
 
@@ -326,7 +326,7 @@ HEAP SUMMARY：整个程序的内存使用情况，以及内存泄漏发生的�
 
 LEAK SUMMARY：内存泄漏情况
 
-## translate-shell
+# translate-shell
 
 语言翻译插件
 
@@ -343,7 +343,7 @@ $ trans -e google zh-CN:en 演示
 $ trans -p zh-CN:en 演示
 ```
 
-## npm
+# npm
 
 ```bash
 # 在当前项目安装开发依赖
@@ -352,7 +352,7 @@ $ npm install -D demo
 $ npm ls demo
 ```
 
-## iftop
+# iftop
 
 监控主机的网络占用
 
@@ -362,7 +362,7 @@ $ sudo pacman -S iftop
 $ sudo iftop
 ```
 
-## peek
+# peek
 
 将屏幕的指定区域录制为 GIF 图像：
 
@@ -371,7 +371,7 @@ $ sudo pacman -S peek
 $ peek
 ```
 
-## adb
+# adb
 
 通过 ADB 安装 XAPK 和 APK，Google Play 上的应用 APK 可在 [apkure](https://apkpure.com/) 上面找到
 
