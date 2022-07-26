@@ -48,3 +48,12 @@ Root distance: 10.444ms (max: 5s)
     Frequency: +3.823ppm
 ```
 
+# 查看时间
+
+```bash
+# 查看 linux 内核时钟
+$ date
+# 查看 BIOS 时钟
+$ sudo hwclock
+```
+
