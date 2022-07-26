@@ -70,33 +70,25 @@ git lfs可以避免二进制文件的提交问题，同时可以避免版本库�
 
     执行以上的命令会生成一个`.gitattributes`文件，该文件也需要`git add .gitattributes`加入关联。提交方式可以使用`git commit`-`git push `或只推送lfs`git lfs commit`-`git lfs push`
 
-## 设置git的文件对比能够正常的显示中文
-
-```bash
-$ git config --global core.quotepath false          # 显示 status 编码
-$ git config --global gui.encoding utf-8            # 图形界面编码
-$ git config --global i18n.commit.encoding utf-8    # 提交信息编码
-$ git config --global i18n.logoutputencoding utf-8  # 输出 log 编码
-```
-
-git log 默认使用 less 分页，所以需要 bash 对 less 命令进行 utf-8 编码
-
-需要添加环境变量
-
-```properties
-LESSCHARSET=utf-8
-```
-
 ## 远程仓库相关命令
 
-```txt
-检出仓库：$ git clone git://github.com/jquery/jquery.git
-查看远程仓库：$ git remote -v
-添加远程仓库：$ git remote add [name] [url]
-删除远程仓库：$ git remote rm [name]
-修改远程仓库：$ git remote set-url --push[name][newUrl]
-拉取远程仓库：$ git pull [remoteName] [localBranchName]
-推送远程仓库：$ git push [remoteName] [localBranchName]
+```bash
+# 检出仓库
+$ git clone git://github.com/jquery/jquery.git
+# 查看远程仓库
+$ git remote -v
+# 添加远程仓库
+$ git remote add [name] [url]
+# 在原有的远程仓库基础上，添加一个新的地址
+$ git remote set-url --add [name] [newurl]
+# 删除远程仓库
+$ git remote rm [name]
+# 修改远程仓库地址
+$ git remote set-url
+# 拉取远程仓库
+$ git pull [remoteName] [localBranchName]
+# 推送远程仓库
+$ git push [remoteName] [localBranchName]
 ```
 
 ## 模块操作相关命令
@@ -113,7 +105,7 @@ LESSCHARSET=utf-8
 4) 手动删除子模块残留的目录
 ```
 
-## git操作-删除文件
+## git 操作-删除文件
 
 ```shell
 rm add2.txt
@@ -122,7 +114,7 @@ git commit -m "rm test"
 git push web
 ```
 
-## git配置CRLF<->LF转换（不建议修改，默认就好）
+## git 配置 CRLF<->LF 转换（不建议修改，默认就好）
 
 ```shell
 # 查看设置
@@ -176,7 +168,7 @@ git pull <远程主机名> <远程分支名>:<本地分支名>
     ```
 
 
-## git tag的使用
+## git tag 的使用
 
 如果你达到一个重要的阶段，并希望永远记住那个特别的提交快照，你可以使用 git tag 给它打上标签。
 
@@ -245,51 +237,3 @@ $ git push origin --tags
 ````bash
 git config --global http.sslBackend schannel
 ````
-
-## 中文乱码问题解决
-
-中文乱码的根源在于 windows 基于一些历史原因无法全面支持 utf-8 编码格式，并且也无法通过有效手段令其全面支持。
-
-解决方法是让 Git 支持 utf-8 编码
-
-在命令行下输入以下命令：
-
-```
-$ git config --global core.quotepath false  		# 显示 status 编码
-$ git config --global gui.encoding utf-8			# 图形界面编码
-$ git config --global i18n.commit.encoding utf-8	# 提交信息编码
-$ git config --global i18n.logoutputencoding utf-8	# 输出 log 编码
-$ export LESSCHARSET=utf-8
-# 最后一条命令是因为 git log 默认使用 less 分页，所以需要 bash 对 less 命令进行 utf-8 编码
-```
-
-## 设置git log日期格式
-
-```shell
-$ git config --global --replace-all log.date format:'%Y-%m-%d %H:%M:%S'
-```
-
-## 设置git的http(s)方式推送，不需要输入密码
-
-```bash
-$ vim ~/.git-credentials
-```
-
-键入内容：
-
-```txt
-https://{username}:{passwd}@{hostname}
-```
-
-配置git，开启密码自动保存
-
-```bash
-$ git config --global credential.helper store
-```
-
-测试：
-
-```bash
-$ git push
-```
-
