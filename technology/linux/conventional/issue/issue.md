@@ -1,4 +1,8 @@
-## 问题一
+# 简介
+
+Linux 操作系统使用过程中遇到的问题
+
+## 修改用户目录下几个常用的文件夹路径
 
 **系统：**
 
@@ -27,4 +31,21 @@ kde
 **发现：**
 
 <span style="color: green">`${HOME}/.local/share/sddm/xorg-session.log`这个文件应该是记录GUI程序的启动日志的，正常情况下，可以在这个文件可以看到GUI程序输出的所有log</span>
+
+## 修改主机的名称
+
+修改主机的名称可以通过以下方式修改: 
+
+```bash
+$ sudo vim /etc/hostname
+myname.localdomain
+```
+
+但是，同时也必须修改hosts文件，不然会导致SpringBoot等检查本机域名超时
+
+```bash
+$ sudo vim /etc/hostname
+127.0.0.1    myname.localdomain
+::1          myname.localdomain
+```
 
