@@ -119,9 +119,38 @@ du -h --max-depth=1 logs
 16M     logs
 ```
 
-# 外部磁盘
+# 磁盘
 
-## 外部磁盘设备的挂载与卸载
+## 修改磁盘分区名称
+
+根据不同的分区格式，使用不同的工具修改卷的标签（名称）
+
+```bash
+# swap，所属工具包：util-linux
+$ swaplabel -L "new label" /dev/XXX
+# ext2/3/4，所属工具包：e2fsprogs
+$ e2label /dev/XXX "new label"
+# btrfs，所属工具包：btrfs-progs
+$ btrfs filesystem label /dev/XXX "new label"
+# reiserfs，所属工具包：reiserfsprogs
+$ reiserfstune -l "new label" /dev/XXX
+# jfs，所属工具包：using jfsutils
+$ jfs_tune -L "new label" /dev/XXX
+# xfs，所属工具包：xfsprogs
+$ xfs_admin -L "new label" /dev/XXX
+# fat/vfat，所属工具包：dosfstools
+$ fatlabel /dev/XXX "new label" 
+# exfat，所属工具包：exfatprogs
+$ exfatlabel /dev/XXX "new label" using exfatprogs
+# ntfs，所属工具包：ntfs-3g
+$ ntfslabel /dev/XXX "new label"
+# udf，所属工具包：udftools
+$ udflabel /dev/XXX "new label"
+# crypto_LUKS (LUKS2 only)，所属工具包：cryptsetup
+$ cryptsetup config --label="new label" /dev/XXX
+```
+
+## 外部磁盘分区的挂载与卸载
 
 ```bash
 # 挂载外部磁盘，设备会被挂载到 /run/media/$HOME 文件夹下
@@ -159,7 +188,7 @@ Available：剩余可用大小
 Use%：磁盘已用百分比
 Mounted on：磁盘挂载目录
 
-**df得出的参数的单位字节，不方便查看，可以通过指令参数进行格式化：`-hl`**
+**df 得出的参数的单位字节，不方便查看，可以通过指令参数进行格式化：`-hl`**
 
 ```bash
 $ df -hl
