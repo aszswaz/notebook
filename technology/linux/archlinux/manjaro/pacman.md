@@ -9,23 +9,16 @@ $ sudo pacman-mirrors -i -c China -m rank # 之后会弹出框,进行选择即�
 $ sudo pacman -Syu
 ```
 
-之后还需要添加`archlinuxcn`源,不然很多软件找不到,编辑`/etc/pacman.conf`文件,添加
+manjaro 的软件仓库更新要比 archlinux 的软件仓库慢一些，可以考虑添加 `archlinuxcn` 源
 
 ```bash
+$ sudo nvim /etc/pacman.conf
 [archlinuxcn]
 SigLevel = TrustAll
 Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
-```
-
-
-
-然后执行
-
-```bash
+# 更新软件密钥
 $ sudo pacman -S archlinuxcn-keyring
 ```
-
-然后就可以通过`pacman`命令安装各种软件了.
 
 ## 美化
 
