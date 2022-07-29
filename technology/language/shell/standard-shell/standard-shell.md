@@ -264,7 +264,7 @@ $ echo "Hello World" >> demo.txt
 
 **read**
 
-`read`是用于从`stdin`读取一行输入，它常常被用来读取用户输入：
+`read` 是用于从 `stdin` 读取一行输入，它常常被用来读取用户输入：
 
 ```bash
 # 读取用户输入，并赋值给变量 demo
@@ -285,7 +285,7 @@ demo
 
 <font color="red">注意：linux的终端模拟程序对于通过stdin输入多字节字符，存在退格键删除，只删除半个字符的问题</font>，如果运行的shell是zsh，应当使用[vared](../zsh.md#vared)获取用户输入
 
-`read`和`<`配合，可以达到按行读取文件的效果：
+`read` 和 `<` 配合，可以达到按行读取文件的效果：
 
 ```bash
 while read -r line; do
