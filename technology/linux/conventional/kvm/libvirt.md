@@ -5,7 +5,7 @@ libvirt是一套用于管理硬件虚拟化的开源API、守护进程与管理�
 ## 安装
 
 ```bash
-$ sudo pacman libvirt libvirt-python libguestfs-tools virt-manager
+$ sudo pacman libvirt virt-manager
 $ virt-install
 $ sudo systemctl enable libvirt && sudo systemctl start libvirt
 ```
