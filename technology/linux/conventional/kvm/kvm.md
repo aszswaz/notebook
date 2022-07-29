@@ -61,6 +61,26 @@ $ sudo qemu-system-x86_64 \
 
 [配置 firewall 开启 NAT 转发](../conventional/network-card.md)
 
+# 共享文件夹
+
+主机与虚拟机共享文件夹的方式有很多种，这里主要介绍常用的方式。
+
+## SMB
+
+QEMU的文档中指出它有一个内置的SMB服务器，但实际上，它只是在宿主机上加载一个自动生成的`smb.conf`配置文件 (位于`/tmp/qemu-smb.*random_string*`)，然后启动宿主机上的[Samba](https://wiki.archlinux.org/title/Samba)，使得客户机能够通过一个IP地址进行访问 (默认的IP地址是10.0.2.4)。这个方法只适用于用户网络，在你不想在宿主机开启通常的[Samba](https://wiki.archlinux.org/title/Samba)服务 (客户机同样能访问这类Samba服务) 时这个方法还挺好用的。
+
+选项 `smb=` 可以设置仅共享一个目录，如果QEMU的SMB配置允许用户使用符号链接，那么即使在虚拟机运行时新加入更多的目录也很容易，只需要通过在共享目录里创建相应的软链接就行。然而他并没有这么配置，我们可以依照如下进行配置SMB服务器
+
+宿主机上必须安装 *Samba*。通过如下QEMU命令启用这项特性:
+
+```bash
+$ qemu-system-x86_64 disk_image -net nic -net user,smb=shared_dir_path
+```
+
+`*shared_dir_path*` 就是你想要在宿主机和客户机之间共享的目录。
+
+接着，在客户机内，你应该能够通过10.0.2.4访问到名为qemu的共享文件夹。例如在Windows Explorer中前往 `\\10.0.2.4\qemu` 这个地址。
+
 # 常用命令
 
 ```bash
@@ -78,6 +98,12 @@ $ qemu-img snapshot -d v1.0.0 ./demo.qcow2
 $ qemu-img snapshot -a v1.0.0 ./demo.qcow2
 ```
 
+# 虚拟设备介绍
+
+## virtio
+
+virtio 是专为 kvm 虚拟机开发的半虚拟化 IO 设置，相比普通的虚拟 IO 设备，它的 IO 传输性能更好。
+
 # 相关工具
 
 **virt-manager**
@@ -89,11 +115,6 @@ $ sudo pacman -S virt-manager
 # 启动虚拟机服务
 $ sudo systemctl start libvirtd
 ```
-
-# 注意事项
-
-1. linux 系统已经自带对 virtio 设备的支持，但是 windows 10 需要额外安装 [virtio-win](https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md) 驱动
-1. 驱动 virtiofs 可以把主机的文件夹映射到虚拟机，virtio-win 中包含这个驱动。在 windows10 系统中，还需要安装 [winfsp](https://winfsp.dev/) ，然后，启动 VirtioFsSvc 服务
 
 # 参数解释
 
