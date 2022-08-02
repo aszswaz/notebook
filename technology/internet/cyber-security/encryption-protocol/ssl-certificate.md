@@ -1,6 +1,8 @@
-# SSL证书
+# Introduction
 
-## 证书的制作
+SSL 证书的制作与免费证书的获取
+
+# 证书的制作
 
 首先制作一个CA机构的证书：
 
@@ -9,28 +11,6 @@
 $ openssl genrsa -out ca.key 2048
 # 生成一个有效期为10年的证书
 $ openssl req -new -x509 -key ca.key -out ca.crt -days 3650 -subj "/CN=los.aszswaz.cn" -addext "subjectAltName = DNS:los.aszswaz.cn"
-Enter pass phrase for aszswaz-ca.key:
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-# 国家
-Country Name (2 letter code) [AU]:
-# 省、州
-State or Province Name (full name) [Some-State]: 
-# 市
-Locality Name (eg, city) []:
-# 公司、组织
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:
-# 部门
-Organizational Unit Name (eg, section) []:
-# 服务器域名
-Common Name (e.g. server FQDN or YOUR name) []:
-# 邮箱地址
-Email Address []:
 ```
 
 用CA证书制作网站证书
@@ -76,7 +56,7 @@ $ sudo trust extract-compat
 
 上面的操作看上去使用的是trust，实际上操作的是openssl，几乎是所有linux软件都会采用openssl作为SSL实现，openssl以`/etc/ssl`作为证书的存储目录，trust则是封装了openssl的证书导入配置，使得导入证书变得简单，`/etc/ca-certificates/trust-source`和`/usr/share/ca-certificates/trust-source`两个文件夹下所有的证书都会被`ln`连接到`/etc/ssl`。
 
-## 查看证书信息
+# 查看证书信息
 
 ```bash
 # 文件后缀名也可以是crt
@@ -85,9 +65,9 @@ $ openssl x509 -in example.pem -noout -text
 $ openssl x509 -in aszswaz-server.crt -noout -ext subjectAltName
 ```
 
-## 注意事项
+# 注意事项
 
-### <font color="red">浏览器从服务器下载的证书，不能与系统本地证书库中的某个证书的颁发者和序列号完全一致，否则将导致证书验证失败</font>
+<font color="red">浏览器从服务器下载的证书，不能与系统本地证书库中的某个证书的颁发者和序列号完全一致，否则将导致证书验证失败</font>
 
 错误演示如下：
 
@@ -128,4 +108,58 @@ $ sudo cp server01.key /etc/ca-certificates/trust-source && sudo trust extract-c
 
 解决办法：
 
-一种是在使用CA证书颁发证书的时候，保证`-set_serial`参数不重复，另外一种就是删除证书库中已经存在的证书，archlinux 使用的证书存储路径是 `/etc/ca-certificates` 和 `/usr/share/ca-certificates/trust-source`，删除目标证书文件后执行一下 `sudo trust `。
+一种是在使用CA证书颁发证书的时候，保证 `-set_serial` 参数不重复，另外一种就是删除证书库中已经存在的证书，archlinux 使用的证书存储路径是 `/etc/ca-certificates` 和 `/usr/share/ca-certificates/trust-source`，删除目标证书文件后执行一下 `sudo trust `。
+
+# 获取 CA 机构颁发的免费证书
+
+可以通过 certbot 获取 [Let's encrypt](https://letsencrypt.org/)， 由于主要使用 centos 作为服务器的操作系统，所以这里以 centos 7 为例。
+
+yum 仓库中的 certbot 版本很旧，官方推荐通过 [snap](https://snapcraft.io/) 进行安装，所以需要先安装 snap。
+
+```bash
+$ sudo yum install epel-release && \
+sudo yum install snapd && \
+sudo systemctl enable --now snapd.socket && \
+sudo ln -s /var/lib/snapd/snap /snap
+```
+
+安装 certbot。
+
+```bash
+$ sudo snap install --classic certbot && sudo ln -s /snap/bin/certbot /usr/bin/certbot
+```
+
+“Let's encrypt” 在颁发证书时，会通过 HTTP 请求有指定内容的文件验证域名的所有权，URL 的基础路径是 /.well-known/acme-challenge，因此我们需要配置 nginx 处理这种静态文件请求。端口是 80 或 443 都行，“Let's encrypt” 优先访问 80 端口。
+
+```bash
+$ sudo nvim /etc/nginx/conf.d/demo.conf
+server {
+    listen 80;
+    server_name example.com www.example.com;
+    location /.well-known/acme-challenge/ {
+        root /var/lib/certbot/;
+    }
+}
+```
+
+验证 nginx 的配置是否正确
+
+```bash
+$ sudo zsh -c "echo 'Hello World' >> /var/lib/certbot/demo.txt"
+$ curl http://www.example.com/.well-known/acme-challenge/demo.txt
+```
+
+请求 Let's encrypt 颁发证书，如果成功，证书保存在 /etc/letsencrypt/live 文件夹下
+
+```bash
+$ sudo certbort --webroot -w /var/lib/certbot -d example.com -d www.example.com
+```
+
+“ Let's encrypt” 证书的有效期是 90 天，因此需要使用 cron 定期更新证书
+
+```bash
+# 每个月更新一次证书
+$ sudo crontab -u root -e
+0 0 1 * *        certbot renew --post-hook "nginx -s reload"
+```
+
