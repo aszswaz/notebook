@@ -145,8 +145,9 @@ server {
 验证 nginx 的配置是否正确
 
 ```bash
-$ sudo zsh -c "echo 'Hello World' >> /var/lib/certbot/demo.txt"
+$ sudo zsh -c "mkdir --parents /var/lib/certbot/.well-known/acme-challenge echo 'Hello World' >> /var/lib/certbot/.well-known/acme-challenge/demo.txt"
 $ curl http://www.example.com/.well-known/acme-challenge/demo.txt
+$ sudo rm -rf /var/lib/certbot/.well-known
 ```
 
 请求 Let's encrypt 颁发证书，如果成功，证书保存在 /etc/letsencrypt/live 文件夹下
