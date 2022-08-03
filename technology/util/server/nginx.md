@@ -27,25 +27,32 @@ module_hotfixes=true
 $ sudo yum install nginx
 ```
 
+# location matching rules
+
+| symbol    | describe                                                    | e.g.                   |
+| --------- | ----------------------------------------------------------- | ---------------------- |
+| =         | Exact match, only exact equality takes effect.              | location = /robots.txt |
+| ^~        | Prefix matches, priority is higher than refular matching.   | location ^~ /example   |
+| ~         | Regular expression matching.                                | location ~ ^/.*\\.txt  |
+| ~*        | Case-insensitive regular expression matching.               | location ~* ^/.*\\.TXT |
+| /xxx or / | Also prefix matching, lower priority than regular matching. | location /example      |
+
 # Configuration Template
 
 Global configuration: /etc/nginx/nginx.conf
 
 ```txt
 user  nginx;
-# 工作进程数
+# Number of worker processes.
 worker_processes  1;
-
 
 error_log  /var/log/nginx/error.log notice;
 pid        /var/run/nginx.pid;
-
 
 events {
     # Maximum number of connections.
     worker_connections  50;
 }
-
 
 http {
     include       /etc/nginx/mime.types;
@@ -137,6 +144,8 @@ server {
 ```
 
 # Notice
+
+## Static file handling
 
 In the location block, both root and alias are used to handle static file requests. If the file is in the root directory of the website, there is no difference between root and alias. The configuration example is as follows:
 
