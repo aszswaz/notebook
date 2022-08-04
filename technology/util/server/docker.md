@@ -42,8 +42,3 @@ $ docker container run -d -t --name="example" --restart=always example
 
 docker 本身就有远程访问配置，我之前也折腾过这个配置，但是随着 docker 的版本升级，它的配置方式总是会出现变化，因此，我不再通过直接配置 docker 来开启远程访问，而是直接通过 ssh 的隧道访问 docker。
 
-```bash
-# 清理已经存在的 docker.sock 文件，远程的 docker.sock 映射到本地，并修改该文件的权限
-$ echo "test -r /run/docker.sock && rm /run/docker.sock; chown root:docker /run/docker.sock && chmod g+rw /run/docker.sock" | sudo zsh
-```
-
