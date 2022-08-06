@@ -2,7 +2,7 @@
 
 There are three ways to package python: "setuptools + build", "setuptools" and "distutils".
 
-## setuptools + build
+# setuptools + build
 
 To execute "setuptools" through "build", you need to write `pyproject.toml` in the root directory of project:
 
@@ -81,9 +81,7 @@ $ demo
 Hello World
 ```
 
-<font color="color">It is not possible to execute makepkg in the venv environment.</font>
-
-## setuptools
+# setuptools
 
 setuptools can also be configured using `setup.py`:
 
@@ -140,6 +138,10 @@ pkg
 8 directories, 13 files
 ```
 
-## distutils
+# distutils
 
 setuptools is essentially an enhanced version of distutils. Python officially plans to remove distutils in python 3.12, so distutils is not recommended.
+
+# Warn
+
+<font color="color">It is not possible to execute makepkg in the venv environment, this results in wrong file location in the package.</font>
