@@ -1,7 +1,7 @@
-## `maven`下载依赖的流程
+## maven 下载依赖的流程
 
-以编译工程下载依赖为例：`localRepository`本地仓库-》`nexus`私服（如果有）-》中央仓库
-具体如下：
+以编译工程下载依赖为例：`localRepository`本地仓库 ➔ nexus ➔ 私服（如果有） ➔ 中央仓库
+具体如下： 
 
 1.  `maven`去`settings`配置的`localRepository`本地仓库查找依赖
 2.  本地仓库没有，根据`pom`文件或者`settings`配置的`repository`仓库查找依赖
@@ -13,7 +13,7 @@
     3.5.**实际上`mirrorOf`只是镜像`url`的一个别名，用来拦截仓库请求并转发到镜像配置的`url`中**
 4.  如果镜像中拦截所有请求到私服，但私服中没有，私服会和中央仓库打交道拉取依赖
 
-## `mirrorOf`配置原则
+## mirrorOf 配置原则
 
 1.  自定义时，和`pom`和`settings`配置的`repository`的`id`保持一致
 2.  如果所有的请求都拦截到自己的私服，那么使用*
