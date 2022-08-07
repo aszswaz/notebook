@@ -12,4 +12,4 @@
 
 [schedule](schedule)：日程表
 
-[technology](technology)：编译技术的学习笔记
+[technology](technology)：编程技术
