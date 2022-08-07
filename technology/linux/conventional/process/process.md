@@ -36,11 +36,9 @@ service 配置文件主要放在 /usr/lib/systemd/system 目录，也可能在 /
 
 示例01：
 
-```txt
-# 查看 sshd 服务启动文件
-systemctl cat sshd.service
-
-# /usr/lib/systemd/system/sshd.service
+```bash
+# 查看 sshd 服务启动文件，文件路径是：/usr/lib/systemd/system/sshd.service
+$ systemctl cat sshd.service
 [Unit]
 Description=OpenSSH server daemon
 Documentation=man:sshd(8) man:sshd_config(5)
@@ -158,7 +156,7 @@ WantedBy：表示该服务所在的 Target(服务组)
 ```bash
 # 查看默认 Target
 $ systemctl get-default
-# 结果为 multi-user.target，表示默认的启动 Target 是multi-user.target。在这个组里的所有服务，都将开机启动。这就是为什么 systemctl enable 命令能设置开机启动的原因
+# 结果为 multi-user.target，表示默认的启动 Target 是 multi-user.target。在这个组里的所有服务，都将开机启动。这就是为什么 systemctl enable 命令能设置开机启动的原因
 
 # 查看 multi-user.target 包含的所有服务
 $ systemctl list-dependencies multi-user.target
