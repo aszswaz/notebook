@@ -141,7 +141,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fexec-charset=GBK")
 
 ```bash
 # 先生成 Make 文件
-$ mkdir builder && cd builder && cmake
+$ mkdir builder && cd builder && cmake ../
 # 构建项目
 $ make
 ```
