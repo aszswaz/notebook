@@ -117,8 +117,12 @@ $ sudo cp server01.key /etc/ca-certificates/trust-source && sudo trust extract-c
 yum 仓库中的 certbot 版本很旧，官方推荐通过 [snap](https://snapcraft.io/) 进行安装，所以需要先安装 snap。
 
 ```bash
-$ sudo yum install epel-release && \
-sudo yum install snapd && \
+# install epel
+# centos 8
+$ sudo dnf install epel-release && sudo dnf upgrade
+# centos 7
+$ sudo yum install epel-release
+$ sudo yum install snapd -y && \
 sudo systemctl enable --now snapd.socket && \
 sudo ln -s /var/lib/snapd/snap /snap
 ```
@@ -126,7 +130,8 @@ sudo ln -s /var/lib/snapd/snap /snap
 安装 certbot。
 
 ```bash
-$ sudo snap install --classic certbot && sudo ln -s /snap/bin/certbot /usr/bin/certbot
+$ sudo snap install --classic certbot
+$ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
 “Let's encrypt” 在颁发证书时，会通过 HTTP 请求有指定内容的文件验证域名的所有权，URL 的基础路径是 /.well-known/acme-challenge，因此我们需要配置 nginx 处理这种静态文件请求。端口是 80 或 443 都行，“Let's encrypt” 优先访问 80 端口。
@@ -145,7 +150,7 @@ server {
 验证 nginx 的配置是否正确
 
 ```bash
-$ sudo zsh -c "mkdir --parents /var/lib/certbot/.well-known/acme-challenge echo 'Hello World' >> /var/lib/certbot/.well-known/acme-challenge/demo.txt"
+$ sudo zsh -c "mkdir --parents /var/lib/certbot/.well-known/acme-challenge && echo 'Hello World' >> /var/lib/certbot/.well-known/acme-challenge/demo.txt"
 $ curl http://www.example.com/.well-known/acme-challenge/demo.txt
 $ sudo rm -rf /var/lib/certbot/.well-known
 ```
@@ -153,7 +158,7 @@ $ sudo rm -rf /var/lib/certbot/.well-known
 请求 Let's encrypt 颁发证书，如果成功，证书保存在 /etc/letsencrypt/live 文件夹下
 
 ```bash
-$ sudo certbort --webroot -w /var/lib/certbot -d example.com -d www.example.com
+$ sudo certbort certonly --webroot -w /var/lib/certbot -d example.com -d www.example.com
 ```
 
 “ Let's encrypt” 证书的有效期是 90 天，因此需要使用 cron 定期更新证书

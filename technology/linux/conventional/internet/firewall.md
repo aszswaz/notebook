@@ -41,6 +41,24 @@ $ sudo firewall-cmd --reload
 $ sudo firewall-cmd --zone=public --list-port
 ```
 
+## 对特定的 service 端口进行管理
+
+firewall 的 service 不同于 systemd 的 service，firewall 的 service 功能主要是对网络流量的拦截规则进行管理，例如，添加一个 mysql 的 service：
+
+```bash
+# 创建 mysql service
+$ sudo firewall-cmd --permanent --new-service=mysql
+# 给 mysql service 添加需要开放的端口号
+$ sudo firewall-cmd --permanent --service=mysql --add-port=3306/tcp
+# 使用 mysql service
+$ sudo firewall-cmd --permanent --add-service=mysql
+# 给 service 设置注释
+$ sudo firewall-cmd --permanent --set-description="databases server"
+$ sudo firewall-cmd --reload
+```
+
+firewall 的 service 功能可以有效防止用户忘记这个端口号作用，便于管理
+
 ## IP封禁
 
 指定IP，指定端口的规则：
