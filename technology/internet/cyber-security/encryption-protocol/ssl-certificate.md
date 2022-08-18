@@ -123,8 +123,8 @@ $ sudo dnf install epel-release && sudo dnf upgrade
 # centos 7
 $ sudo yum install epel-release
 $ sudo yum install snapd -y && \
-sudo systemctl enable --now snapd.socket && \
-sudo ln -s /var/lib/snapd/snap /snap
+$ sudo systemctl enable --now snapd.socket
+$ sudo ln -s /var/lib/snapd/snap /snap
 ```
 
 安装 certbot。
