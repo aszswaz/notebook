@@ -1,6 +1,6 @@
 # openssl
 
-## 使用 openssl 进行 https 同行
+## 使用 openssl 进行 https 通信
 
 首先配置cmake
 
