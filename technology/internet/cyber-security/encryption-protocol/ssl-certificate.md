@@ -7,17 +7,20 @@ SSL 证书的制作与免费证书的获取
 首先制作一个CA机构的证书：
 
 ```bash
-# 生成CA认证机构的证书密钥key，注意：启用 -des3 就需要强制输入私钥密码
-$ openssl genrsa -out ca.key 2048
+# 生成CA认证机构的证书密钥key
+# 生成 RSA 密钥
+# $ openssl genrsa -out ca.key 2048
+# 生成 ECC 密钥，ECC 加密算法的性能表现要比 RSA 好
+$ openssl ecparam -genkey -name prime256v1 -out ca.key
 # 生成一个有效期为10年的证书
-$ openssl req -new -x509 -key ca.key -out ca.crt -days 3650 -subj "/CN=los.aszswaz.cn" -addext "subjectAltName = DNS:los.aszswaz.cn"
+$ openssl req -new -x509 -key ca.key -out ca.crt -days 3650 -subj "/CN=www.aszswaz.cn" -addext "subjectAltName = DNS:www.aszswaz.cn"
 ```
 
 用CA证书制作网站证书
 
 ```bash
 # 生成私钥
-$ openssl genrsa -out server.key 2048
+$ openssl ecparam -genkey -name prime256v1 -out server.key
 # 生成证书请求文件
 $ openssl req -new -key server.key -out server.csr
 # 设置证书拓展字段，subjectAltName 字段用于表示证书的域名信息，很多客户端采用该字段来验证证书的有效性
@@ -48,13 +51,9 @@ $ keytool -importkeystore -v -srckeystore server.p12 -srcstoretype PKCS12 -destk
 证书制作完毕之后，需要把CA证书导入系统的证书库才能被浏览器信任，这里以archlinux为例：
 
 ```bash
-# 把证书复制到系统的证书存储目录
-$ sudo cp ca.crt /etc/ca-certificates/trust-source
-# 加载证书
-$ sudo trust extract-compat
+# 把 CA 证书安装到系统的证书存储目录
+$ sudo trust anchor --store ca.crt
 ```
-
-上面的操作看上去使用的是trust，实际上操作的是openssl，几乎是所有linux软件都会采用openssl作为SSL实现，openssl以`/etc/ssl`作为证书的存储目录，trust则是封装了openssl的证书导入配置，使得导入证书变得简单，`/etc/ca-certificates/trust-source`和`/usr/share/ca-certificates/trust-source`两个文件夹下所有的证书都会被`ln`连接到`/etc/ssl`。
 
 # 查看证书信息
 
