@@ -32,7 +32,7 @@ unix域套接字
 
 int main() {
     // 创建本地socket
-    const int server_socket = socket(AF_UNIX, SOCK_STREAM, IPPROTO_ICMP);
+    const int server_socket = socket(AF_UNIX, SOCK_STREAM, 0);
     if (server_socket == -1) {
         fprintf(stderr, "Socket create error: %s.", strerror(errno));
         return EXIT_FAILURE;
