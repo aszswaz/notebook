@@ -157,7 +157,7 @@ Reboot Into Firmware Interface
 
 如果看到`Welcome to Arch Linux`说明系统加载成功，等待一段事时间后，会出现`root@archiso ~ # `以及一个光标不停的闪烁，到这里U盘系统就启动成功
 
-## 3. 连接wifi无线网络
+## 3. 连接 wifi 无线网络
 
 1. 连接网络
 
@@ -279,7 +279,7 @@ Command (m for help): w # 保存分区更改
 首先格式化UEFI，以FAT32模式格式化
 
 ```bash
-$ mkfs.fat -F32 /dev/sda1 
+$ mkfs.fat -F 32 /dev/sda1
 ```
 
 格式化swap
@@ -305,13 +305,13 @@ $ lsblk -f
 
 ## 5. 挂载分区
 
-1. 挂载swap分区
+1. 挂载 swap 分区
 
 ```bash
 $ swapon /dev/sda3
 ```
 
-2. 挂载系统分区到`/mnt`目录
+2. 挂载系统分区到 /mnt 目录
 
 ```bash
 $ mount /dev/sda5 /mnt
