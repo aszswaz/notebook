@@ -6,8 +6,9 @@ libvirt是一套用于管理硬件虚拟化的开源API、守护进程与管理�
 
 ```bash
 $ sudo pacman libvirt virt-manager
-$ virt-install
-$ sudo systemctl enable libvirt && sudo systemctl start libvirt
+$ sudo systemctl enable libvirtd && sudo systemctl start libvirtd
+# 安装 libvirtd 时，会给 firewall 一个 libvirt 的区域设置文件，文件路径是 /usr/lib/firewalld/zones/libvirt.xml，因此需要让 firewall 加载这个配置文件，否则虚拟机的网络将不可用
+$ sudo firewall-cmd --reload
 ```
 
 ## 虚拟网络

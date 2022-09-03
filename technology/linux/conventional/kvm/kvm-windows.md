@@ -67,46 +67,101 @@ pause
 The startup configuration of qemu cannot be saved, we can use a script instead:
 
 ```shell
-#!/bin/zsh
+#!/bin/sudo sh
+
+set -o errexit
+set -o nounset
 
 cd "$(dirname $0)"
 
-# Number of CPUs
-cpu=$(cat /proc/cpuinfo | grep 'physical id' | sort | uniq | wc -l)
-# Number of CPU cores
-cpu_cores=$(cat /proc/cpuinfo | grep "cores" | uniq | awk '{print $4}')
-# Number of CPU logical cores
-cpu_logic_cores=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-# The number of single-core CPU threads, Intel Hyper-Threading Technology is turned on, the value is 2, otherwise it is 1
-threads=$(( $cpu_logic_cores / $cpu / $cpu_cores ))
+# qemu 启动脚本
 
-cpu_cores=$(( $cpu_cores / 2 ))
-cpu_logic_cores=$(( $cpu_logic_cores / 2 ))
-memory_size="4G"
+BRIDGE="virbr0"
+MEMORY_SIZE="4G"
+SHARED_DIR="/run/media/aszswaz/kvm-win10"
 
-# Start virtiofsd, folder sharing for host and virtual machines.
-echo "start virtiofsd"
-virtio_fs_sock="/var/run/qemu-virtio-fs.sock"
-sudo /usr/lib/qemu/virtiofsd --socket-path="$virtio_fs_sock" -o "source=/dev/shm" -o "cache=always" &
-sudo chgrp kvm "$virtio_fs_sock" && sudo chmod g+rwx "$virtio_fs_sock"
+# Prepare resources for virtual machines.
+prepare() {
+    # Enable ip forwarding
+    [[ $(sysctl -n net.ipv4.ip_forward) != 1 ]] && sysctl -w net.ipv4.ip_forward=1
 
-echo "start qemu"
-qemu-system-x86_64 \
-    -m $memory_size \
-    -object "memory-backend-memfd,id=mem,size=$memory_size,share=on" \
-    -numa 'node,memdev=mem' \
-    -cpu 'host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time' \
-    -smp "cpus=$cpu_logic_cores,sockets=$cpu,cores=$cpu_cores,threads=$threads,maxcpus=$cpu_logic_cores" \
-    -enable-kvm \
-    -boot 'menu=on' \
-    -rtc 'base=localtime' \
-    -nic 'user,model=virtio-net-pci' \
-    -vga virtio \
-    -device intel-hda -device hda-duplex \
-    -usb -device usb-tablet \
-    -chardev "socket,id=char0,path=$virtio_fs_sock" \
-    -device "vhost-user-fs-pci,chardev=char0,tag=shared" \
-    -drive 'file=win10.qcow2,format=qcow2,index=0,media=disk,if=virtio'
+    # If the bridge does not exist, create the bridge.
+    if ! ip link show $BRIDGE >>/dev/null 2>&1; then
+        brctl addbr $BRIDGE
+        ip addr add '192.168.122.1/24' dev $BRIDGE
+        ip link set dev $BRIDGE up
+        brctl stp $BRIDGE on
+    fi
+
+    # Enable NAT forwarding
+    if [[ ! $(firewall-cmd --get-zones) =~ $BRIDGE ]]; then
+        firewall-cmd --permanent --new-zone=$BRIDGE >>/dev/null
+        firewall-cmd --permanent --zone=$BRIDGE --change-interface=$BRIDGE >>/dev/null
+        firewall-cmd --permanent --zone=$BRIDGE --set-target=ACCEPT >>/dev/null
+
+        [[ $(firewall-cmd --query-forward) == "no" ]] && firewall-cmd --permanent --add-forward >>/dev/null
+        [[ $(firewall-cmd --query-masquerade) == "no" ]] && firewall-cmd --permanent --add-masquerade >>/dev/null
+
+        local rule='firewall-cmd --query-masquerade'
+        if [[ $(firewall-cmd --query-masquerade="$rule") == "no" ]]; then
+            firewall-cmd --permanent --add-rich-rule="$rule" >>/dev/null
+        fi
+
+        firewall-cmd --reload
+    fi
+
+    # qmeu limits available bridges via the /etc/qemu/bridge.conf file. Permission needs to be added to this file.
+    if [[ ! $(</etc/qemu/bridge.conf) =~ "allow $BRIDGE" ]]; then
+        echo "allow $BRIDGE" >>/etc/qemu/bridge.conf
+    fi
+}
+
+smb_mount() {
+    sleep 60
+    # Use the id command to get the uid and gid of  the currently logged in user
+    mount -t cifs -o "username=Administrator,password=z199809051593,gid=1000,uid=1000" -l '//192.168.122.2/Downloads' --mkdir "$SHARED_DIR"
+    echo "successfully mounted samba to $SHARED_DIR"
+}
+
+smb_umount() {
+    umount "$SHARED_DIR"
+    rm -rf "$SHARED_DIR"
+}
+
+main() {
+    # Number of CPUs
+    local cpu=$(cat /proc/cpuinfo | grep 'physical id' | sort | uniq | wc -l)
+    # Number of CPU cores
+    local cpu_cores=$(cat /proc/cpuinfo | grep "cores" | uniq | awk '{print $4}')
+    # Number of CPU logical cores
+    local cpu_logic_cores=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+    # The number of single-core CPU threads, Intel Hyper-Threading Technology is turned on, the value is 2, otherwise it is 1
+    local threads=$(($cpu_logic_cores / $cpu / $cpu_cores))
+
+    local cpu_cores=$(($cpu_cores / 2))
+    local cpu_logic_cores=$(($cpu_logic_cores / 2))
+
+    echo "start qemu"
+    smb_mount &
+    qemu-system-x86_64 \
+        -m $MEMORY_SIZE \
+        -cpu host \
+        -smp "cpus=$cpu_logic_cores,sockets=$cpu,cores=$cpu_cores,threads=$threads,maxcpus=$cpu_logic_cores" \
+        -enable-kvm \
+        -boot 'menu=on' \
+        -rtc 'base=localtime' \
+        -netdev "bridge,br=$BRIDGE,id=kvm0" -device 'virtio-net,netdev=kvm0' \
+        -vga virtio \
+        -device intel-hda -device hda-duplex \
+        -usb -device usb-tablet \
+        -drive 'file=win10.qcow2,format=qcow2,index=0,media=disk,if=virtio'
+
+    unset cpu cpu_cores cpu_logic_cores threads
+    smb_umount
+}
+
+prepare
+main
 ```
 
 # Warn
