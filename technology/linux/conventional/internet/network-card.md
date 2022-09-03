@@ -213,7 +213,9 @@ $ sysctl -p /etc/sysctl.conf.d/ipv4_forward.conf
 $ sudo firewall-cmd --permanent --zone=public --change-interface=enp7s0
 # 信任区域，enp9s0 是内部网卡，所有连接都信任
 $ sudo firewall-cmd --permanent --zone=trusted --change-interface=enp9s0
-# 打开NAT的IP伪装
+# 打开 NAT 数据包转发，zone 必须是 enp7s0 网卡的 zone
+$ sudo firewall-cmd --zone=public --permanent --add-forward
+# 打开 NAT 的 IP 伪装
 $ sudo firewall-cmd --zone=public --add-masquerade --permanent
 # 设置NAT规则，将来自指定网段的数据包，伪装成enp7s0的IP地址
 $ sudo firewall-cmd --zone=public --permanent --add-rich-rule='rule family=ipv4 source address=192.168.24.0/24 masquerade'
@@ -223,7 +225,7 @@ $ sudo firewall-cmd --reload
 
 <font color="red">注意事项：</font>
 
-1. firewalld 和  iptables之间会出现冲突，使用firewalld就不能使用iptables。
-2. 操作firewalld进行NAT转发，需要关闭SELinux的时候，建议临时关闭就行，因为Docker运行容器需要用到SELinux，如果永久关闭SELinux，会直接导致docker无法启动容器
+1. firewalld 和  iptables 之间会出现冲突，使用 firewalld 就不能使用 iptables。
+2. 操作 firewalld 进行NAT转发，需要关闭 SELinux 的时候，建议临时关闭就行，因为 Docker 运行容器需要用到 SELinux，如果永久关闭 SELinux，会直接导致 docker 无法启动容器
 2. 本示例中 enp7s0 是网络出口网卡，它的规则区域需要慎重选择，这直接影响到外来流量是否可以访问本机的特定端口，我一般把端口的开放规则配置在 public 区域，所以我把 enp7s0 网卡添加到 public 。
 

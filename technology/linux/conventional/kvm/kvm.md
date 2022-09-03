@@ -42,10 +42,12 @@ qemu 默认是通过软件模拟的方式，给虚拟机创建一个单独的内
 
 ```bash
 # 创建网桥
-$ sudo brctl addbr kvm-br
+$ BRIDGE=kvmbr0
+$ sudo brctl addbr $BRIDGE
 # 使用 iproute2 配置网桥
-$ sudo ip addr add '192.168.122.1/24' dev kvm-br
-$ sudo ip link set kvm-br up
+$ sudo ip addr add '192.168.122.1/24' dev $BRIDGE
+$ sudo ip link set $BRIDGE up
+$ sudo brctl stp $BRIDGE on
 # 配置 firewall，开启 NAT 功能
 ...
 # 在网桥上启用 DHCP，如果是希望给虚拟机配置静态 IP，则不需要这个
@@ -54,12 +56,12 @@ $ sudo ip link set kvm-br up
 $ sudo qemu-system-x86_64 \
     -m 4G \
     -smp "cpus=2,sockets=1,cores=1,threads=2,maxcpus=2" \
-    -device virtio-net,netdev=kvm0 -netdev bridge,br=kvm-br,id=kvm0 \
+    -netdev "bridge,br=$BRIDGE,id=kvm0" -device 'virtio-net,netdev=kvm0' \
     -enable-kvm \
     ./demo.qcow2
 ```
 
-[配置 firewall 开启 NAT 转发](../conventional/network-card.md)
+[配置 firewall 开启 NAT 转发](../internet/network-card.md)
 
 # 共享文件夹
 
