@@ -98,13 +98,14 @@ prepare() {
         firewall-cmd --permanent --new-zone=$BRIDGE >>/dev/null
         firewall-cmd --permanent --zone=$BRIDGE --change-interface=$BRIDGE >>/dev/null
         firewall-cmd --permanent --zone=$BRIDGE --set-target=ACCEPT >>/dev/null
+        firewall-cmd --permanent --zone=$BRIDGE --set-description="Network configuration for qemu/kvm virtual machines"
 
         [[ $(firewall-cmd --query-forward) == "no" ]] && firewall-cmd --permanent --add-forward >>/dev/null
         [[ $(firewall-cmd --query-masquerade) == "no" ]] && firewall-cmd --permanent --add-masquerade >>/dev/null
 
         local rule='firewall-cmd --query-masquerade'
-        if [[ $(firewall-cmd --query-masquerade="$rule") == "no" ]]; then
-            firewall-cmd --permanent --add-rich-rule="$rule" >>/dev/null
+        if [[ $(firewall-cmd --zone=$BRIDGE --query-rich-rule="$rule") == "no" ]]; then
+            firewall-cmd --permanent --zone=$BRIDGE --add-rich-rule="$rule" >> /dev/null
         fi
 
         firewall-cmd --reload
@@ -129,13 +130,13 @@ smb_umount() {
 }
 
 main() {
-    # Number of CPUs
+    # CPU 数量
     local cpu=$(cat /proc/cpuinfo | grep 'physical id' | sort | uniq | wc -l)
-    # Number of CPU cores
+    # CPU 核心数
     local cpu_cores=$(cat /proc/cpuinfo | grep "cores" | uniq | awk '{print $4}')
-    # Number of CPU logical cores
+    # CPU 逻辑核心数
     local cpu_logic_cores=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-    # The number of single-core CPU threads, Intel Hyper-Threading Technology is turned on, the value is 2, otherwise it is 1
+    # 单核 CPU 线程数，开启了 Intel 超线程技术，该值为 2，反之为 1
     local threads=$(($cpu_logic_cores / $cpu / $cpu_cores))
 
     local cpu_cores=$(($cpu_cores / 2))
