@@ -165,7 +165,7 @@ if [[ $USER == "root" ]]; then
     prepare
     main
 else
-    echo "Permission denied, please run as root user."
+    sudo sh -c "nohup \"$0\" >win10.log 2>&1 &"
 fi
 ```
 
