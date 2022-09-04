@@ -217,8 +217,8 @@ $ sudo firewall-cmd --permanent --zone=trusted --change-interface=enp9s0
 $ sudo firewall-cmd --zone=public --permanent --add-forward
 # 打开 NAT 的 IP 伪装
 $ sudo firewall-cmd --zone=public --add-masquerade --permanent
-# 设置NAT规则，将来自指定网段的数据包，伪装成enp7s0的IP地址
-$ sudo firewall-cmd --zone=public --permanent --add-rich-rule='rule family=ipv4 source address=192.168.24.0/24 masquerade'
+# 设置 NAT 规则，将来自指定网段的数据包，伪装成 enp7s0 的 IP 地址
+$ sudo firewall-cmd --zone=trusted --permanent --add-rich-rule='rule family=ipv4 source address=192.168.24.0/24 masquerade'
 # 生效配置
 $ sudo firewall-cmd --reload
 ```
