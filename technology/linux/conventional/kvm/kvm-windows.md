@@ -157,7 +157,6 @@ main() {
         -usb -device usb-tablet \
         -drive 'file=win10.qcow2,format=qcow2,index=0,media=disk,if=virtio'
 
-    unset cpu cpu_cores cpu_logic_cores threads
     smb_umount
 }
 
