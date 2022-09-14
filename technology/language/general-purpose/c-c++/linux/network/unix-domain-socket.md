@@ -173,7 +173,7 @@ server message: Hello World
 
 int main() {
     unlink(SERVER_SOCKET_PATH);
-    // 创建本地socket
+    // 创建本地 socket
     const int server_socket = socket(AF_UNIX, SOCK_DGRAM, IPPROTO_IP);
     if (server_socket == -1) {
         fprintf(stderr, "Socket create error: %s.", strerror(errno));

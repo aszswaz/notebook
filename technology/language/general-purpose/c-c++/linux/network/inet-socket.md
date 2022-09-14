@@ -4,14 +4,23 @@
 
 ### Server
 
-```c++
-#include <iostream>
+```c
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <cerrno>
 #include <unistd.h>
 #include <arpa/inet.h>
+
+#define SYSCALL_ERROR(expression) \
+    if (expression) { \
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, strerror(errno)); \
+        goto finally; \
+    }
 
 #define RECV_DATA(socket, buff, buffLen) \
     if (recv(socket, buff, buffLen, 0) == -1) { \
@@ -26,147 +35,109 @@
     }
 
 int main() {
-    // 创建socket
-    const int server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server_socket == -1) {
-        fprintf(stderr, "Socket create error: %s.", strerror(errno));
-        return EXIT_FAILURE;
-    }
-
-    // unix domain socket 专用的地址结构体
-    struct sockaddr_in server_addr{};
-    // AF_LOCAL = AF_UNIX
-    server_addr.sin_port = htons(8080);
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-    // 绑定套接字
-    ssize_t code = bind(
-            server_socket,
-            reinterpret_cast<const sockaddr *>(&server_addr),
-            sizeof(server_addr)
-    );
-    if (code == -1) {
-        fprintf(stdout, "socket bind error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-
-    // 套接字请求队列大小
+    int sockfd = -1, clientfd = -1;
+    struct sockaddr_in saddr;
+    int code;
     int queueSize = 10;
-    // 监听socket
-    code = listen(server_socket, queueSize);
-    if (code == -1) {
-        fprintf(stderr, "listen error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    struct sockaddr_in caddr;
+    socklen_t caddr_len = sizeof(caddr);
+    char buff[BUFSIZ];
 
-    // 地址结构体的长度，会影响客户端地址结构的填充
-    socklen_t socket_len = sizeof(struct sockaddr_in);
-    struct sockaddr_in client_addr{};
+    // Create a socket using TCP.
+    sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SYSCALL_ERROR(sockfd == -1);
 
-    // 等待客户端连接
-    int client_socket = accept(
-            server_socket, reinterpret_cast<sockaddr *>(&client_addr),
-            &socket_len
-    );
-    if (client_socket == -1) {
-        fprintf(stderr, "accept error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    } else {
-        fprintf(stdout, "client ip: %s\n", inet_ntoa(client_addr.sin_addr));
-    }
+    saddr.sin_port = htons(8080);
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // 接收客户端传入的数据
-    char buff[BUFSIZ]{};
-    RECV_DATA(client_socket, buff, BUFSIZ)
-    fprintf(stdout, "client message: %s\n", buff);
+    // bind address.
+    code = bind(sockfd, (struct sockaddr *)(&saddr), sizeof(saddr));
+    SYSCALL_ERROR(code == -1);
+    // Listen on the port and set the size of the connection establishment request queue.
+    code = listen(sockfd, 10);
+    SYSCALL_ERROR(code == -1);
 
-    // 发送数据
-    SEND_DATA(client_socket, buff, BUFSIZ)
 
-    close(server_socket);
-    close(client_socket);
+    // Waiting for client to connect.
+    clientfd = accept(sockfd, (struct sockaddr *)(&caddr), &caddr_len);
+    printf("Connection established successfully! client ip: %s\n", inet_ntoa(caddr.sin_addr));
+
+    memset(buff, 0, sizeof(buff));
+    code = recv(clientfd, buff, sizeof(buff), 0);
+    SYSCALL_ERROR(code < 0);
+    printf("client message: ");
+    fwrite(buff, code, 1, stdout);
+    printf("\n");
+    code = send(clientfd, buff, code, 0);
+    SYSCALL_ERROR(code < 0);
+
+finally:
+    if (sockfd != -1) close(sockfd);
+    if (clientfd != -1) close(clientfd);
     return EXIT_SUCCESS;
 }
 ```
 
 ### Client
 
-```c++
+```c
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "sys/socket.h"
 #include "netinet/in.h"
 #include "arpa/inet.h"
-#include <unistd.h>
 #include "netdb.h"
-#include <cstdio>
-#include "cstring"
-#include <cerrno>
-#include <cstdlib>
+
+#define SYSCALL_ERROR(expression) \
+    if (expression) { \
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, strerror(errno)); \
+        goto finally; \
+    }
 
 int main() {
-    int server_socket;
-    // 服务器网络地址结构体
-    struct sockaddr_in remote_addr{};
-    // 设置为 IPV4 通信
-    remote_addr.sin_family = AF_INET;
-
-    // 根据域名获得 IPV4 地址
-    struct hostent *h;
-    h = gethostbyname("localhost");
-    // 把地址的字节转换为字符串
-    const char *ip = inet_ntoa(*((struct in_addr *) h->h_addr));
-    fprintf(stdout, "ip: %s\n", ip);
-    // 也可以使用 memcpy(remote_addr.sin_addr.s_addr, h->h_addr, 4); 这两种方式的作用效果是等价的
-    remote_addr.sin_addr.s_addr = inet_addr(ip);
-    remote_addr.sin_port = htons(8080);
-
-    /*
-     * 创建客户端套接字--IPv4协议，面向连接通信，TCP协议
-     * AF_INET = 地址格式，Internet = IP 地址
-     * PF_INET = 数据包格式，Internet = IP、TCP/IP 或 UDP/IP
-     * AF_UNIX = unix domain socket，UNIX 域套接字，通过unix的文件系统，进行套接字连接，支持TCP和UDP，但不支持原始数据包
-     * 具体的区分暂且不清楚，可能是个互联网历史遗留的毛病，大多数情况下 AF_INET 等同 PF_INET
-     *
-     * 第二个参数指定的是socket类型
-     * SOCK_STREAM：是一种基于连接的协议。连接建立并进行对话，直到连接被其中一方或网络错误终止。SOCK_STREAM 通过 TTL 控制指令来保证数据包的正确收发（不会出现数据包丢失，以及数据包顺序混乱等）
-     * SOCK_DGRAM：是一种基于数据报的协议。发送端只管发送，接受端只管接受，相比SOCK_STREAM，具有消耗计算资源和网络资源少的特点，有有不提供数据报分组、组装和不能对数据包进行排序的缺点。
-     * SOCK_RAW：原始模式基本上允许您绕过计算机处理 TCP/IP 的某些方式。您只需将数据包传递给需要它的应用程序，而不是通过内核上的 TCP/IP 堆栈执行的常规封装/解封装层。
-     *           没有 TCP/IP 处理——所以它不是一个处理过的数据包，它是一个原始数据包。使用数据包的应用程序现在负责剥离报头，分析数据包，内核中的 TCP/IP 堆栈通常为您做的所有事情。
-     * 更多请参见下面 socket_type 章节
-     *
-     * 第三个参数用于指定所要接收的协议包
-     * IPPROTO_IP：TCP 的虚拟协议（Dummy protocol for TCP.），实际上是让内核根据socket类型和地址类型，自动选择协议，对于 SOCK_RAW 类型的 socket 无效
-     * IPPROTO_TCP：传输控制协议（Transmission Control Protocol.）,告诉内核，这个socket只接受TCP数据包
-     * IPPROTO_UDP：用户数据报协议（User Datagram Protocol.），告诉内核，这个socket只接受UDP数据包
-     * IPPROTO_IPV6：对IPv6了解还不够，以后再补充
-     */
-    if ((server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
-        fprintf(stderr, "socket error： %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-    // 将套接字绑定到服务器的网络地址上
-    if (connect(server_socket, (struct sockaddr *) &remote_addr, sizeof(struct sockaddr)) == -1) {
-        fprintf(stderr, "connect error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-    fprintf(stdout, "connected server\n");
-
-    const char *sendStr = "Hello World";
-    ssize_t len = send(server_socket, sendStr, strlen(sendStr) + 1, 0);
-    if (len == -1) {
-        fprintf(stderr, "send error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-
+    int ssocketfd = -1;
+    struct sockaddr_in saddr;
+    struct hostent *host;
+    int code;
+    socklen_t saddr_len = sizeof(saddr);
+    const char *message = "Hello World";
     char buff[BUFSIZ];
-    len = recv(server_socket, buff, BUFSIZ, 0);
-    if (len == -1) {
-        fprintf(stderr, "recv error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-    fprintf(stdout, "server message: %s\n", buff);
 
-    close(server_socket);
+    // Quey DNS.
+    host = gethostbyname("localhost");
+    if (!host) {
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, hstrerror(h_errno));
+        goto finally;
+    }
+    printf("ip: %s\n", inet_ntoa(*((struct in_addr *) host->h_addr)));
+    // Set the IP address and address type.
+    saddr.sin_family = host->h_addrtype;
+    memcpy(&saddr.sin_addr.s_addr, host->h_addr, host->h_length);
+    saddr.sin_port = htons(8080);
+
+    // Create a socket using the TCP protocol.
+    ssocketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SYSCALL_ERROR(ssocketfd == -1);
+    code = connect(ssocketfd, (struct sockaddr *)&saddr, saddr_len);
+    SYSCALL_ERROR(code == -1);
+    printf("connected server\n");
+
+    code = send(ssocketfd, message, strlen(message), 0);
+    SYSCALL_ERROR(code == -1);
+    memset(buff, 0, sizeof(message));
+    code = recv(ssocketfd, buff, BUFSIZ, 0);
+    SYSCALL_ERROR(code == -1);
+    printf("server message: ");
+    fwrite(buff, code, 1, stdout);
+    printf("\n");
+
+finally:
+    if (ssocketfd != -1) close(ssocketfd);
     return 0;
 }
 ```
@@ -176,55 +147,53 @@ int main() {
 ### Server
 
 ```c++
-#include <cstring>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <cerrno>
-#include <unistd.h>
 #include <arpa/inet.h>
-#include <cstdio>
-#include <cstdlib>
+
+#define SYSCALL_ERROR(expression) \
+    if (expression) { \
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, strerror(errno)); \
+        goto finally; \
+    }
 
 int main() {
-    struct sockaddr_in server_addr{};
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(8080);
-    server_addr.sin_family = AF_INET;
+    struct sockaddr_in addr;
+    int socketfd = -1, clientfd = -1;
+    socklen_t socklen = sizeof(addr);
+    char buff[BUFSIZ];
 
-    const int server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    if (server_socket == -1) {
-        fprintf(stderr, "socket create error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    int code;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(8080);
+    addr.sin_family = AF_INET;
 
-    ssize_t code = bind(server_socket, reinterpret_cast<struct sockaddr *> (&server_addr), sizeof(server_addr));
-    if (code == -1) {
-        fprintf(stderr, "bind socket error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    socketfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+    SYSCALL_ERROR(socketfd == -1);
 
-    struct sockaddr_in client_addr{};
-    // IP地址结构的大小，绝对不能为0，否则recvfrom无法填充客户端的地址结构
-    socklen_t socklen = sizeof(client_addr);
-    char buff[BUFSIZ]{};
+    code = bind(socketfd, (struct sockaddr *)&addr, socklen);
+    SYSCALL_ERROR(code == -1);
 
-    // 读取数据，并且获得客户端的地址，数据报协议是无连接的，需要掌握双方的地址信息才可以双向通信
-    code = recvfrom(
-            server_socket, buff, BUFSIZ, 0, reinterpret_cast<struct sockaddr *>(&client_addr), &socklen
-    );
-    if (code == -1) {
-        fprintf(stderr, "recvfrom error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
-    fprintf(stdout, "client %s message: %s\n", inet_ntoa(client_addr.sin_addr), buff);
 
-    code = sendto(server_socket, buff, strlen(buff) + 1, 0, reinterpret_cast<struct sockaddr *>(&client_addr), socklen);
-    if (code == -1) {
-        fprintf(stderr, "sendto error :%s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    // Read the data and obtain the address of the client.
+    // The datagram protocol is connectionless, and it is necessary to master the address information of both parties to enable two-way communication.
+    memset(buff, 0, sizeof(buff));
+    code = recvfrom(socketfd, buff, sizeof(buff), 0, (struct sockaddr *)&addr, &socklen);
+    SYSCALL_ERROR(code == -1);
+    printf("client %s message: %s\n", inet_ntoa(addr.sin_addr), buff);
 
-    close(server_socket);
+    code = sendto(socketfd, buff, strlen(buff), 0, (struct sockaddr *)&addr, socklen);
+    SYSCALL_ERROR(code == -1);
+
+finally:
+    if (socketfd) close(socketfd);
+    if (clientfd) close(clientfd);
     return EXIT_SUCCESS;
 }
 ```
@@ -232,56 +201,47 @@ int main() {
 ### Client
 
 ```c++
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <cerrno>
-#include <cstdio>
-#include <cstdlib>
 #include <sys/un.h>
-#include <unistd.h>
 #include <arpa/inet.h>
 
+#define SYSCALL_ERROR(expression) \
+    if (expression) { \
+        printf("%s %d: %s", __FILE_NAME__, __LINE__, strerror(errno)); \
+        goto finally; \
+    }
+
 int main() {
-    struct sockaddr_in server_addr{};
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8080);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
+    struct sockaddr_in saddr;
+    int socketfd = -1;
+    int code;
+    const char *message = "Hello World";
+    socklen_t socklen = sizeof(saddr);
+    char buff[BUFSIZ];
 
-    const int server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (server_socket == -1) {
-        fprintf(stderr, "socket create error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    saddr.sin_family = AF_INET;
+    saddr.sin_port = htons(8080);
+    saddr.sin_addr.s_addr = INADDR_ANY;
 
-    ssize_t code;
+    socketfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    SYSCALL_ERROR(socketfd == -1);
 
-    // 发送数据
-    const char *sendData = "Hello World";
-    code = sendto(
-            server_socket, sendData, strlen(sendData) + 1, 0,
-            reinterpret_cast<struct sockaddr *> (&server_addr),
-            sizeof(server_addr)
-    );
-    if (code == -1) {
-        fprintf(stderr, "sendto error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    code = sendto(socketfd, message, strlen(message), 0, (struct sockaddr *)&saddr, socklen);
+    SYSCALL_ERROR(code == -1);
 
-    // 注意，这里不可为0，否则会导致地址结构无法填充
-    socklen_t socklen = sizeof(server_addr);
-
-    // 接收数据
-    char buff[BUFSIZ]{};
-    code = recvfrom(
-            server_socket, buff, BUFSIZ, 0, reinterpret_cast<struct sockaddr *> (&server_addr), &socklen
-    );
-    if (code == -1) {
-        fprintf(stderr, "recvfrom error: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    memset(buff, 0, sizeof(buff));
+    code = recvfrom(socketfd, buff, sizeof(buff), 0, (struct sockaddr *)&saddr, &socklen);
+    SYSCALL_ERROR(code == -1);
     fprintf(stdout, "sever message: %s\n", buff);
 
-    close(server_socket);
+finally:
+    if (socketfd != -1) close(socketfd);
     return EXIT_SUCCESS;
 }
 ```

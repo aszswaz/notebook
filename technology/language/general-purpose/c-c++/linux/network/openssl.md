@@ -47,7 +47,7 @@ int main() {
 
     // 注册可用的 SSL/TLS 密码和摘要。
     SSL_library_init();
-    // 为所有libcrypto函数注册错误字符串。SSL_load_error_strings() 执行相同的操作，但还会注册libssl错误字符串。
+    // 为所有 libcrypto 函数注册错误字符串。SSL_load_error_strings() 执行相同的操作，但还会注册 libssl 错误字符串。
     ERR_load_crypto_strings();
     SSL_load_error_strings();
     // 将所有算法添加到表中（摘要和密码）。
@@ -55,25 +55,25 @@ int main() {
 
     /*
      * SSLv23_method(), SSLv23_server_method(), SSLv23_client_method()
-     * 这些是通用版本灵活的SSL/TLS 方法。实际使用的协议版本将协商为客户端和服务器相互支持的最高版本。支持的协议有 SSLv2、SSLv3、TLSv1、TLSv1.1 和 TLSv1.2。大多数应用程序应该使用这些方法.
+     * 这些是通用版本灵活的 SSL/TLS 方法。实际使用的协议版本将协商为客户端和服务器相互支持的最高版本。支持的协议有 SSLv2、SSLv3、TLSv1、TLSv1.1 和 TLSv1.2。大多数应用程序应该使用这些方法.
      */
-    // 构建ssl客户端
+    // 构建 ssl 客户端
     const SSL_METHOD *sslMethod = SSLv23_client_method();
-    // 创建一个新的SSL_CTX对象作为框架来建立支持 TLS/SSL 的连接。
+    // 创建一个新的 SSL_CTX 对象作为框架来建立支持 TLS/SSL 的连接。
     SSL_CTX *sslCtx = SSL_CTX_new(sslMethod);
     if (!sslCtx) {
         fprintf(log_err, "SSL_CTX_new failed\n");
         ERR_print_errors_fp(log_err);
         return 1;
     }
-    // 查询域名的IP地址
+    // 查询域名的 IP 地址
     hostent *hostent = gethostbyname(HOST);
     in_addr ip;
     memcpy(&(ip.s_addr), hostent->h_addr_list[0], hostent->h_length);
-    // 输出域名和对应的IP地址
+    // 输出域名和对应的 IP 地址
     fprintf(log_out, "host: %s, ipv4: %s\n", HOST, inet_ntoa(ip));
 
-    // 建立TCP的socket
+    // 建立 TCP 的 socket
     const int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
         fprintf(log_err, "Socket creation failed.\n");
@@ -83,14 +83,14 @@ int main() {
     sock_address.sin_family = AF_INET;
     sock_address.sin_port = htons(PORT);
     sock_address.sin_addr = ip;
-    // 连接socket
+    // 连接 socket
     int error = connect(sock, (sockaddr *) &sock_address, sizeof(sockaddr));
     if (error) {
         fprintf(log_err, "The socket connection failed.\n");
         return 1;
     }
 
-    // 开始ssl握手
+    // 开始 ssl 握手
     SSL *ssl = SSL_new(sslCtx);
     if (!ssl) {
         fprintf(log_err, "ssl handle creation failed.\n");
@@ -99,9 +99,9 @@ int main() {
     }
     // 设置 TSL 的 SNI 字段，这个字段用于握手的时候进行服务器域名验证，并且是不加密的，目前被政府用于拦截没有备案的网站的访问
     SSL_set_tlsext_host_name(ssl, HOST);
-    // ssl句柄和socket进行绑定
+    // ssl 句柄和 socket 进行绑定
     SSL_set_fd(ssl, sock);
-    // ssl握手开始
+    // ssl 握手开始
     SSL_connect(ssl);
     /* (5) 打印出协商的好的加密密文 */
     fprintf(log_out, "(5) SSL connected with cipher: %s\n", SSL_get_cipher(ssl));
