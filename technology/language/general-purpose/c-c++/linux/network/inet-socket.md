@@ -147,14 +147,16 @@ finally:
 ### Server
 
 ```c++
-#include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 #define SYSCALL_ERROR(expression) \
@@ -164,36 +166,56 @@ finally:
     }
 
 int main() {
-    struct sockaddr_in addr;
-    int socketfd = -1, clientfd = -1;
-    socklen_t socklen = sizeof(addr);
-    char buff[BUFSIZ];
-
+    int sockfd = -1, clientfd = -1;
+    struct sockaddr_in saddr;
     int code;
-    addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons(8080);
-    addr.sin_family = AF_INET;
+    int queueSize = 10;
+    struct sockaddr_in caddr;
+    socklen_t caddr_len = sizeof(caddr);
+    char buff[BUFSIZ];
+    const int tcp_retries = 3;
+    struct timeval timeout = {10, 0};
 
-    socketfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
-    SYSCALL_ERROR(socketfd == -1);
+    // Create a socket using TCP.
+    sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SYSCALL_ERROR(sockfd == -1);
+    // Set the number of TCP handshake retries.
+    code = setsockopt(sockfd, IPPROTO_TCP, TCP_SYNCNT, &tcp_retries, sizeof(tcp_retries));
+    SYSCALL_ERROR(code == -1);
+    // Set the socket read and write timeout.
+    code = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    SYSCALL_ERROR(code == -1);
+    code = setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    SYSCALL_ERROR(code);
 
-    code = bind(socketfd, (struct sockaddr *)&addr, socklen);
+    saddr.sin_port = htons(8080);
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    // bind address.
+    code = bind(sockfd, (struct sockaddr *)(&saddr), sizeof(saddr));
+    SYSCALL_ERROR(code == -1);
+    // Listen on the port and set the size of the connection establishment request queue.
+    code = listen(sockfd, 10);
     SYSCALL_ERROR(code == -1);
 
 
-    // Read the data and obtain the address of the client.
-    // The datagram protocol is connectionless, and it is necessary to master the address information of both parties to enable two-way communication.
+    // Waiting for client to connect.
+    clientfd = accept(sockfd, (struct sockaddr *)(&caddr), &caddr_len);
+    printf("Connection established successfully! client ip: %s\n", inet_ntoa(caddr.sin_addr));
+
     memset(buff, 0, sizeof(buff));
-    code = recvfrom(socketfd, buff, sizeof(buff), 0, (struct sockaddr *)&addr, &socklen);
-    SYSCALL_ERROR(code == -1);
-    printf("client %s message: %s\n", inet_ntoa(addr.sin_addr), buff);
-
-    code = sendto(socketfd, buff, strlen(buff), 0, (struct sockaddr *)&addr, socklen);
-    SYSCALL_ERROR(code == -1);
+    code = recv(clientfd, buff, sizeof(buff), 0);
+    SYSCALL_ERROR(code < 0);
+    printf("client message: ");
+    fwrite(buff, code, 1, stdout);
+    printf("\n");
+    code = send(clientfd, buff, code, 0);
+    SYSCALL_ERROR(code < 0);
 
 finally:
-    if (socketfd) close(socketfd);
-    if (clientfd) close(clientfd);
+    if (sockfd != -1) close(sockfd);
+    if (clientfd != -1) close(clientfd);
     return EXIT_SUCCESS;
 }
 ```
@@ -201,52 +223,76 @@ finally:
 ### Client
 
 ```c++
-#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <unistd.h>
 
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/un.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #define SYSCALL_ERROR(expression) \
     if (expression) { \
-        printf("%s %d: %s", __FILE_NAME__, __LINE__, strerror(errno)); \
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, strerror(errno)); \
         goto finally; \
     }
 
 int main() {
+    int ssocketfd = -1;
     struct sockaddr_in saddr;
-    int socketfd = -1;
+    struct hostent *host;
     int code;
+    socklen_t saddr_len = sizeof(saddr);
     const char *message = "Hello World";
-    socklen_t socklen = sizeof(saddr);
     char buff[BUFSIZ];
+    const int tcp_retries = 3;
+    struct timeval timeout = {10, 0};
 
-    saddr.sin_family = AF_INET;
+    // Quey DNS.
+    host = gethostbyname("localhost");
+    if (!host) {
+        printf("%s %d: %s\n", __FILE_NAME__, __LINE__, hstrerror(h_errno));
+        goto finally;
+    }
+    printf("ip: %s\n", inet_ntoa(*((struct in_addr *) host->h_addr)));
+    // Set the IP address and address type.
+    saddr.sin_family = host->h_addrtype;
+    memcpy(&saddr.sin_addr.s_addr, host->h_addr, host->h_length);
     saddr.sin_port = htons(8080);
-    saddr.sin_addr.s_addr = INADDR_ANY;
 
-    socketfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    SYSCALL_ERROR(socketfd == -1);
-
-    code = sendto(socketfd, message, strlen(message), 0, (struct sockaddr *)&saddr, socklen);
+    // Create a socket using the TCP protocol.
+    ssocketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SYSCALL_ERROR(ssocketfd == -1);
+    // Set the number of TCP handshake retries.
+    code = setsockopt(ssocketfd, IPPROTO_TCP, TCP_SYNCNT, &tcp_retries, sizeof(tcp_retries));
     SYSCALL_ERROR(code == -1);
-
-    memset(buff, 0, sizeof(buff));
-    code = recvfrom(socketfd, buff, sizeof(buff), 0, (struct sockaddr *)&saddr, &socklen);
+    // Set the socket read and write timeout.
+    code = setsockopt(ssocketfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     SYSCALL_ERROR(code == -1);
-    fprintf(stdout, "sever message: %s\n", buff);
+    code = setsockopt(ssocketfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    SYSCALL_ERROR(code == -1);
+    code = connect(ssocketfd, (struct sockaddr *)&saddr, saddr_len);
+    SYSCALL_ERROR(code == -1);
+    printf("connected server\n");
+
+    code = send(ssocketfd, message, strlen(message), 0);
+    SYSCALL_ERROR(code == -1);
+    memset(buff, 0, sizeof(message));
+    code = recv(ssocketfd, buff, BUFSIZ, 0);
+    SYSCALL_ERROR(code == -1);
+    printf("server message: ");
+    fwrite(buff, code, 1, stdout);
+    printf("\n");
 
 finally:
-    if (socketfd != -1) close(socketfd);
-    return EXIT_SUCCESS;
+    if (ssocketfd != -1) close(ssocketfd);
+    return 0;
 }
 ```
-
-<font color="red">通过以上代码，可以看出UDP不能通过“连接”来交换数据，UDP的数据交换只能通过双方各自持有的对方的IP和端口进行数据交互。这点和TCP不同，TCP的三次握手建立一个连接后，数据的交换是由TTL控制包维护的，开发者不需要关心客户端的IP和端口</font>
 
 ## ipv4 字符串和int的相互转换
 
