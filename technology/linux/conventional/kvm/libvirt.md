@@ -7,6 +7,10 @@ libvirt是一套用于管理硬件虚拟化的开源API、守护进程与管理�
 ```bash
 $ sudo pacman libvirt virt-manager
 $ sudo systemctl enable libvirtd && sudo systemctl start libvirtd
+# 为了避免文件权限和设备独占权限问题，需要将 qemu 配置为 root 用户启动
+$ sudo nvim /etc/libvirt/qemu.conf
+user = "aszswaz"
+group = "aszswaz"
 # 安装 libvirtd 时，会给 firewall 一个 libvirt 的区域设置文件，文件路径是 /usr/lib/firewalld/zones/libvirt.xml，因此需要让 firewall 加载这个配置文件，否则虚拟机的网络将不可用
 $ sudo firewall-cmd --reload
 ```
@@ -85,3 +89,24 @@ $ sudo systemctl restart libvirtd
 $ sudo firewall-cmd --zone=public --add-port='16509/tcp' --permanent && sudo firewall-cmd --reload
 ```
 
+# 注意事项
+
+## 创建镜像文件
+
+不建议通过 virt 创建 raw 格式的镜像文件，因为 virt 在创建 raw 格式的镜像文件时，会对文件进行填充，这直接导致镜像文件真的占用了大量空间。解决办法是通过 qemu-img 创建镜像文件：
+
+```bash
+$ qemu-img create -f raw demo.img && sudo chown libvirt-qemu:$USER demo.img && sudo chmod g+rw demo.img
+```
+
+## 镜像文件存放在外部驱动器
+
+如果要将镜像文件存放在外部驱动器，则要注意驱动器挂载点的权限问题。
+
+如果是通过 udisksctl 挂载外部驱动器，它会在 /run/media/\$USER 目录中创建一个目录来挂载驱动器，并把  /run/media/\$USER 的目录权限设置为只有两个用户可以访问，一个是 root 用户，另一个是执行 udisksctl 的用户。解决办法是让 libvirt 用指定用户启动 qemu：
+
+```bash
+$ sudo nvim /etc/libvirt/qemu.conf
+user = "aszswaz"
+group = "aszswaz"
+```

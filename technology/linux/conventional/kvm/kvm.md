@@ -1,175 +1,162 @@
-# 简介
+# Introduction
 
-KVM(Kernel-based Virtual Machine的缩写)，是内核内建的虚拟机，追求简便的运作。例如运行虚拟机仅需要加载相应的 kvm 模块，但是KVM需要芯片支持虚拟化技术（Intel的VT扩展，或是AMD的AMD-V 扩展）。
+>  [KVM](https://www.linux-kvm.org/page/Main_Page) (for Kernel-based Virtual Machine) is a full virtualization solution for Linux on x86 hardware containing virtualization extensions (Intel VT or AMD-V).
+>
+> KVM is open source software. The kernel component of KVM is included in mainline Linux, as of 2.6.20. The userspace component of KVM is included in mainline QEMU, as of 1.3.
 
-在KVM中，可以运行各种GNU/Linux，Windows 或其他系统镜像（例如FreeBSD，MacOS）。每个虚拟机都可以提供独享的虚拟硬件：网卡，硬盘，显卡等（虚拟机甚至可以直通主机设备，例如GPU PCI pass through）。
+# Install QEMU/KVM (take ArchLinux as an example)
 
-# 安装 KVM（以 ArchLinux 为例）
+Archlinux qemu wiki: [https://wiki.archlinux.org/title/QEMU](https://wiki.archlinux.org/title/QEMU)
 
-只要有输出就表示支持虚拟化，例如：
+Check if the CPU has virtualization extensions turned on.
 
 ```bash
-# 检查 CPU 是否开启虚拟化支持，KVM需要host的处理器支持虚拟化，通过以下命令查看host是否支持
 $ LC_ALL=C lscpu | grep Virtualization
-# 这是我本人的（Intel x86）
+
+```
+
+If it is an x86 cpu, the output is like this:
+
+```text
 Virtualization:                  VT-x
-# 这是一位博客作者的（AMD 的电脑）
-Virtualization:                AMD-V
-# kvm 负责CPU和内存的虚拟化
-# qemu 向 guest OS 模拟硬件（例如，CPU，网卡，磁盘，等）
-# ovmf 为虚拟机启用UEFI支持
-# 实际上，这步只需要安装qemu就可以使用虚拟机，但是 qemu-kvm 接口有些复杂，libvirt 和 virt-manager 让配置和管理虚拟机更便捷。
-# qemu-desktop 适用于有 GUI 的计算机上，启动虚拟机时，qemu 会给虚拟机创建一个 GUI 窗口
-# qemu-base 则适用于没有 GUI 的计算机，qemu 会为虚拟机启动 VNC
-$ sudo pacman -S qemu-desktop ovmf
-$ sudo pacman -S libvirt virt-manager
 ```
 
-# 创建并启动虚拟机
+If it is an AMD64 CPU, the output is as follows:
 
-## 创建虚拟机
-
-```bash
-# 创建虚拟磁盘
-$ qemu-img create -f qcow2 demo.qcow2 100G
-# 使用 iso 镜像，安装虚拟机操作系统
-$ qemu-system-x86_64 -m 2G -cpu host -smp "2,sockets=1,cores=1,threads=2,maxcpus=2" -enable-kvm ./demo.qcow2 -cdrom ./demo.iso
+```text
+Virtualization:                  AMD-V
 ```
 
-## 主机和虚拟机的网络互通
+qemu-full and qemu-base packages, choose on to install. The difference is: qemu-full has GUI, qemu-base has no GUI. qemu-base is for servers, it starts the VNC service for virtual machines.
 
-qemu 默认是通过软件模拟的方式，给虚拟机创建一个单独的内部网络，这种方式的好处是无需进行配置，虚拟机就可以进行网络连接，它的弊端是虚拟机主动连接主机，而主机无法连接虚拟机。如果想要主机可以连接虚拟机，并且不影响虚拟机连接互联网，则需要通过主机操作系统的虚拟往桥功能才能实现。
+Take qemu-full as an exmaple:
 
 ```bash
-# 创建网桥
-$ BRIDGE=kvmbr0
-$ sudo brctl addbr $BRIDGE
-# 使用 iproute2 配置网桥
-$ sudo ip addr add '192.168.122.1/24' dev $BRIDGE
-$ sudo ip link set $BRIDGE up
-$ sudo brctl stp $BRIDGE on
-# 配置 firewall，开启 NAT 功能
-...
-# 在网桥上启用 DHCP，如果是希望给虚拟机配置静态 IP，则不需要这个
-# $ sudo dnsmasq --interface=kvm-br --bind-interfaces --dhcp-range=127.0.0.2,127.0.0.254
-# 启动虚拟机
-$ sudo qemu-system-x86_64 \
-    -m 4G \
-    -smp "cpus=2,sockets=1,cores=1,threads=2,maxcpus=2" \
+$ sudo pacman -S qemu-full
+```
+
+# Create a virtual machine
+
+First you need to create an image file:
+
+```bash
+$ qemu-img create -f raw demo.img 50G
+```
+
+`-f raw` specifies the format of the image file. There are two file formats: `raw` and `qcow2`. "raw" has the best performance, but does not support snapshots, and "qcow2" has less performance, but supports snapshots. 
+
+Assuming that the input file of the guest system has been prepared: `demo.iso`, you can start the virtual machine:
+
+```bash
+$ qemu-system-x86_64 -m 2G -enable-kvm -cdrom ./demo.iso -drive 'file=demo.img,format=raw,index=0,media=disk,if=virtio'
+```
+
+# Qemu device configuration
+
+The device configuration of qemu is usually divided into two parts: frontend and backend. Frontend refers to the driver in the Guest OS, or the device emulated by qemu. The backend refers to how qemu processes data from the Guest OS in the Host OS.
+
+For example, to connect the virtual machine to the host bridge:
+
+```bash
+$ qemu-system-x86_64 -netdev "bridge,br=$BRIDGE,id=kvm0" -device 'virtio-net,netdev=kvm0' ...
+```
+
+`-netdev` is to create a network backend, `-device` is to create a frontend, and the frontend specifies the backend through `netdev`.
+
+# Network
+
+By default, qemu creates a separate internal network for the virtual machine through software simulation. The advantage of this method is that the virtual machine can connect to the network without configuration. The disadvantage is that the virtual machine can connect to the host, but the host cannot. Connect the virtual machine. If you want the host to be able to connect to the virtual machine without affecting the virtual machine's connection to the Internet, you need to pass the bridge and NAT forwarding of the host operating system to achieve this.
+
+A completed host NAT network configuration is as follows:
+
+```bash
+#!/bin/bash
+
+set -o errexit
+
+cd "$(dirname $0)"
+
+BRIDGE="virbr0"
+FIREWALL_ZONE="libvirt"
+NETWORK_SEGMENT="192.168.122"
+MASK=24
+
+# Prepare resources for virtual machines.
+# Enable ip forwarding
+[[ $(sysctl -n net.ipv4.ip_forward) != 1 ]] && sysctl -w net.ipv4.ip_forward=1
+
+# If the bridge does not exist, create the bridge.
+if ! ip link show $BRIDGE >>/dev/null 2>&1; then
+    brctl addbr $BRIDGE
+    ip addr add "$NETWORK_SEGMENT.1/$MASK" dev $BRIDGE
+    ip link set dev $BRIDGE up
+    brctl stp $BRIDGE on
+fi
+
+# Enable NAT forwarding
+if [[ ! $(sudo firewall-cmd --get-zones) =~ $FIREWALL_ZONE ]]; then
+    firewall-cmd --permanent --new-zone=$FIREWALL_ZONE >>/dev/null
+    firewall-cmd --permanent --zone=$FIREWALL_ZONE --change-interface=$BRIDGE >>/dev/null
+    firewall-cmd --permanent --zone=$FIREWALL_ZONE --set-target=ACCEPT >>/dev/null
+    firewall-cmd --permanent --zone=$FIREWALL_ZONE --set-description="Network configuration for qemu/kvm virtual machines"
+
+    [[ $(firewall-cmd --query-forward) == "no" ]] && firewall-cmd --permanent --add-forward >>/dev/null
+    [[ $(firewall-cmd --query-masquerade) == "no" ]] && firewall-cmd --permanent --add-masquerade >>/dev/null
+
+    local rule="rule family=ipv4 source address=$NETWORK_SEGMENT.0/$MASK masquerade"
+    if [[ $(firewall-cmd --zone=$FIREWALL_ZONE --query-rich-rule="$rule") == "no" ]]; then
+        firewall-cmd --permanent --zone=$FIREWALL_ZONE --add-rich-rule="$rule" >>/dev/null
+    fi
+
+    firewall-cmd --reload
+fi
+
+# qmeu limits available bridges via the /etc/qemu/bridge.conf file. Permission needs to be added to this file.
+if [[ ! $(</etc/qemu/bridge.conf) =~ "allow $BRIDGE" ]]; then
+    echo "allow $BRIDGE" >>/etc/qemu/bridge.conf
+fi
+```
+
+Start the virtual machine and connect the virtual NIC to the bridge:
+
+```bash
+$ qemu-system-x86_64 \
     -netdev "bridge,br=$BRIDGE,id=kvm0" -device 'virtio-net,netdev=kvm0' \
-    -enable-kvm \
-    ./demo.qcow2
+    -drive 'file=demo.img,format=raw,index=0,media=disk,if=virtio'
 ```
 
-[配置 firewall 开启 NAT 转发](../internet/network-card.md)
+You only need to configure a static IP in the virtual machine to access the network.
 
-# 共享文件夹
+# Audio
 
-主机与虚拟机共享文件夹的方式有很多种，这里主要介绍常用的方式。
+qemu has the following built-in audio processing methods:
 
-## SMB
+| name      | describe                                                     |
+| --------- | ------------------------------------------------------------ |
+| none      | Creates a dummy backend that discards all outputs. This backend has no backend specific properties. |
+| alsa      | Creates backend using the ALSA. This backend is only available on Linux. |
+| coreaudio | Creates a backend using Apple's Core Audio. This backend is only available on Mac OS and only supports playback. |
+| dsound    | Creates a backend using Microsoft's DirectSound. This backend is only available on Windows and only supports playback. |
+| oss       | Creates a backend using OSS. This backend is available on most Unix-like systems. |
+| pa        | Creates a backend using PulseAudio. This backend is available on most systems. |
+| sdl       | Creates a backend using SDL. This backend is available on most systems, but you should use your platform's native backend if possible. |
+| spice     | Creates  a backend that sends audio through SPICE. This backend requires -spice and automatically selected in that case, so usually you can ignore this option. This backend has no backend specific properties. |
+| wav       | Creates a backend that writes audio to a WAV file.           |
 
-QEMU的文档中指出它有一个内置的SMB服务器，但实际上，它只是在宿主机上加载一个自动生成的`smb.conf`配置文件 (位于`/tmp/qemu-smb.*random_string*`)，然后启动宿主机上的[Samba](https://wiki.archlinux.org/title/Samba)，使得客户机能够通过一个IP地址进行访问 (默认的IP地址是10.0.2.4)。这个方法只适用于用户网络，在你不想在宿主机开启通常的[Samba](https://wiki.archlinux.org/title/Samba)服务 (客户机同样能访问这类Samba服务) 时这个方法还挺好用的。
+Let qemu directly use `alsa` api to process audio input and output, the effect is very poor, the audio delay is very serious, unstable, and there is often no sound. The effect of `sdl` is relatively good, and it is barely usable, but the coordination with the alsa of the host is not perfect, and the sound will change somewhat. `spice` is one of qemu's server modes, for audio, qemu will not process the audio, but send it directly to the client.
 
-选项 `smb=` 可以设置仅共享一个目录，如果QEMU的SMB配置允许用户使用符号链接，那么即使在虚拟机运行时新加入更多的目录也很容易，只需要通过在共享目录里创建相应的软链接就行。然而他并没有这么配置，我们可以依照如下进行配置SMB服务器
+The performance of `pa` is very good. Here we mainly explain the configuration of `pa`.
 
-宿主机上必须安装 *Samba*。通过如下QEMU命令启用这项特性:
+First, `pulseaudio` and `pulseaudio-alsa` need to be installed:
 
 ```bash
-$ qemu-system-x86_64 disk_image -net nic -net user,smb=shared_dir_path
+$ sudo pacman pulseaudio pulseaudio-alsa
 ```
 
-`*shared_dir_path*` 就是你想要在宿主机和客户机之间共享的目录。
-
-接着，在客户机内，你应该能够通过10.0.2.4访问到名为qemu的共享文件夹。例如在Windows Explorer中前往 `\\10.0.2.4\qemu` 这个地址。
-
-# 常用命令
+Then you need to configure `audiodev` on the back end of qemu, `ich9-intel-hda` and `hda-micro` on the front end:
 
 ```bash
-# 创建硬盘
-$ qemu-img create -f qcow2 demo.qcow2 100G
-# 增加虚拟机硬盘容量上限
-$ qemu-img resize win10-01.qcow2 +40G
-# 创建快照
-$ qemu-img snapshot -c v1.0.0 ./demo.qcow2
-# 查看快照
-$ qemu-img snapshot -l ./demo.qcow2
-# 删除快照
-$ qemu-img snapshot -d v1.0.0 ./demo.qcow2
-# 恢复到快照
-$ qemu-img snapshot -a v1.0.0 ./demo.qcow2
+$ qemu-system-x86_64 -audiodev 'pa,id=sound0' -device 'ich9-intel-hda' -device 'hda-micro,audiodev=sound0' ...
 ```
 
-# 虚拟设备介绍
-
-## virtio
-
-virtio 是专为 kvm 虚拟机开发的半虚拟化 IO 设置，相比普通的虚拟 IO 设备，它的 IO 传输性能更好。
-
-# 相关工具
-
-**virt-manager**
-
-通过可视化窗口管理 qemu 虚拟机
-
-```bash
-$ sudo pacman -S virt-manager
-# 启动虚拟机服务
-$ sudo systemctl start libvirtd
-```
-
-# 参数解释
-
-## qemu-system-x86_64
-
-qemu 虚拟机执行程序
-
-### -m
-
-指定虚拟机可用内存大小
-
-### -smp
-
-虚拟机的 CPU 配置
-
-cpus：CPU 逻辑核心的初始数量，必须小于 maxcpus
-
-sockets：虚拟 CPU 插槽，这个仅作用于虚拟机，与主机无关，通常设置为 1 个就行
-
-cores：虚拟机可用的物理 CPU 核心，通常是物理 CPU 核心数的一半
-
-threads：单个 CPU 核心的线程数，2 或者 1，2 表示开启 Intel 超线程技术
-
-maxcpus：最多可用 N 个逻辑 CPU，值必须是 sockets \* cores \* threads
-
-### -cdrom
-
-使用 iso 镜像文件给虚拟机创建一个 CD 驱动器，通常用于虚拟机安装操作系统
-
-### -device
-
-创建虚拟设备，参数根据设备类型的不同而不同
-
-第一个参数：设备驱动，比如：virtio-net
-
-网络设置参数：
-
-netdev：网络设备 ID
-
-### -netdev
-
-配置虚拟网络设备
-
-第一个参数：网络类型，比如：bridge（网络桥接）
-
-br：主机中已存在的桥接网卡
-
-id：虚拟网络设备 ID，与 -device 的 netdev 参数一致
-
-### -cpu
-
-CPU 模式，该参数的可选值有很多，常用的只有两个
-
-host：直接使用主机的 CPU 型号，启用主机 CPU 支持的全部功能
-
-qemu64：qemu 模拟的 CPU 型号，默认值
+Use `qemu-system-x86_64 -device help | grep hda` to see other front-end devices supported by qemu.
