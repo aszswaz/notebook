@@ -24,3 +24,13 @@ For example, if 8 bits of data are sent at same time, if one bit fails to be sen
 
 Each USB port has a corresponding number. The default is port 0 as the control port, which is used to transmit control commands. The USB host can specify which ports to use for transmission through commands.
 
+# OS Basic Concepts
+
+## Kernel Mode and User Mode
+
+Kernel mode and user mode are relative to the CPU. Kernel mode refers to the CPU running at privilege level 0, and user mode refers to the CPU running at privilege level 3.
+
+User process enters kernel mode: It means that the current process temporarily terminates execution due to an interrupt from the kernel or outside, and starts executing a piece of kernel code after the interrupt program saves its context.
+
+The application program can directly execute the system call across the standard library. For the Linux system, the system call can be executed directly by directly embedding the assembly code `int 0x80`. Of course, the system call sub-function number should be prepared in advance, and the sub-function number uses the register `eax` storage.
+

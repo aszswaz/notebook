@@ -153,10 +153,53 @@ First, `pulseaudio` and `pulseaudio-alsa` need to be installed:
 $ sudo pacman pulseaudio pulseaudio-alsa
 ```
 
+Run pulseaudio:
+
+```bash
+$ systemctl --user start pulseaudio
+```
+
+Some distributions will automatically start "pulseaudio" on boot, which does not require the step.
+
 Then you need to configure `audiodev` on the back end of qemu, `ich9-intel-hda` and `hda-micro` on the front end:
 
 ```bash
+# Do not run as "root" user
 $ qemu-system-x86_64 -audiodev 'pa,id=sound0' -device 'ich9-intel-hda' -device 'hda-micro,audiodev=sound0' ...
 ```
 
 Use `qemu-system-x86_64 -device help | grep hda` to see other front-end devices supported by qemu.
+
+# Video
+
+First, get the bus and address where the camera is located:
+
+```bash
+$ lsusb | grep WebCam
+Bus 001 Device 003: ID 0bda:58d2 Realtek Semiconductor Corp. USB2.0 HD UVC WebCam
+```
+
+<font style="background-color: yellow">The address of the camera is not fixed, is may be "003" or "004"</font>
+
+After that, start qemu:
+
+```bash
+$ qemu-system-x86_64 -device 'usb-ehci' -device 'usb-host,hostbus=001,hostaddr=003' ...
+```
+
+You may get an error message like this:
+
+```text
+qemu-system-x86_64: -device usb-host,hostbus=001,hostaddr=003: failed to open host usb device 1:3
+```
+
+This is because the currently logged in user does not have writable permissions on "/dev/bus/001/003". The solution is to add the current user to the "root" user group:
+
+```bash
+$ sudo usermod -aG root $USER
+# Or log out the user and log back in.
+$ reboot
+```
+
+
+
