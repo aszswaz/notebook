@@ -53,12 +53,23 @@ _start:
 
 编译，以及生成可执行程序：
 
+编译32位的程序：
+
 ```bash
 # 使用 nasm 汇编器编译汇编
 $ nasm -f elf demo.asm -o demo.o
 # 使用链接器生成可执行程序
 $ ld -m elf_i386 demo.o -o demo
 ```
+
+编译64位的程序：
+
+```bash
+$ nasm -f elf64 demo.asm -o demo.o
+$ ld demo.o -o demo
+```
+
+
 
 # 外部函数调用
 
@@ -132,7 +143,7 @@ print:
 编译汇编，并生成可执行程序：
 
 ```bash
-$ nasm -f elf main.asm -o main.o && nasm -f elf print.asm -o print.o
-$ ld -m elf_i386 main.o print.o -o main
+$ nasm -f elf64 main.asm -o main.o && nasm -f elf print.asm -o print.o
+$ ld main.o print.o -o main
 ```
 
