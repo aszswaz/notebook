@@ -131,36 +131,137 @@ $ nasm -f elf64 hello-world02.asm -o hello-world02.o
 $ ld hello-world02.o -o hello-world02
 ```
 
-# 外部函数调用
+# 函数调用
+
+函数调用在汇编中，称为过程调用。汇编中的过程调用是通过指令 call 和 ret 完成的。call 指令将当前过程的返回地址压入堆栈，再把被调用过程的地址复制到指令指针寄存器。当过程准备返回时，它的 ret 指令从堆栈把返回地址弹回到指令指针寄存器。一个简单的示例如下：
+
+```assembly
+global _start
+
+section .bss
+BUFFER resb 2
+
+section .data
+STRLEN db 1
+
+section .text
+_start:
+    mov byte [BUFFER], 97
+    call demo
+    mov byte [BUFFER + 1], 10
+
+    ; 打印字符串
+    mov edx, STRLEN
+    mov ecx, BUFFER
+    mov eax, 4
+    int 0x80
+
+    mov ebx, 0
+    mov eax, 1
+    int 0x80
+
+demo:
+    sub byte [BUFFER], 32
+    ret
+```
+
+```bash
+$ nasm -f elf demo.asm -o demo.o
+$ ld -m elf_i386 demo.o -o demo
+$ ./demo
+A
+```
+
+为了能和 C 的函数互相操作，汇编的过程调用需要符合 C 的函数规范，为此，需要加入栈帧的压栈（创建栈帧）和弹栈（销毁栈帧）操作：
+
+```assembly
+global _start
+
+section .bss
+BUFFER resb 2
+
+section .data
+STRLEN db 1
+
+section .text
+_start:
+    push ebp
+    mov ebp, esp
+
+    push 97
+    call demo
+    ; 回收 demo 函数的函数所占用的空间
+    add esp, 4
+    mov [BUFFER], eax
+    mov byte [BUFFER + 1], 10
+
+    ; 打印字符串
+    mov edx, STRLEN
+    mov ecx, BUFFER
+    mov eax, 4
+    int 0x80
+
+    mov ebx, 0
+    mov eax, 1
+    int 0x80
+
+demo:
+    ; 创建栈帧
+    push ebp
+    mov ebp, esp
+
+    mov eax, [ebp + 8]
+    sub eax, 32
+
+    ; 销毁栈帧
+    ; 销毁函数的局部变量（如果有）
+    ; mov esp, ebp
+    ; 让 ebp 指向上一层堆栈，pop ebp == sub ebp, 4 == ebp - 4
+    ; pop ebp
+    ; 上面两步，可以使用 leave 代替
+    leave
+    ret
+```
+
+```bash
+$ nasm -f elf demo.asm -o demo.o
+$ ld -m elf_i386 demo.o -o demo
+$ ./demo
+A
+```
+
+除了调用同一个文件中的函数之外，还可以通过 ld 调用外部函数：
 
 main.asm:
 
 ```assembly
-section .bss
-resb 64
-
-; 自定义数据段，未使用“传统”的数据段 .data
-section maindata
-; 在数据段中存放一个字符串，OA 是一个换行符
-strHello: db "Hello World!", 0AH
-STRLEN equ $ - strHello
-
-; 自定义代码段，未使用“传统”的代码段 .txt
-section maintext
 ; 声明此函数在别的文件中
 extern print
-
 ; 声明程序入口，只能是 _start
 global _start
 
+; 自定义数据段，未使用“传统”的数据段 .data
+section .data
+; 在数据段中存放一个字符串，OA 是一个换行符
+strHello db "Hello World!", 0AH
+STRLEN equ $ - strHello
+
+section .text
 _start:
-    ; 传入参数，字符串的长度
-    push STRLEN
+    ; 创建栈帧
+    push ebp
+    mov ebp, esp
+
     ; 传入参数，待打印的字符串
     push strHello
+    ; 传入参数，字符串的长度
+    push STRLEN
     ; 调用外部函数
     call print
-    ; 函数调用完毕，继续执行
+    ; 回收 print 函数的参数占用的空间
+    add esp. 8
+
+    ; 函数调用完毕，退出程序
     ; 设置程序返回值（exit code）
     mov ebx, 0
     ; 设置系统子功能调用号，1: sys_exit
@@ -172,31 +273,30 @@ _start:
 print.asm:
 
 ```assembly
-section .text
-mov eax, 0x10
-jmp $
-
-; 自定义数据段
-section printdata
-num DB 3
-
-; 自定义代码段
-section printtext
-
 ; 导出 print，供其他模块使用
 global print
 
+; 自定义代码段
+section .text
 print:
-    ; 字符串长度
-    mov edx,[esp+8]
-    ; 设置要输出的字符串
-    mov ecx,[esp+4]
+    ; 创建栈帧
+    ; 备份上一层函数的堆栈地址
+    push ebp
+    ; 将 ebp 更新为当前对战地址
+    mov ebp, esp
 
-    mov ebx, 1
+    ; 字符串长度
+    mov edx,[ebp+8]
+    ; 设置要输出的字符串
+    mov ecx,[ebp+12]
+
     ; 设置系统子功能号，4:sys_write
     mov eax, 4
     ; 开始系统调用
     int 0x80
+
+    ; 即将离开函数，销毁栈帧
+    leave
     ret
 ```
 
@@ -250,3 +350,69 @@ _start:
     int 0x80
 ```
 
+# 调用 C 函数
+
+以调用 C 的 printf 函数为例，代码如下：
+
+```assembly
+; 从 nasm 汇编调用 C 的 printf 函数
+
+global main
+extern printf, exit
+
+section .data
+FORMAT: db "%s", 10, 0
+MESSAGE: db "Hello World", 0
+
+section .text
+main:
+    push ebp
+
+    push MESSAGE
+    push FORMAT
+    call printf
+
+    push 0
+    call exit
+```
+
+编译程序：
+
+```bash
+$ nasm -f elf demo.asm -o demo.o
+$ gcc -no-pie -m32 demo.o -o demo
+```
+
+在 64 位程序中，函数的参数传递是优先存放在 6 个寄存器 rdi、rsi、rdx、rcx、r8、r9 当中，因此，64 位 printf 的参数传递也必须使用寄存器：
+
+```assembly
+; 64 位的 printf 使用寄存器 rdi、rsi、rdx、rcx、r8、r9 传递参数
+
+global main
+extern printf, exit
+
+section .data
+FMT db "%s", 10, 0
+MESSAGE db "Hello World"
+
+section .text
+main:
+    push rbp
+
+    mov rdi, FMT
+    mov rsi, MESSAGE
+    call printf
+
+    mov rdi, 0
+    call exit
+```
+
+```bash
+$ nasm -f elf64 demo.asm -o demo.o
+# PIE 是用于可执行文件中的地址空间随机化的技术，PIC 是对地址空间通过偏移量进行相对定位，-no-pie 表示不使用 PIE，只使用 PIC
+$ gcc -no-pie demo.o -o demo
+```
+
+无论是 32 位程序，还是 64 位程序，函数的返回值都是放在 eax 中。
+
+在 64 位程序中，如果函数的参数的数量超过 6 个，剩余的参数还是会通过 push 压入堆栈的。
