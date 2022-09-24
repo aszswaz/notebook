@@ -174,6 +174,23 @@ A
 
 为了能和 C 的函数互相操作，汇编的过程调用需要符合 C 的函数规范，为此，需要加入栈帧的压栈（创建栈帧）和弹栈（销毁栈帧）操作：
 
+首先请看一段 C 代码：
+
+```c
+#include <stdio.h>
+
+int sub(int a, int b) {
+    int d;
+    return a - b;
+}
+
+void _start() {
+    printf("%c\n", demo(97, 32));
+}
+```
+
+这段 C 代码的汇编对等实现
+
 ```assembly
 global _start
 
@@ -188,10 +205,13 @@ _start:
     push ebp
     mov ebp, esp
 
+    ; 添加参数 b
+    push 32
+    ; 添加参数 a
     push 97
     call demo
-    ; 回收 demo 函数的函数所占用的空间
-    add esp, 4
+    ; 回收 demo 函数的参数所占用的空间
+    add esp, 8
     mov [BUFFER], eax
     mov byte [BUFFER + 1], 10
 
@@ -209,12 +229,16 @@ demo:
     ; 创建栈帧
     push ebp
     mov ebp, esp
+    ; 由于函数中存在局部变量 d，esp 需要给 d 腾出空间
+    sub esp, 4
 
+    ; 获取参数 a
     mov eax, [ebp + 8]
-    sub eax, 32
+    ; 参数 a - 参数 b，函数返回值存放在 eax
+    sub eax, [ebp + 12]
 
     ; 销毁栈帧
-    ; 销毁函数的局部变量（如果有）
+    ; 销毁函数的局部变量
     ; mov esp, ebp
     ; 让 ebp 指向上一层堆栈，pop ebp == sub ebp, 4 == ebp - 4
     ; pop ebp
@@ -229,6 +253,10 @@ $ ld -m elf_i386 demo.o -o demo
 $ ./demo
 A
 ```
+
+堆栈的整体布局如图所示：
+
+![stack.svg](./assets/stack.svg)
 
 除了调用同一个文件中的函数之外，还可以通过 ld 调用外部函数：
 
