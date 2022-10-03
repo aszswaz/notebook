@@ -1,6 +1,6 @@
 # 简介
 
-汇编语言笔记。<font color="red">在本文中，如果没有特殊说明，代码的都是基于x86指令集编写的</font>
+汇编语言笔记。<font color="red">在本文中，如果没有特殊说明，代码的都是基于 x86 指令集编写的</font>
 
 # x86 或 AMD64 寄存器
 
@@ -158,7 +158,7 @@ $ ld hello-world02.o -o hello-world02
     指令格式：`call far cs:ip`
     例如：`call far 0x10:0x99`
 * 间接绝对远调用
-    间接：函数的地址从内存读取
+    间接：函数的地址从内存读取，在内存中，前两个字节是段内偏移，后两个字节是段基址。
     例如：`call far [0x12345]`
 
 ## 过程调用
@@ -516,6 +516,80 @@ $ gcc -no-pie demo.o -o demo
 
 在 64 位程序中，如果函数的参数的数量超过 6 个，剩余的参数还是会通过 push 压入堆栈的。
 
+# 指令转移
+
+## 无条件指令转移
+
+无条件的指令转移主要是通过 `jmp` 指令完成的。
+
+### 相对短转移
+
+是否段内转移：是
+
+指令格式：
+
+```assembly
+jmp short laber
+```
+
+操作数大小：1 B
+
+操作数取值范围：-128 ~ 127
+
+目标地址计算公式：当前指令地址 + 当前指令大小 + 相对量（操作数）
+
+例子：
+
+```assembly
+jmp $
+```
+
+当前指令的结束地址减去 2 等于当前指令的开始地址，重新执行当前指令。这就是一个死循环。
+
+<font color="orange">注意：</font>
+
+<font color="orange">如果操作数是立即数，生成的操作码只能在实模式中执行。原因未知。</font>
+
+### 16 位相对近转移
+
+是否段内转移：是
+
+指令格式：
+
+```assembly
+jmp near register
+jmp near [memory_address]
+```
+
+### 16 位直接绝对转移
+
+执行时，处理器用段地址的内容取代CS的值，用偏移地址（也可以是标号）取代IP的值。
+
+指令格式：
+
+```assembly
+jmp segment_address: offset_address
+```
+
+### 16 位间接绝对转移
+
+执行时，处理器根据内存地址找到偏移地址和段地址，分别用来代替IP和CS的内容。内存中，存放着两个字节，低字节是偏移地址，高字节是段地址。
+
+指令格式：
+
+```assembly
+jmp far [memory_address]
+```
+
+内存布局：
+
+```text
+offset   segment
+00000000 00000000
+```
+
 # 笔记参考
 
 [带你弄懂 call 指令调用方式](https://tehub.com/a/8zVhecP9dd)
+
+[8086处理器的无条件转移指令——《x86汇编语言：从实模式到保护模式》](https://blog.csdn.net/longintchar/article/details/50529164)
