@@ -470,6 +470,7 @@ main:
     push MESSAGE
     push FORMAT
     call printf
+    add esp, 8
 
     push 0
     call exit
@@ -587,6 +588,100 @@ jmp far [memory_address]
 offset   segment
 00000000 00000000
 ```
+
+## 条件转移指令
+
+条件转移指令为高级语言的 if、while 等提供了支持。条件转移指令需要配合[ Flags 寄存器](#Flags 寄存器)才能发挥它的作用。所有的条件转移指令如下：
+
+| 指令        | 条件               | 意义                                | 英文助记                                |
+| ----------- | ------------------ | ----------------------------------- | --------------------------------------- |
+| jz/je       | ZF = 1             | 相减结果等于 0 时转移，或相等时转移 | Jump if Zero/Equal                      |
+| jnz/jne     | ZF = 0             | 不等于 0，或不相等时转移            | Jump if not Zero/Not Equal              |
+| js          | SF = 1             | 负数时转移                          | Jump if sign                            |
+| jns         | SF = 0             | 非负数时转移                        | Jump if not sign                        |
+| jo          | OF = 1             | 溢出时转移                          | Jump if Overflow                        |
+| jno         | OF =0              | 未溢出时转移                        | Jump if not overflow                    |
+| jp/jpe      | PF = 1             | 低字节中，有偶数个 1 时转移         | Jump if parity even                     |
+| jnp/jpo     | PF = 0             | 低字节中，有奇数个 1 时转移         | Jump if not parity odd                  |
+| jbe/jna     | CF = 1 或 ZF = 1   | 小于等于/不大于时转移               | Jump if below of equal/not above        |
+| jnbe/ja     | CF = 0 或 ZF =0    | 不小于等于/大于时转移               | Jump if not below or equal/above        |
+| jc/jb/jnae  | CF = 1             | 进位/小于/不大于等于时转移          | Jump if Carry/Below/Not Above Equal     |
+| jnc/jnb/jae | CF = 0             | 未进位/不小于/大于等于时转移        | Jump if Not Carry/Not Below/Above Equal |
+| jl/jnge     | SF != OF           | 小于/不大于等于时转移               | Jump Less/Not Great Equal               |
+| jnl/jge     | SF = OF            | 不小于/大于等于时转移               | Jump if Not Less/Great Equal            |
+| jle/jng     | ZF != OF 或 ZF = 1 | 小于等于/不大于时转移               | Jump if Less or Equal/Not Great         |
+| jnle/jg     | SF = OF 且 ZF = 0  | 不小于等于/大于时转移               | Jump Not Less Equal/Great               |
+| Jcxz        | CX 寄存器值为 0    | CX 寄存器值为 0 时转移              | Jump if register CX's value is 0        |
+
+在大多数情况下，在条件指令之前，会存在一条或多条比较指令，比如 cmp 指令。
+
+例：比较寄存器 eax、ebx 的值：
+
+```assembly
+global main
+extern printf, exit
+
+section .data
+FORMAT: db "%s", 10, 0
+EQUAL_MSG: db "eax == ebx", 0
+LESS_MSG: db "eax < ebx", 0
+GREATER_MSG: db "eax > ebx", 0
+ELSE_MSG: db "None of the conditions were hit.", 0
+
+section .text
+main:
+    push ebp
+
+    mov eax, 100
+    mov ebx, 1
+    ; cmp 是比较指令，它将目标操作数减去源操作数，并根据结果，修改 Flags 寄存器。它不会修改任何操作数，即便该操作数是寄存器或内存地址
+    cmp eax, ebx
+
+    ; eax == ebx 时转移
+    je equal
+    ; eax < ebx 时转移
+    jl less
+    ; eax > ebx 时转移
+    ja greater
+    ; 所有条件都不满足时，进行无条件转移
+    jmp else
+
+equal:
+    push EQUAL_MSG
+    push FORMAT
+    call printf
+    add esp, 8
+    jmp end
+
+less:
+    push LESS_MSG
+    push FORMAT
+    call printf
+    add esp, 8
+    jmp end
+
+greater:
+    push GREATER_MSG
+    push FORMAT
+    call printf
+    add esp, 8
+    jmp end
+
+else:
+    push ELSE_MSG
+    push FORMAT
+    call printf
+    add esp, 8
+    jmp end
+
+end:
+    push 0
+    call exit
+```
+
+<font color="orange">注意事项：</font>
+
+<font color="orange">jl 和 jb 都是小于时跳转，但是 jb 要求进行比较的两个数的符号必须相同，要么都是正数，要么都是负数，不能是一正一负。jl 无此限制。</font>
 
 # Flags 寄存器
 
