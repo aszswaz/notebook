@@ -8,10 +8,10 @@
 
 | 8 位寄存器 | 16 位寄存器 | 32 位寄存器 | 64 位寄存器 | 描述                                                         |
 | ---------- | ----------- | ----------- | ----------- | ------------------------------------------------------------ |
-| AH、AL     | AX          | EAX         | RAX         | 通用寄存器                                                   |
-| BH、BL     | BX          | EBX         | RBX         | 通用寄存器                                                   |
-| CH、CL     | CX          | ECX         | RCX         | 通用寄存器                                                   |
-| DH、DL     | DX          | EDX         | RDX         | 通用寄存器                                                   |
+| AL、AH     | AX          | EAX         | RAX         | 通用寄存器                                                   |
+| BL、BH     | BX          | EBX         | RBX         | 通用寄存器                                                   |
+| CL、CH     | CX          | ECX         | RCX         | 通用寄存器                                                   |
+| DL、DH     | DX          | EDX         | RDX         | 通用寄存器                                                   |
 | SIL        | SI          | ESI         | RSI         | 使用 movs 指令族复制内存时，使用 SI 寄存器指定数据源的内存地址，默认段寄存器是 DS |
 | SDL        | DI          | EDI         | RDI         | 使用 movs 指令族复制内存时，使用 DI 寄存器指定目标内存地址，默认段寄存器是 DS |
 | BPL        | BP          | EBP         | RBP         | 用于存放当前函数栈的基准地址                                 |
@@ -29,6 +29,8 @@
 | R13B       | R13W        | R13D        | R13         | 通用寄存器                                                   |
 | R14B       | R14W        | R14D        | R14         | 通用寄存器                                                   |
 | R15B       | R15W        | R15D        | R15         | 通用寄存器                                                   |
+
+<font color="orange">\*L 寄存器是 \*X 的低 8 位，\*H 是 \*X 的高 8 位。</font>
 
 # Hello World
 
