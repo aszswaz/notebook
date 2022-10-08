@@ -21,7 +21,7 @@
 | ES         | ES          | ES          |             | 拓展段寄存器                                                 |
 | FS         | FS          | FS          |             | 拓展段寄存器                                                 |
 | GS         | GS          | GS          |             | 拓展段寄存器                                                 |
-|            | IP          | EIP         | RIP         | 指令寄存器，物理内存地址 = CS \* 16 + IP                     |
+|            | IP          | EIP         | RIP         | 指令寄存器，物理内存地址 = $\rm CS \times 16 + \rm IP$       |
 | R8B        | R8W         | R8D         | R8          | 通用寄存器                                                   |
 | R10B       | R10W        | R10D        | R9          | 通用寄存器                                                   |
 | R11B       | R11W        | R11D        | R10         | 通用寄存器                                                   |

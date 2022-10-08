@@ -38,6 +38,8 @@ x86 架构的 CPU，使用段基地址 + 段内偏移的方式访问内存，并
 
 IO 接口是连接 CPU 与外部设备的逻辑控制部件，分为硬件和软件两部分，硬件部分的功能是协调 CPU 和外设之间的种种不匹配，例如双方的速度不匹配，那 IO 接口就实现数据缓冲以减少等待时间，数据格式不匹配，IO 接口就在这两种格式间互相转换。IO 接口内部实际上也是由软件（驱动程序）来控制运作的，这就是所谓的逻辑部分。
 
+对 IO 接口的操作有两种方式，一种是通过 CPU 的地址总线进行操作，比如显存被映射到地址 0xB8000 ～ 0xA0000，想要往屏幕上输出 ASCII 字符，只需要通过 mov 指令向该地址写入数据即可，另一种方式是通过 IO 端口进行操作，IO 端口实际上是 IO 寄存器，不同的接口，IO 寄存器是不一样的。
+
 IO 接口主要功能如下：
 
 * 设置数据缓冲，解决 CPU 与外设之间的速度不匹配
@@ -52,15 +54,15 @@ IO 接口主要功能如下：
 
 ## IO 接口种类
 
-### [**串行端口**](https://en.wikipedia.org/wiki/Serial_port)
+### [串行端口](https://en.wikipedia.org/wiki/Serial_port)
 
 串行端口是一次只能传输一位的端口。 在 20 世纪末，它的缺点是传输速度慢，但从 21 世纪初开始，它通过增加数据传输频率来提高数据传输速度。
 
-### [**并行端口**](https://en.wikipedia.org/wiki/Parallel_port)
+### [并行端口](https://en.wikipedia.org/wiki/Parallel_port)
 
 并行端口是一次可以传输多个位的端口。 20世纪末，它的传输速度比串口还快，得到了广泛的应用。 但它有一个缺陷，它必须同时发送多位数据，多位数据也必须同时到达，如果一位数据丢失，则必须重新发送多位数据。
 
-### [**USB**](https://en.wikipedia.org/wiki/USB)
+### [USB](https://en.wikipedia.org/wiki/USB)
 
 串行和并行端口已在很大程度上被 USB 端口所取代。 USB 本质上是对串行端口的改进，其接口内部有多个串行端口，称为端点。
 
@@ -96,3 +98,24 @@ USB 也可以并行传输，但与并行端口不同的是，如果在传输过�
 文本模式的显存大小是 32 KB，一屏可以显示 $80 \times 25$ 个字符，每屏字符占用 $80 \times 25 \times 2 = 4000$ B，因此，文本模式可以有  $32 \times 1024 \div 4000 = 8.192 \approx 8$ 屏，这也是 Linux 8 个 tty 的切换原理。
 
 每个字符的低字节是字符的 ASCII 码，高字节是字符的属性信息，低 4 位是字符背景色，高 4 位是字符的前景色。颜色用 RGB 三种基色混合，第 4 位用来控制亮度，为 1 是高亮，为 0 是正常亮度。第 7 位用来控制字符是否闪烁。
+
+## 硬盘
+
+硬盘控制器主要 IO 端口（寄存器）：
+
+| IO 端口                 |                | 端口用途         |                |
+| ----------------------- | -------------- | ---------------- | -------------- |
+| Primary 通道            | Secondary 通道 | 读操作时         | 写操作时       |
+| Command Block registers |                |                  |                |
+| 0x1F0                   | 0x170          | Data             | Data           |
+| 0x1F1                   | 0x171          | Error            | Features       |
+| 0x1F2                   | 0x172          | Sector count     | Sector count   |
+| 0x1F3                   | 0x173          | LBA low          | LBA low        |
+| 0x1F4                   | 0x174          | LBA mid          | LBA mid        |
+| 0x1F5                   | 0x175          | LBA high         | LBA high       |
+| 0x1F6                   | 0x176          | Device           | Device         |
+| 0x1F7                   | 0x177          | Status           | Status         |
+| Control Block registers |                |                  |                |
+| 0x3F6                   | 0x376          | Alternate status | Device Control |
+
+端口可以被分为两组：Control Block registers 和 Command Block registers，Command Block registers 用于向硬盘驱动器写入命令或者从硬盘控制器获得硬盘的状态，Control Block registers 用于控制硬盘工作状态。
