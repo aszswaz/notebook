@@ -76,3 +76,4 @@ $ dd if=mbr of=os.img bs=512 count=1 conv=notrunc
 $ qemu-system-i386 -drive 'file=os.img,format=raw'
 ```
 
+现在的 BIOS，大多数默认只支持 UEFI，禁用了 MBR。如果想使用 MBR，需要在 BIOS 的 Boot 设置中，启用 CSM 支持。
