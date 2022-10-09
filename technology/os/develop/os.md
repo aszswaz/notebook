@@ -101,9 +101,17 @@ USB 也可以并行传输，但与并行端口不同的是，如果在传输过�
 
 ## 硬盘
 
+### CHS 和 LBA
+
+硬盘中的扇区在物理上是用“柱面 - 磁头 - 扇区”来定位的，简称为 CHS，CHS 的扇区编号是从 1 开始的。
+
+另外一种定位称为 LBA（Logical Block Address）。LBA 的扇区编号从 0 开始，寻址时，不需要计算柱面和磁头。LBA 分为 LBA28 和 LBA48，LBA28 表示 28 位的 LBA 地址，最大支持 128 GB，LBA48 最大支持 128 PB。
+
+### IO 端口
+
 硬盘控制器主要 IO 端口（寄存器）：
 
-| IO 端口                 |                | 端口用途         |                |
+| IO 端口                 |                | 端口名称         |                |
 | ----------------------- | -------------- | ---------------- | -------------- |
 | Primary 通道            | Secondary 通道 | 读操作时         | 写操作时       |
 | Command Block registers |                |                  |                |
@@ -114,8 +122,44 @@ USB 也可以并行传输，但与并行端口不同的是，如果在传输过�
 | 0x1F4                   | 0x174          | LBA mid          | LBA mid        |
 | 0x1F5                   | 0x175          | LBA high         | LBA high       |
 | 0x1F6                   | 0x176          | Device           | Device         |
-| 0x1F7                   | 0x177          | Status           | Status         |
+| 0x1F7                   | 0x177          | Status           | Command        |
 | Control Block registers |                |                  |                |
 | 0x3F6                   | 0x376          | Alternate status | Device Control |
 
 端口可以被分为两组：Control Block registers 和 Command Block registers，Command Block registers 用于向硬盘驱动器写入命令或者从硬盘控制器获得硬盘的状态，Control Block registers 用于控制硬盘工作状态。
+
+端口是按通道给出的，不是直接和某块硬盘关联的，要想操作某通道上的某块硬盘，需要通过 device 寄存器指定。一个通道上就只能有主从两块硬盘，因此只需要 1 位就可以指定，0 表示主盘。1 为从盘。
+
+各个端口的详细描述：
+
+Data：在读写硬盘时，用于存储数据，大小是 16 位
+
+Error、Features：在读取数据时，作为存储异常信息的寄存器，读取失败后，会记录失败的信息。在写入数据时，用于存储指令参数
+
+  Sector count：指定待读取或写入的扇区数，硬盘每完成一个扇区，就会将此寄存器的值减 1,所以如果中间失败了，此寄存器中的值便是尚未完成的扇区。这是 8 位寄存器，最大值位 255，若指定为 0，则表示要写入 256 个扇区。
+
+LBA low、LBA mid、LBA high：LBA low 存储 LBA 的第 0～7 位，LBA mid 存储第 8～15 位，LBA high 存储第16～23位
+
+device：此寄存器的低 4 位用于存储 LBA 地址的第 24～27 位。第 5 位用来指定通道上的主盘或从盘，0 代表主盘，1 代表从盘。第 7 位用来设置是否启用 LBA 寻址方式，1 代表启用 LBA，0 代码使用 CHS。第 6位和第 8 位固定为 1，用途未知。
+
+Status、Command：在读硬盘时，此寄存器用于给出硬盘的状态信息。第 0 位是 ERR 位，如果此位为 1，表示指令出错，具体原因保存在 error 寄存器，第 3 位是 data request 位，此位为 1，表示硬盘已经把数据准备好了，主机现在可以把数据读出来，第 6 位是 DRDY，表示硬盘准备就绪，第 7 位是 BSY 位，表示硬盘是否繁忙，如果为 1 表示硬盘正忙，此寄存器其他位都无效。
+在写硬盘时，此寄存器用于存储指令。
+
+device 寄存器示意图：
+
+![device 寄存器示意图](./assets/io-device.jpg)
+
+status 寄存器示意图：
+
+![status 寄存器示意图](./assets/io-status.jpg)
+
+### 数据传送方式
+
+1. 查询传送方式
+    也称为程序 IO（PIO，Programming Input/Output Model），CPU 先检查设备状态，如果状态为“准备好了可以发送”，CPU 再去获取数据
+2. 中断传送方式
+    也称中断启动 IO，当数据源设备准备好数据后，通过发送中断通知 CPU 获取数据
+3. 直接存储器存取方式
+    不让 CPU 参与传输，由 DMA 控制器完成数据传输，CPU 直接从内存读取数据就行
+4. IO 处理机
+    IO 处理机在 DMA 基础上，自动完成数据的交换、组合、校验等，让 CPU 完全不需要参与此类工作
