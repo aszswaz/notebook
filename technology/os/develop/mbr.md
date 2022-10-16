@@ -14,54 +14,47 @@ mbr.asm：
 ; ah、al等以“*h”、“*l”为名的寄存器是 8 位的寄存器，以寄存器 ax、ah、al 为例，ah 是 ax 的高 8 位，al 是 ax 的低 8 位，bh、bl 等寄存器以此类推
 ; vstart 是 mbr 程序的入口地址
 section MBR vstart=0x7C00
-    jmp start
-    ; 在物理机中运行 MBR 时，BIOS 可能会使用 BPB 数据覆盖 MBR 头部的一些内存，为了避免由此造成的指令和数据错误，需要将指令和数据后移一些字节
-    times 32 db 0x00
-
-start:
     mov sp, $$
 
-    ; 初始化寄存器
+    ; 初始化段寄存器
     mov ax, 0
-    ; ds、es、fs、gs 这类段寄存器不能通过立即数初始化，需要通过别的寄存器进行中转
     mov ss, ax
     mov ds, ax
-    mov es, ax
     mov fs, ax
-    ; 将显存的地址设置给 es 段寄存器
+
+    ; 设置显存的文本模式地址
     mov ax, 0xB800
     mov es, ax
 
     ; 清理屏幕
-    ; 设置目标地址，段寄存器是 ES
+    mov cx, PAGE_SIZE
     mov di, 0
-    ; 使用 cx 作为循环计数器
-    mov cx, VIDEO_TEXT_PAGE_SIZE
-    while01:
-        mov byte [es: di], 0
-        add di, 1
-        ; 每次执行 loop，cx 寄存器就会减 1，这里用于循环，当 cx 为 0 时，循环结束
-        loop while01
+    .L1:
+        mov dword [es: di], 0
+        add di, 2
+        loop .L1
 
-    ; 将 ASCII 字符发送到显存
-    ; 设置源地址，和目标地址
+    ; 将字符串写入显存
+    mov cx, MESSAGE_LEN
     mov si, MESSAGE
     mov di, 0
-    ; 设置文字属性，0 表示无背景色，7 表示前景色为白色
+    ; 设置文字样式，黑底白字
     mov ah, 0x07
-    mov cx, STRLEN
-    while02:
+    .L2:
         mov al, [si]
         mov [es: di], ax
         add si, 1
         add di, 2
-        loop while02
+        loop .L2
 
+    ; 死循环，让指令流不再继续执行
     jmp $
 
-VIDEO_TEXT_PAGE_SIZE equ 80 * 25 * 2
+; 显卡文本模式中，一页的内存大小
+PAGE_SIZE equ 80 * 25 * 2
+; 字符串
 MESSAGE db "Hello World"
-STRLEN equ $ - MESSAGE
+MESSAGE_LEN equ $ - MESSAGE
 ; 对剩余空间进行填充，让整个程序的总计大小为 512 B
 times 510-($-$$) db 0
 db 0x55, 0xAA
@@ -81,4 +74,120 @@ $ dd if=mbr of=os.img bs=512 count=1 conv=notrunc
 $ qemu-system-i386 -drive 'file=os.img,format=raw'
 ```
 
-现在的 BIOS，大多数默认只支持 UEFI，禁用了 MBR。如果想使用 MBR，需要在 BIOS 的 Boot 设置中，启用 CSM 支持。
+# 通过 U 盘在物理机上执行 MBR
+
+想要通过 U 盘在物理机上执行 MBR，需要进行两个步骤：在 BIOS 中开启 CSM 支持，以及在 MBR 头部填充 BPB 数据。
+
+**开启 CSM 支持**
+
+以华硕主板为例，需要进行以下几个步骤：
+
+1. 开机时，按 f2 进入 BIOS
+    ![bios-home.jpg](./assets/bios-home.jpg)
+2. 进入 Advanced Mode，并切换到 Security 选项卡
+    ![](./assets/advanced-mode-security.jpg)
+3. 进入 Secure Boot，禁用 Secure Boot Control
+    ![](./assets/secure-boot.jpg)
+4. 切换到 Boot 选项卡，启用 CSM 支持
+    ![](./assets/csm-support.jpg)
+5. 按 F10 保存配置并关机
+
+**MBR 头部写入 BPB**
+
+BIOS 如果把 U 盘作为软盘启动，它会在加载 MBR 之后，在 MBR 的头部写入一些 [BPB](https://en.wikipedia.org/wiki/BIOS_parameter_block) 数据，这会造成 MBR 的指令流或数据出现问题，使得程序不能按预期运行。
+
+BPB 是卷引导记录 (VBR) 中描述数据存储卷的物理布局的数据结构。在分区设备（如硬盘）上，BPB 描述卷分区，而在未分区设备（如软盘）上，BPB 描述整个介质。
+
+解决办法是在 MBR 的头部，填充一些 BPB 信息：
+
+```assembly
+; MBR 主引导记录
+; MBR 只能使用 16 位的寄存器，这是 BIOS 的规范所要求的，因此，程序中使用的寄存器大多数是 16 位的
+; ah、al等以“*h”、“*l”为名的寄存器是 8 位的寄存器，以寄存器 ax、ah、al 为例，ah 是 ax 的高 8 位，al 是 ax 的低 8 位，bh、bl 等寄存器以此类推
+; vstart 是 mbr 程序的入口地址
+section MBR vstart=0x7C00
+    jmp main
+
+    ; Dos 4.0 EBPB 1.44MB 软盘的分区信息
+    OEMname: db "mkfs.fat"
+    ; 每个逻辑扇区的字节数
+    bytesPerSector: dw 512
+    ; 每个集群的逻辑扇区
+    sectPerCluster: db 1
+    ; 保留的逻辑扇区
+    reservedSectors: dw 1
+    ; FAT 数量
+    numFAT: db 2
+    ; 根目录条目
+    numRootDirEntries: dw 224
+    ; 总逻辑扇区
+    numSectors: dw 2880
+    ; 媒体描述符
+    mediaType: db 0xf0
+    ; 每个 FAT 的逻辑扇区
+    numFATsectors: dw 9
+    ; 每个磁道的物理扇区
+    sectorsPerTrack: dw 18
+    ; 磁头数量
+    numHeads: dw 2
+    ; 隐藏扇区
+    numHiddenSectors: dd 0
+    ; 大的总逻辑扇区
+    numSectorsHuge: dd 0
+    ; 物理驱动器号
+    driveNum: db 0
+    ; Flags 等
+    reserved: db 0
+    ; 扩展引导签名
+    signature: db 0x29
+    ; 卷序号
+    volumeID: dd 0x2d7e5a1a
+    ; 卷标识
+    volumeLabel: db "NO NAME    "
+    ; 文件系统类型
+    fileSysType: db "FAT12   "
+
+    MESSAGE: db "Hello World"
+    MESSAGE_LEN: equ $ - MESSAGE
+    PAGE_SIZE: equ 80 * 25 * 2
+
+main:
+    mov sp, $$
+
+    ; 初始化寄存器
+    mov ax, 0
+    ; ds、es、fs、gs 这类段寄存器不能通过立即数初始化，需要通过别的寄存器进行中转
+    mov ss, ax
+    mov ds, ax
+    mov fs, ax
+
+    mov ax, 0xB800
+    mov es, ax
+
+    mov cx,PAGE_SIZE
+    mov di, 0
+    .L1:
+        mov dword [es: di], 0
+        add di, 2
+        loop .L1
+
+    mov si, MESSAGE
+    mov di, 0
+    mov cx, MESSAGE_LEN
+    mov ah, 0x07
+    .L2:
+        mov al, [si]
+        mov [es: di], ax
+        add si, 1
+        add di, 2
+        loop .L2
+
+    jmp $
+
+; 对剩余空间进行填充，让整个程序的总计大小为 512 B
+times 510-($-$$) db 0
+db 0x55, 0xAA
+```
+
+
+
