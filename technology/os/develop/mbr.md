@@ -14,48 +14,53 @@ mbr.asm：
 ; ah、al等以“*h”、“*l”为名的寄存器是 8 位的寄存器，以寄存器 ax、ah、al 为例，ah 是 ax 的高 8 位，al 是 ax 的低 8 位，bh、bl 等寄存器以此类推
 ; vstart 是 mbr 程序的入口地址
 section MBR vstart=0x7C00
-    mov ax, cs
+    jmp start
+    ; 在物理机中运行 MBR 时，BIOS 可能会使用 BPB 数据覆盖 MBR 头部的一些内存，为了避免由此造成的指令和数据错误，需要将指令和数据后移一些字节
+    times 32 db 0x00
+
+start:
+    mov sp, $$
+
+    ; 初始化寄存器
+    mov ax, 0
+    ; ds、es、fs、gs 这类段寄存器不能通过立即数初始化，需要通过别的寄存器进行中转
+    mov ss, ax
     mov ds, ax
     mov es, ax
-    mov ss, ax
     mov fs, ax
-    mov sp, 0x7C00
+    ; 将显存的地址设置给 es 段寄存器
+    mov ax, 0xB800
+    mov es, ax
 
-    ; 上卷屏幕，达到清屏的效果
-    ; 设置 BIOS 子功能号
-    mov ax, 0x600
-    ; 设置上卷行的属性
-    mov bx, 0x700
-    ; 设置文本的长方形显示区域，VGA 文本模式中，一行只能容纳 80 个字符，共 25 行
-    ; 设置左上角坐标（0, 0）
-    mov cx, 0x0000
-    ; 设置右下角坐标（24, 27）
-    mov dx, 0x184F
-    ; BIOS 中断调用
-    int 0x10
+    ; 清理屏幕
+    ; 设置目标地址，段寄存器是 ES
+    mov di, 0
+    ; 使用 cx 作为循环计数器
+    mov cx, VIDEO_TEXT_PAGE_SIZE
+    while01:
+        mov byte [es: di], 0
+        add di, 1
+        ; 每次执行 loop，cx 寄存器就会减 1，这里用于循环，当 cx 为 0 时，循环结束
+        loop while01
 
-    ; 获取光标位置
-    ; 设置 BIOS 子功能号
-    mov ah, 3
-    ; bh 寄存器存储的是待获取光标的页号
-    mov bh, 0
-    int 0x10
-
-    ; 打印字符串
-    mov ax, MESSAGE
-    ; es: bp 为字符串串首地址
-    mov bp, ax
+    ; 将 ASCII 字符发送到显存
+    ; 设置源地址，和目标地址
+    mov si, MESSAGE
+    mov di, 0
+    ; 设置文字属性，0 表示无背景色，7 表示前景色为白色
+    mov ah, 0x07
     mov cx, STRLEN
-    ; 子功能号 13 表示显示字符串，01 表示光标跟随移动
-    mov ax, 0x1301
-    ; 设置要显示的页号和字符属性，bh 为页号，bl 为字符颜色，bl 的取值范围是 0～255
-    mov bx, 2
-    int 0x10
+    while02:
+        mov al, [si]
+        mov [es: di], ax
+        add si, 1
+        add di, 2
+        loop while02
 
-    ; 程序进入死循环
     jmp $
 
-MESSAGE db "Hello World!"
+VIDEO_TEXT_PAGE_SIZE equ 80 * 25 * 2
+MESSAGE db "Hello World"
 STRLEN equ $ - MESSAGE
 ; 对剩余空间进行填充，让整个程序的总计大小为 512 B
 times 510-($-$$) db 0
