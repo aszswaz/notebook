@@ -92,6 +92,7 @@
       <text x="20.86377" y="39" style="font-style:italic">Base address (24-31)</text>
       <text x="150.77295" y="39" style="font-style:italic">G</text>
       <text x="165.22534" y="39" style="font-style:italic">DB</text>
+      <text x="188.5" y="39" style="font-style:italic">L</text>
       <text x="205.33154" y="39">A</text>
       <text x="222.896" y="39" style="font-style:italic">Limit (16-19)</text>
       <text x="295.14624" y="39">P</text>
