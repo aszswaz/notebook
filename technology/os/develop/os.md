@@ -67,9 +67,11 @@ x86 架构的 CPU，使用段基地址 + 段内偏移的方式访问内存，并
 
 全局描述符表（Global Descriptor Table，缩写为 GDT），是一个从 Intel 8086 处理器开始用于界定不同内存区域的特征数据结构。全局描述表位于内存中。全局描述表的条目描述及规定了不同内存分区的各种特征，包括基地址、大小和访问等特权如可执行和可写等。在 Intel 术语中，这些内存区域被称为段。
 
-GDT 中，segment descriptor 的结构：
+GDT 中，segment descriptor 的大小是 8 byte（64 bit），它的结构如图所示：
 
 ![](./assets/SegmentDescriptor.svg)
+
+结构图分为上下两个部分，每个部分各占 32 bit。图中的各字段说明如下：
 
 **Base Address**，段的起始内存地址。 它的长度为 32 位，由低位 16 到 31 位，高位 0 到 7 位，然后是 24 到 31 位组成。
 
