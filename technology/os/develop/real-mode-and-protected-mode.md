@@ -41,7 +41,7 @@ GDT 中，segment descriptor 的大小是 8 byte（64 bit），它的结构如�
 
 ![](./assets/SegmentDescriptor.svg)
 
-结构图分为上下两个部分，每个部分各占 32 bit。图中的各字段说明如下：
+结构图分为上下两个部分，上半部分是高 32 bit，下班部分是低 32 bit。图中的各字段说明如下：
 
 **Base Address**，段的起始内存地址。 它的长度为 32 位，由低位 16 到 31 位，高位 0 到 7 位，然后是 24 到 31 位组成。
 
