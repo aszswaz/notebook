@@ -79,7 +79,7 @@ $ openssl genrsa -des3 -out server01.key 2048
 $ openssl req -new -key server01.key -out server01.csr
 # 颁发证书
 $ openssl x509 -req -in server01.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server01.crt -days 3650
-# 重复上述操作，生成server02.key和server02.crt
+# 重复上述操作，生成 server02.key 和 server02.crt
 ```
 
 查看两个证书的颁发者和序列号：
@@ -103,7 +103,7 @@ serial=01
 $ sudo cp server01.key /etc/ca-certificates/trust-source && sudo trust extract-compat
 ```
 
-然后把server02.key和server02.crt放到服务器，会发现无论如何，浏览器都会警告服务器证书不可信，因为浏览器发现在本地的证书库当中，存在一个颁发者与序列号都相同的证书。
+然后把 server02.key 和 server02.crt 放到服务器，会发现无论如何，浏览器都会警告服务器证书不可信，因为浏览器发现在本地的证书库当中，存在一个颁发者与序列号都相同的证书。
 
 解决办法：
 
