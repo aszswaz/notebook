@@ -1,6 +1,6 @@
 # 修改用户目录下的文件名称为英文
 
-修改`${HOME}/.config/user-dirs.dirs`
+修改 ${HOME}/.config/user-dirs.dirs
 
 原本文件内容
 
@@ -42,4 +42,4 @@ XDG_PICTURES_DIR="$HOME/image"
 XDG_VIDEOS_DIR="$HOME/video"
 ```
 
-<font color="red">注意如果是kde桌面，还需要修改Dolphin(可视化文件管理器)的几个用户主菜单的属性设置</font>
+<font color="red">注意如果是 kde 桌面，还需要修改 Dolphin (可视化文件管理器)的几个用户主菜单的属性设置</font>

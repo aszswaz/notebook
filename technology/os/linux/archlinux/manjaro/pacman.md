@@ -9,7 +9,7 @@ $ sudo pacman-mirrors -i -c China -m rank # 之后会弹出框,进行选择即�
 $ sudo pacman -Syu
 ```
 
-manjaro 的软件仓库更新要比 archlinux 的软件仓库慢一些，可以考虑添加 `archlinuxcn` 源
+manjaro 的软件仓库更新要比 archlinux 的软件仓库慢一些，可以考虑添加 archlinuxcn 源
 
 ```bash
 $ sudo nvim /etc/pacman.conf
@@ -24,25 +24,25 @@ $ sudo pacman -S archlinuxcn-keyring
 
 ### 主题
 
-安装`numix cicle`图标
+安装 numix cicle 图标
 
-```
-yay -S numix-circle-icon-theme-git
-```
-
-安装`Latte` dock软件
-
-```
-sudo pacman -S latte-dock
+```bash
+$ yay -S numix-circle-icon-theme-git
 ```
 
-在`latte dock`软件启动后,右键`布局`->`配置`中选择`下载`,可以联网下载`macOS`主题,然后选择应用即可.
+安装 Latte dock 软件
+
+```bash
+$ sudo pacman -S latte-dock
+```
+
+在 latte dock 软件启动后,右键“布局” -> “配置”中选择下载,可以联网下载 macOS 主题,然后选择应用即可.
 
 同理,在系统设置中,可以从互联网上下载自己喜欢的主题,图标,开机登录界面,锁屏等.
 
 ### 字体
 
-在不修改字体渲染的情况下,各种软件的中文字体会大小不一,包括在使用`chrome`浏览网站时.所以需要更改默认的字体渲染,在尝试微软雅黑等字体后,个人觉得思源黑体比较适合
+在不修改字体渲染的情况下,各种软件的中文字体会大小不一,包括在使用 chrome 浏览网站时.所以需要更改默认的字体渲染,在尝试微软雅黑等字体后,个人觉得思源黑体比较适合
 
 #### 安装思源黑体
 
@@ -53,7 +53,7 @@ $ sudo pacman -S wqy-bitmapfont wqy-microhei wqy-microhei-lite wqy-zenhei
 $ sudo pacman -S noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts
 ```
 
-#### 复制`Windows`下的字体至`/usr/share/fonts`文件夹下
+#### 复制 Windows 下的字体至 /usr/share/fonts 文件夹下
 
 参考链接:
 https://wiki.archlinux.org/index.php/Microsoft_fonts
@@ -62,7 +62,7 @@ https://wiki.archlinux.org/index.php/Microsoft_fonts
 
 #### 修改渲染文件
 
-1. 在`/etc/fonts`下新建`local.conf`文件
+1. 在 /etc/fonts 下新建 local.conf 文件
 
 ```xml
 <?xml version="1.0"?>

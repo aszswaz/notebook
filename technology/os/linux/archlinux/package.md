@@ -25,9 +25,9 @@ $ sudo pacman -Rc $(pacman -Qdtq)
 $ reflector --verbose -l 200 -p http --sort rate --save /etc/pacman.d/mirrorlist
 ```
 
-## 删除gpg密钥
+## 删除 gpg 密钥
 
-以sublime为例：
+以 sublime 为例：
 
 ```bash
 # 查找sublime gpg的密钥序列号
