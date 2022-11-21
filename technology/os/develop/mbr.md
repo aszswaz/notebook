@@ -60,7 +60,7 @@ times 510-($-$$) db 0
 db 0x55, 0xAA
 ```
 
-制作一个只包行 MBR 的镜像文件：
+制作一个只包含 MBR 的镜像文件：
 
 ```bash
 $ dd if=/dev/zero of=os.img bs=1MB count=1
