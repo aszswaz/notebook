@@ -1,4 +1,6 @@
-# 命令行工具
+# 简介
+
+命令行的常用工具文档
 
 # tidy
 
@@ -387,5 +389,21 @@ XXXXXXXXXXXXXXXX       device usb:1-1.1 product:DEVICE02 model:DEVICE02 device:D
 XXXXXXXXXXXXXXXX       device usb:1-1.2 product:DEVICE01 model:DEVICE01 device:DEVICE transport_id:1
 # 假设将软件安装到 DEVICE02，需要指定设备的 transport_id
 $ adb -t 2 install-multiple *.apk
+```
+
+# zenity
+
+一个使用 GTK 编写的对话框程序，使用方式如下：
+
+```bash
+$ zenity --error --title="Hello World" --text="Hello Wrold" --no-wrap
+```
+
+# notify-send
+
+notify-send 也是对话框程序，它和 [zenity](zenity) 的不同之处是，zenity 的对话框出现位置是屏幕中央，notify-send 的出现位置是在屏幕的角落，具体的位置是随着 GUI 环境的不同而不同，比如在 xface 环境下，对话框默认是出现在右上角，在 kde 环境下，对话框出现在右下角。使用方式为：
+
+```bash
+$ notify-send "Hello World" "Hello World"
 ```
 

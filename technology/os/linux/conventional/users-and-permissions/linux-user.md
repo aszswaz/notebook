@@ -1,13 +1,15 @@
-# linux user相关的指令
+# 简介
 
-### 删除用户账户
+linux 的用户管理
+
+# 删除用户账户
 
 ```shell
 # 完全删除用户
 $ userdel -r username
 ```
 
-### 创建用户账户
+# 创建用户账户
 
 ```shell
 # 添加用户
@@ -16,7 +18,7 @@ $ adduser username
 $ passwd username
 ```
 
-### 授权
+# 授权
 
 个人用户的权限只可以在本home下有完整权限，其他目录要看别人授权。而经常需要root用户的权限，这时候sudo可以化身为root来操作。我记得我曾经sudo创建了文件，然后发现自己并没有读写权限，因为查看权限是root创建的。
 
@@ -57,7 +59,7 @@ root    ALL=(ALL)       ALL
 username  ALL=(ALL)       ALL  #这个是新增的用户
 ```
 
-wq保存退出，这时候要记得将写权限收回：
+wq 保存退出，这时候要记得将写权限收回：
 
 ```shell
 $ chmod -v u-w /etc/sudoers
@@ -78,5 +80,11 @@ Administrator. It usually boils down to these three things:
     #3) With great power comes great responsibility.
 ```
 
-第一次使用会提示你，你已经化身超人，身负责任。而且需要输入密码才可以下一步。如果不想需要输入密码怎么办，将最后一个ALL修改成NOPASSWD: ALL。
+第一次使用会提示你，你已经化身超人，身负责任。而且需要输入密码才可以下一步。如果不想需要输入密码怎么办，将最后一个 ALL 修改成 NOPASSWD: ALL。
+
+# 设置用户的登陆 shell
+
+```bash
+$ usermod -s /bin/zsh $USER && grep $USER /etc/passwd
+```
 
