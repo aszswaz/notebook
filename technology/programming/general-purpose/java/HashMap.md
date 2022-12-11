@@ -33,7 +33,7 @@ public HashMap() {
 
 ## 2. 第一次PUT
 
-1. 计算KEY的hash code：
+1. 计算 KEY 的 hash code：
 
     ```java
     static final int hash(Object key) {
