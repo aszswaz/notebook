@@ -2,7 +2,7 @@
 
 ## java.lang.UnsatisfiedLinkError: /home/aszswaz/Downloads/jdk1.8.0_291/jre/lib/i386/libawt_xawt.so: libXrender.so.1: 无法打开共享对象文件: 没有那个文件或目录
 
-这个异常是linux系统下发现的，windows可能也会有对应的异常，异常的详细堆栈
+这个异常是 linux 系统下发现的，windows 可能也会有对应的异常，异常的详细堆栈
 
 ```txt
 Exception in thread "main" com.alibaba.excel.exception.ExcelGenerateException: java.lang.UnsatisfiedLinkError: /home/aszswaz/Downloads/jdk1.8.0_291/jre/lib/i386/libawt_xawt.so: libXrender.so.1: 无法打开共享对象文件: 没有那个文件或目录
@@ -45,11 +45,11 @@ Caused by: java.lang.UnsatisfiedLinkError: /home/aszswaz/Downloads/jdk1.8.0_291/
 	... 5 more
 ```
 
-在网上找原因，有说是系统中缺少X11可视化框架的库libXrender，需要安装libXrender。
+在网上找原因，有说是系统中缺少 X11 可视化框架的库 libXrender，需要安装 libXrender。
 
 不过我发现在我的系统中这个库是存在的，并且重新安装也无效。
 
-导致这个异常的实际原因是使用的JDK与电脑系统不对应导致的。由于我的粗心，jdk下载了x86也就是i586版本，而我的电脑是x64的...
+导致这个异常的实际原因是使用的 JDK 与电脑系统不对应导致的。由于我的粗心，jdk 下载了 x86 也就是i586版本，而我的电脑是 x64 的...
 
-我用这x86版本还使用了挺长时间的，因为开发服务器项目的时候功能一切正常，使用easyexcel才出现的问题...
+我用这x86版本还使用了挺长时间的，因为开发服务器项目的时候功能一切正常，使用 easyexcel 才出现的问题...
 
