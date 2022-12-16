@@ -174,6 +174,16 @@ public class Demo {
 }
 ```
 
+```bash
+$ javac --source 19 --enable-preview Demo.java
+$ java --enable-preview Demo
+main thread id: 1
+v1, thread id: 20
+v2, thread id: 22
+v3, thread id: 25
+v4, thread id: 26
+```
+
 虚拟线程一样会出现死循环问题，详细代码如下：
 
 ```java
@@ -191,6 +201,7 @@ public class Demo02 {
                 int num = i;
                 service.submit(() -> {
                     System.out.println("i: " + num);
+                    // 通过死循环永久占有平台线程
                     while (args.length == 0){}
                 });
             }
@@ -213,3 +224,60 @@ i: 3
 ```
 
 用于调度虚拟线程的平台线程数量是根据 CPU 的核心数决定的，在我这台四核的电脑上，调度线程就是 4 个。
+
+下面这段代码验证了在虚拟线程中调用 Thread.sleep() 会不会切换到其他线程，同时还反映了一个可能会遇到的 BUG：虚拟线程中的死循环，可以让其他虚拟线程永远的处于 sleep 状态。
+
+```java
+import java.util.concurrent.Executors;
+
+@SuppressWarnings({"StatementWithEmptyBody", "LoopConditionNotUpdatedInsideLoop"})
+public class Demo02 {
+    /**
+     * 测试当虚拟线程进行 BIO 操作或 sleep() 时，是否真的切换到其他的虚拟线程去运行了
+     */
+    public static void main(String[] args) throws InterruptedException {
+        // 使用自行创建的调度线程运行虚拟线程
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < 10; i++) {
+                int num = i;
+                service.submit(() -> {
+                    try {
+                        System.out.println("i: " + num);
+                        // BIO 操作有些麻烦，这里用 sleep 代替，暂停当前虚拟线程，执行其他虚拟线程
+                        Thread.sleep(5000);
+                        // 由于死循环的存在，只有部分虚拟线程可以继续执行，其他虚拟线程会永远的处于 sleep 状态
+                        System.out.println("wait, i: " + num);
+                        while (args.length == 0) {}
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
+
+        Thread.sleep(500);
+    }
+}
+```
+
+```bash
+$ javac --source 19 --enable-preview Demo02.java
+$ java --enable-preview Demo02
+i: 1
+i: 0
+i: 3
+i: 4
+i: 5
+i: 6
+i: 7
+i: 8
+i: 9
+i: 2
+wait, i: 1
+wait, i: 0
+wait, i: 3
+wait, i: 4
+```
+
+# 线程锁
+
