@@ -109,3 +109,107 @@ public class Demo implements Callable<Integer> {
 }
 ```
 
+# 虚拟线程
+
+虚拟线程，英文是 virtual thread，它是一种用户线程，它的调度不是由 OS 完成的，而是由用户进程中的线程调度器完成调度。为了表示区别，Java 把普通线程改称为平台线程（英文：platform thread）。
+
+虚拟线程本质上只是一个调度任务，虚拟线程依赖于平台线程，它的调度就是用单个平台线程运行一个调度器，调度器从自己的任务队列中取出一个任务执行，如果该任务进行了 BIO 操作，或者是调用了 sleep() 进入休眠状态，调度器就会执行另一个任务。
+
+虚拟线程是为 I/O 密集型任务而生，它不适合计算密集型任务，计算密集型任务还是使用平台线程效果更佳。
+
+我的猜测是，虚拟线程等于 GO 的协程，主要的目的在于简化 NIO 的操作，它主要的核心思想是以 BIO 的方式操作 NIO，将 BIO 操作的便利性与 NIO 的异步相结合，换言之，就是以操作阻塞 IO 的方式去操作异步 IO，降低异步 IO 操作的繁琐步骤。
+
+虚拟线程的操作方式如下：
+
+```java
+import java.util.concurrent.Executors;
+
+public class Demo {
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println("main thread id: " + Thread.currentThread().threadId());
+        // 通过三种方式创建并执行虚拟线程
+        v1();
+        v2();
+        v3();
+        v4();
+        // 防止 main 函数退出时，虚拟线程还没有启动
+        Thread.sleep(1000);
+    }
+
+    private static void v1() {
+        // 创建并执行虚拟线程
+        Thread.startVirtualThread(() ->
+                System.out.println("v1, thread id: " + Thread.currentThread().threadId()));
+    }
+
+    private static void v2() {
+        // 创建虚拟线程
+        var t = Thread.ofVirtual().unstarted(() ->
+                System.out.println("v2, thread id: " + Thread.currentThread().threadId()));
+        // 执行虚拟线程
+        t.start();
+    }
+
+    /**
+     * 通过 ThreadFactory 创建虚拟线程
+     */
+    private static void v3() {
+        // 创建 ThreadFactory
+        var tf = Thread.ofVirtual().factory();
+        // 创建虚拟线程
+        var t = tf.newThread(() ->
+                System.out.println("v3, thread id: " + Thread.currentThread().threadId()));
+        t.start();
+    }
+
+    /**
+     * 直接调用虚拟线程的 start()，实际上是由 ForkJoinPool 的线程来进行调度的，我们也可以自己创建调度线程，然后运行虚拟线程
+     */
+    private static void v4() {
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
+            var tf = Thread.ofVirtual().factory();
+            service.submit(() -> System.out.println("v4, thread id: " + Thread.currentThread().threadId()));
+        }
+    }
+}
+```
+
+虚拟线程一样会出现死循环问题，详细代码如下：
+
+```java
+import java.util.concurrent.Executors;
+
+@SuppressWarnings({"StatementWithEmptyBody", "LoopConditionNotUpdatedInsideLoop"})
+public class Demo02 {
+    /**
+     * 向虚拟线程的调度器添加一定数量的虚拟线程，并且使用死循环让虚拟线程无法终止
+     */
+    public static void main(String[] args) throws InterruptedException {
+        // 使用自行创建的调度线程运行虚拟线程
+        try (var service = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < 10; i++) {
+                int num = i;
+                service.submit(() -> {
+                    System.out.println("i: " + num);
+                    while (args.length == 0){}
+                });
+            }
+        }
+
+        Thread.sleep(500);
+    }
+}
+```
+
+运行结果如下：
+
+```bash
+$ javac --source 19 --enable-preview Demo02.java
+$ java --enable-preview Demo02
+i: 2
+i: 1
+i: 0
+i: 3
+```
+
+用于调度虚拟线程的平台线程数量是根据 CPU 的核心数决定的，在我这台四核的电脑上，调度线程就是 4 个。
