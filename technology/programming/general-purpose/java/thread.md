@@ -281,3 +281,199 @@ wait, i: 4
 
 # 线程锁
 
+线程锁的存在是为了解决资源占用问题，保证一段时间内一个资源只能被一个线程访问，以此来保证数据的安全性。
+
+## 线程锁的种类
+
+线程锁的种类划分如下
+
+### 公平锁与非公平锁
+
+公平锁是指多个线程在等待同一个锁时，必须按照申请锁的顺序依次获得锁。非公平锁与公平锁相反，是指多个线程在等待同一个锁时，不需要按照申请锁的顺序依次获得锁。
+
+公平锁的好处是等待锁的线程不会被饿死，但是效率相对低些，非公平锁的好处是效率相对高些，但是有些线程可能会饿死，或者说很早就在等待锁，但要很久才会获得锁。其中的原因是公平锁是严格按照请求锁的顺序来依次获得锁的，而非公平锁是可以抢占的，即如果在某个时刻有线程需要获取锁，而这个时候刚好锁可用，那么这个线程会直接抢占，而这是阻塞在等待队列的线程不会被唤醒。
+
+代码示例：
+
+```java
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class ReentrantLockDemo extends Thread {
+    private static int num;
+
+    private final Lock lock;
+
+    public ReentrantLockDemo(Lock lock) {
+        this.lock = lock;
+    }
+
+    public static void main(String[] args) {
+        // 公平锁
+        Lock lock = new ReentrantLock(true);
+        // 非公平锁
+        // Lock lock = new ReentrantLock(false);
+
+        for (int i = 0; i < 10; i++) {
+            Thread t1 = new ReentrantLockDemo(lock);
+            t1.start();
+        }
+    }
+
+    @Override
+    public void run() {
+        lock.lock();
+
+        try {
+            num++;
+            Thread.sleep(100);
+            System.out.println("thread id: " + super.getId() + ", " + num);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
+
+### 互斥锁与非互斥锁
+
+**互斥锁**，又称独占锁、独享锁或排他锁，是指不允许多个线程同时持有的锁，常见的互斥锁有：synchronized、ReentrantLock 和 ReentrantReadWriteLock 中的 WriteLock。**非互斥锁**，又称非共享锁，是指允许多个线程同时持有的锁，常见的非互斥锁有：ReentrantReadWriteLock 中的 ReadLock。
+
+### 可重入锁与不可重入锁
+
+**可重入锁**，又称递归锁，是指同一个线程可以多次获取的锁，并且获取多少次就要释放多少次，这种锁多用于函数的递归调用，常见的可重入锁有：synchronized 和 ReentrantLock。**不可重入锁**，是指不可以多次获取的锁，本质上是不对锁的获取次数进行统计的[自旋锁](#自旋锁与非自旋锁)。
+
+### 读写锁
+
+**读写锁**分为**读锁**和**写锁**，读锁是一种[非互斥锁](#互斥锁与非互斥锁)，写锁是一种[互斥锁](#互斥锁与非互斥锁)，读锁和写锁是互斥的，它们不能同时被获取。例子如下：
+
+```java
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class ReentrantReadWriteLockDemo extends Thread {
+    private static final Lock READ_LOCK;
+    private static final Lock WRITE_LOCK;
+
+    static {
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        READ_LOCK = lock.readLock();
+        WRITE_LOCK = lock.writeLock();
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 4; i++) {
+            new ReentrantReadWriteLockDemo().start();
+        }
+    }
+
+    /**
+     * ReadLock 是共享锁，它允许被多个线程同时持有
+     * WriteLock 是独占锁，同一时间内只允许单个线程持有
+     * ReadLock 和 WriteLock 是互斥的，ReadLock 被获取时，无法获取 WriteLock，反过来说，WriteLock 被获取时，无法获取 ReadLock
+     */
+    @Override
+    public void run() {
+        try {
+            READ_LOCK.lock();
+            System.out.println(System.currentTimeMillis() % 100000 + " thread id: " + this.getId() + ", get ReadLock.");
+            Thread.sleep(500);
+            READ_LOCK.unlock();
+
+            WRITE_LOCK.lock();
+            System.out.println(System.currentTimeMillis() % 100000 + " thread id: " + this.getId() + ", get WriteLock.");
+            Thread.sleep(1000);
+            WRITE_LOCK.unlock();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+```bash
+$ javac ReentrantReadWriteLockDemo.java
+$ java ReentrantReadWriteLockDemo
+29284 thread id: 10, get ReadLock.
+29284 thread id: 11, get ReadLock.
+29285 thread id: 12, get ReadLock.
+29285 thread id: 13, get ReadLock.
+29785 thread id: 13, get WriteLock.
+30786 thread id: 11, get WriteLock.
+31786 thread id: 10, get WriteLock.
+32787 thread id: 12, get WriteLock.
+```
+
+从上面的例子就不难看出，ReadLock 虽然允许被多个线程持有，但是在 ReadLock 被所有线程释放之前，是无法获取 WriteLock 的。如果把 `Thread.sleep(500);` 这行代码删除，执行结果如下：
+
+```bash
+$ javac ReentrantReadWriteLockDemo.java && java ReentrantReadWriteLockDemo
+80493 thread id: 10, get ReadLock.
+80493 thread id: 12, get ReadLock.
+80493 thread id: 11, get ReadLock.
+80494 thread id: 10, get WriteLock.
+81494 thread id: 12, get WriteLock.
+82495 thread id: 13, get ReadLock.
+82495 thread id: 13, get WriteLock.
+83495 thread id: 11, get WriteLock.
+```
+
+从上面的结果可以看出，当 thread 10 和 thread 12 持有 WriteLock 时，thread 13 无法获得 ReadLock。
+
+### 乐观锁和悲观锁
+
+**乐观锁**，是指每次获取资源时别的线程不会修改，所以不会上锁，但是在更新数据时会判断一下别的线程有没有去更新这个数据，可以使用版本号机制和 CAS 算法实现。乐观锁适用于读数据比较多的应用场景，比如数据库的 write_condition 机制就是提供的乐观锁，`java.util.concurrent.atomic` 包下的类就是使用 CAS 算法实现的乐观锁。
+
+**悲观锁**，是指每次获取资源时别的线程很可能会修改，所以在每次获取资源的时候都会上锁。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，Java 中的 synchronized、ReentrantLock、WriteLock 等独占锁就是悲观锁的实现。
+
+### 自旋锁与非自旋锁
+
+**自旋锁**（spinlock），是指当一个线程在获取锁的时候，如果该锁已经被其它线程获取，那么该线程将不断的尝试获取锁，直到获得锁时退出循环。**非自旋锁**，是指一个线程在获取锁的时候，如果该锁已经被其它线程线程获取，它会进入阻塞状态，直到锁被释放。
+
+通过 CAS 实现非自旋锁：
+
+```java
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * 自旋锁演示
+ */
+@SuppressWarnings("unused")
+public class SpinLockDemo {
+    private static final AtomicReference<Object> CAS = new AtomicReference<>();
+    private final Object lock = new Object();
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public void lock() {
+        // 利用 CAS 实现自旋锁
+        while (!CAS.compareAndSet(null, this.lock)) ;
+    }
+
+    public void unlock() {
+        CAS.compareAndSet(this.lock, null);
+    }
+}
+```
+
+自旋锁不会使线程状态发生切换，一直处于用户态，即线程一直都是活跃的；不会使线程进入阻塞状态，减少了不必要的上下文切换，执行速度快。但它的缺点也很明显，如果某个线程持有锁的时间过长，就会导致其它线程在获取锁时进入不停的循环，这会导致 CPU 消耗过高。
+
+## 分段锁
+
+**分段锁**是一种锁的使用方式，并不是具体的一种锁，它是指使用多个锁对不同的数据进行保护，降低多个线程对同一个锁的竞争。最常见的例子就是 ConcurrentHashMap，在 ConcurrentHashMap 中就是使用 Node 对象自己作为线程锁，以此保证对该 Node 的更新不会出现线程安全问题[^@1]。
+
+## CAS
+
+**CAS**，全称是 Compare and Swap（比较并交换），指的是不使用线程锁，而是直接以原子的方式将给变量设置为新的值。在 Java 中，要想使用 CAS 算法，只有两种方式：
+
+1. 使用 `java.util.concurrent.atomic` 包中的类。
+2. 自行编写一个 JNI 函数，因为 CAS 算法在进行变量更新，对于变量原子性保证，依赖于一个 Intel 汇编指令 [cmpxchgl](../assembly/x86.md#cmpxchg) 和一个指令前缀 [lock](../assembly/x86.md#lock)。
+
+文章写到这里似乎出现了一个自相矛盾的地方：前面明明是说：“CAS 不使用线程锁的，为啥还是用了汇编中的 lock？”，其实它们不是一个等价的东西，类似 synchronized 这种普通的线程锁，线程进入等待锁的时候和成功获得锁被唤醒的时候，是要切换线程的上下文的，这会带来额外的开销，而汇编中的 lock 不会带来这种开销。
+
+[^@1]: 线程安全问题是指多个线程访问同一个资源，从而发生数据不一致的问题。
+
