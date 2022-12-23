@@ -121,7 +121,7 @@ yum 仓库中的 certbot 版本很旧，官方推荐通过 [snap](https://snapcr
 $ sudo dnf install epel-release && sudo dnf upgrade
 # centos 7
 $ sudo yum install epel-release
-$ sudo yum install snapd -y && \
+$ sudo yum install snapd -y
 $ sudo systemctl enable --now snapd.socket
 $ sudo ln -s /var/lib/snapd/snap /snap
 ```
@@ -157,7 +157,7 @@ $ sudo rm -rf /var/lib/certbot/.well-known
 请求 Let's encrypt 颁发证书，如果成功，证书保存在 /etc/letsencrypt/live 文件夹下
 
 ```bash
-$ sudo certbort certonly --webroot -w /var/lib/certbot -d example.com -d www.example.com
+$ sudo certbot certonly --webroot -w /var/lib/certbot -d example.com -d www.example.com
 ```
 
 “ Let's encrypt” 证书的有效期是 90 天，因此需要使用 cron 定期更新证书
