@@ -1,6 +1,8 @@
-# pacman
+# 简介
 
-## 软件源配置
+在 Manjaro 中使用 pacman 和 archlinux 中的 pacman 有一点区别，需要进行额外的配置。
+
+# 软件源配置
 
 ```bash
 # 设置中国的源
@@ -20,103 +22,52 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
 $ sudo pacman -S archlinuxcn-keyring
 ```
 
-## 美化
+# 更新镜像源
 
-### 主题
-
-安装 numix cicle 图标
+在滚动更新的时候，有可能会遇到软件开发已发布最新版本，但目前使用的镜像源还没有同步的情况，比如 manjaro-mirrors 的更新失败：
 
 ```bash
-$ yay -S numix-circle-icon-theme-git
+$ sudo pacman -Syyu
+:: Synchronizing package databases...
+ core                                                                            159.8 KiB  1141 KiB/s 00:00 [################################################################] 100%
+ extra                                                                          1834.7 KiB  6.11 MiB/s 00:00 [################################################################] 100%
+ community                                                                         7.5 MiB  6.85 MiB/s 00:01 [################################################################] 100%
+ multilib                                                                        167.0 KiB  3.47 MiB/s 00:00 [################################################################] 100%
+:: Starting full system upgrade...
+:: Replace pacman-mirrors with core/manjaro-mirrors? [Y/n] Y
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (4) libpamac-11.4.1-3  manjaro-mirrors-4.23.2+2+g2f58b3c-2  pacman-6.0.2-6  pacman-mirrors-4.23.2-2 [removal]
+
+Total Download Size:    0.15 MiB
+Total Installed Size:   9.07 MiB
+Net Upgrade Size:      -0.05 MiB
+
+:: Proceed with installation? [Y/n] Y
+:: Retrieving packages...
+ manjaro-mirrors-4.23.2+2+g2f58b3c-2-any.pkg.tar.xz failed to download
+error: failed retrieving file 'manjaro-mirrors-4.23.2+2+g2f58b3c-2-any.pkg.tar.xz' from mirror.nju.edu.cn : The requested URL returned error: 404
+error: failed retrieving file 'manjaro-mirrors-4.23.2+2+g2f58b3c-2-any.pkg.tar.xz' from mirrors.huaweicloud.com : The requested URL returned error: 404
+error: failed retrieving file 'manjaro-mirrors-4.23.2+2+g2f58b3c-2-any.pkg.tar.xz' from mirrors.sjtug.sjtu.edu.cn : The requested URL returned error: 404
+warning: failed to retrieve some files
+error: failed to commit transaction (failed to retrieve some files)
+Errors occurred, no packages were upgraded.
 ```
 
-安装 Latte dock 软件
+这时就需要把当前使用的镜像源更改为有最新镜像的镜像源，操作方式如下：
 
 ```bash
-$ sudo pacman -S latte-dock
+# 获取当前国家中，有最新镜像的镜像源，将其设置为当前使用的镜像源
+$ sudo pacman-mirrors -f
+::INFO Downloading mirrors from Manjaro
+::INFO => Mirror pool: https://repo.manjaro.org/mirrors.json
+::INFO => Mirror status: https://repo.manjaro.org/status.json
+::INFO Using custom mirror file
+::INFO Querying mirrors - This may take some time
+  0.329 China          : https://mirrors.sjtug.sjtu.edu.cn/manjaro/
+::INFO Writing mirror list
+::China           : https://mirrors.sjtug.sjtu.edu.cn/manjaro/stable/$repo/$arch
+::INFO Mirror list generated and saved to: /etc/pacman.d/mirrorlist
 ```
 
-在 latte dock 软件启动后,右键“布局” -> “配置”中选择下载,可以联网下载 macOS 主题,然后选择应用即可.
-
-同理,在系统设置中,可以从互联网上下载自己喜欢的主题,图标,开机登录界面,锁屏等.
-
-### 字体
-
-在不修改字体渲染的情况下,各种软件的中文字体会大小不一,包括在使用 chrome 浏览网站时.所以需要更改默认的字体渲染,在尝试微软雅黑等字体后,个人觉得思源黑体比较适合
-
-#### 安装思源黑体
-
-```bash
-# 文泉驿黑
-$ sudo pacman -S wqy-bitmapfont wqy-microhei wqy-microhei-lite wqy-zenhei
-# 思源字体
-$ sudo pacman -S noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts
-```
-
-#### 复制 Windows 下的字体至 /usr/share/fonts 文件夹下
-
-参考链接:
-https://wiki.archlinux.org/index.php/Microsoft_fonts
-
-[中文版](https://wiki.archlinux.org/index.php/Microsoft_fonts_(简体中文)
-
-#### 修改渲染文件
-
-1. 在 /etc/fonts 下新建 local.conf 文件
-
-```xml
-<?xml version="1.0"?>
-<fontconfig>
-	<match target="font">
-		<edit name="autohint">
-			<bool>false</bool>
-		</edit>
-		<edit name="hinting">
-			<bool>false</bool>
-		</edit>
-		<edit name="hintstyle">
-			<const>hintnone</const>
-		</edit>
-	</match>
-	<match target="pattern">
-		<test qual="any" name="family">
-			<string>sans</string>
-		</test>
-		<edit name="family" mode="assign" binding="same">
-			<string>Yahei Mono</string>
-		</edit>
-	</match>
-	<match target="pattern">
-		<test qual="any" name="family">
-			<string>serif</string>
-		</test>
-		<edit name="family" mode="assign" binding="same">
-			<string>Source Han Sans CN</string>
-		</edit>
-	</match>
-	<match target="pattern">
-		<test qual="any" name="family">
-			<string>sans serif</string>
-		</test>
-		<edit name="family" mode="assign" binding="same">
-			<string>Source Han Sans CN</string>
-		</edit>
-	</match>
-	<match target="pattern">
-		<test qual="any" name="family">
-			<string>sans-serif</string>
-		</test>
-		<edit name="family" mode="assign" binding="same">
-			<string>Source Han Sans CN</string>
-		</edit>
-	</match>
-	<match target="pattern">
-		<test qual="any" name="family">
-			<string>monospace</string>
-		</test>
-		<edit name="family" mode="assign" binding="same">
-			<string>Source Han Sans CN</string>
-		</edit>
-	</match>
-</fontconfig>
-```
