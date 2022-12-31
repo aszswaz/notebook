@@ -1,11 +1,11 @@
-# mysql的自增主键可能会出现重复冲突的问题
+# mysql 的自增主键可能会出现重复冲突的问题
 
 这个问题出现的原因，主要是由于表格的当前自增值小于id的最大值所导致的问题
 
 **该问题的主要几个原因如下**
 
-1.  update更新了主键导致
-    例1：首先在mysql中创建demo库
+1.  update 更新了主键导致
+    例1：首先在 mysql 中创建demo库
 
     ```mysql
     create database demo charset utf8mb4;
@@ -48,7 +48,7 @@ show table status;
 
 可以看到auto_increment没有什么改变，当auto_incretment达到200时就会发生主键冲突
 
-# 在docker当中安装mysql，从外部挂载的配置文件无效
+# 在 docker 当中安装 mysql，从外部挂载的配置文件无效
 
 <span style="color: red">这个问题出现的原因是linux文件权限导致的。</span>
 

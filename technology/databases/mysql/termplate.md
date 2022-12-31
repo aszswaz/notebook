@@ -1,4 +1,19 @@
-# mysql删除重复的数据
+# 简介
+
+常用的 SQL 模板
+
+# 数据去重
+
+现有一个数据表，其表结构如下：
+
+```mysql
+CREATE TABLE demo_table(
+    id BIGINT,
+    `time` TIMESTAMP
+);
+```
+
+表中 id 存在大量重复，需要对数据进行去重，操作步骤如下：
 
 ```mysql
 # 锁定数据表
@@ -6,7 +21,7 @@ LOCK TABLES demo_table WRITE;
 
 # 查找重复的数据记录，并且把查询结果存储到临时表
 CREATE TEMPORARY TABLE repeat_table
-SELECT id, `time`, count(id)
+SELECT id, `time`, COUNT(id)
 FROM demo_table
 GROUP BY id, `time`
 HAVING COUNT(id) > 1;
@@ -26,7 +41,7 @@ HAVING COUNT(*) > 1;
 SELECT *
 FROM repeat_min_id_table;
 
-# 删除多余的重复数据，保留id最小的一条
+# 删除多余的重复数据，保留 id 最小的一条
 DELETE
 FROM demo_table
 WHERE (id, `time`) IN (SELECT id, `time` FROM repeat_table)
