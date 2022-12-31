@@ -101,7 +101,7 @@ $ mongo -u admin -p password --host 192.168.24.1 --port 27017 --authenticationDa
 
 <font color="red">uri中的authSource和终端参数--authenticationDatabase，用途一致，都是指定认证数据库，默认是admin数据库，如果这个参数错误，会导致认证失败</font>
 
-### 运行script脚本
+### 运行 script 脚本
 
 除了交互式，还可以直接运行js脚本：
 
@@ -115,7 +115,7 @@ $ mongo demo
 load("/home/aszswaz/demo.js")
 ```
 
-还可以直接在脚本中连接Mongodb：
+还可以直接在脚本中连接 mongodb：
 
 ```javascript
 var client = new Mongo("localhsot:27017");

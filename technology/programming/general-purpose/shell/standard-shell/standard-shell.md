@@ -52,8 +52,7 @@ sudo pacman -Rc $(pacman -Qdtq)
 
 ```shell
 demo=(element01 element02 element03)
-for element in ${demo}
-do
+for element in ${demo}; do
     echo "value: ${element}"
 done
 # value: element01
@@ -94,8 +93,7 @@ echo "元素3：${demo[3]}"
 ```shell
 demo=(element01 element02 element03)
 index=1
-while ((${index} <= ${#demo[*]}))
-do
+while ((${index} <= ${#demo[*]})); do
     echo "第${index}个元素为：${demo[index]}"
     index=$(expr $index + 1)
 done
@@ -113,8 +111,7 @@ done
 
 ```shell
 demo=(element01 element02 element03)
-for elemente in ${demo}
-do
+for elemente in ${demo}; do
     echo "value: ${elemente}"
 done
 ```
@@ -133,7 +130,7 @@ value: element03
 
 ```shell
 # 声明函数
-demo(){
+demo() {
     echo 'Hello World'
 }
 # 调用函数
@@ -158,11 +155,10 @@ Hello World
 
 ```shell
 # 方式一，使用“$*”
-$ demo(){
+$ demo() {
     echo "参数长度：$#"
     echo "参数列表：$*"
-    for arg in $*
-    do
+    for arg in $*; do
         echo ${arg}
     done
 }
@@ -176,11 +172,10 @@ test02
 
 ```shell
 # 方式二。使用“$@”
-$ demo(){
+$ demo() {
     echo "参数长度：$#"
     echo "参数列表：$*"
-    for arg in $*
-    do
+    for arg in $*; do
         echo ${arg}
     done
 }
@@ -194,10 +189,10 @@ test02
 **函数返回值**
 
 ```shell
-$ demo02(){
+$ demo02() {
     echo 'Hello World!'
 }
-$ demo(){
+$ demo() {
     # 运行函数，并且获得返回值
     echo $(demo02)
 }
@@ -229,7 +224,7 @@ for key in ${!dict[*]}; do
 done
 ```
 
-# SHELL 的IO操作
+# SHELL 的 IO 操作
 
 **>**
 
@@ -245,7 +240,7 @@ $ echo "Hello World" > demo.txt
 $ <demo.txt
 ```
 
-读取文件内容，功能上类似于`cat`，主要在脚本当中使用，比如读取文件每一行：
+读取文件内容，功能上类似于 cat，主要在脚本当中使用，比如读取文件每一行：
 
 ```bash
 #!/bin/zsh
@@ -283,9 +278,9 @@ $ echo $demo
 demo
 ```
 
-<font color="red">注意：linux的终端模拟程序对于通过stdin输入多字节字符，存在退格键删除，只删除半个字符的问题</font>，如果运行的shell是zsh，应当使用[vared](../zsh.md#vared)获取用户输入
+<font color="red">注意：linux的终端模拟程序对于通过stdin输入多字节字符，存在退格键删除，只删除半个字符的问题</font>，如果运行的 shell 是 zsh，应当使用 [vared](../z-shell/commonly-used.md#vared) 获取用户输入
 
-`read` 和 `<` 配合，可以达到按行读取文件的效果：
+read 和 < 配合，可以达到按行读取文件的效果：
 
 ```bash
 while read -r line; do

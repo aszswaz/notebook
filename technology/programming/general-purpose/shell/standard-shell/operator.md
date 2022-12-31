@@ -217,8 +217,8 @@ fi
 | 运算符 | 说明 | 举例|
 |-----------|--------|-------|
 | ! | 非运算，表达式为 true 则返回 false，否则返回 true。 | [ ! false ] 返回 true。 |
-| -o | 或运算，有一个表达式为 true 则返回 true。 | [ $a -lt 20 -o $b -gt 100 ] 返回 true。 |
-| -a | 与运算，两个表达式都为 true 才返回 true。 | [ $a -lt 20 -a $b -gt 100 ] 返回 false。 |
+| -o | 或运算，有一个表达式为 true 则返回 true。 | [ a -lt 20 -o b -gt 100 ] 返回 true。 |
+| -a | 与运算，两个表达式都为 true 才返回 true。 | [ a -lt 20 -a b -gt 100 ] 返回 false。 |
 
 布尔运算符实例如下：
 
@@ -477,7 +477,7 @@ fi
 [[ a < 0 ]] && { echo "a < 0" && echo "true" }
 ```
 
-# 字符串运算符
+# 字符串操作
 
 ## 删除指定字符
 
@@ -516,5 +516,43 @@ demo="Hello World"
 echo "${demo/[a-zA-Z]/a}"
 # “//”与“/”的不同之处在于，“/”只能匹配一次，“//”是全文匹配
 echo "${demo//[a-zA-Z]/a}"
+```
+
+## 拆分字符串
+
+shell 有一个特殊的变量 IFS（Internal Field Seprator），全称是内部域分隔符，shell 使用存储在 IFS 中的值（默认情况下为空格、制表符和换行符）来分隔指令的参数、解析指令的输出，以及分割字符串。
+
+```bash
+#!/bin/bash
+
+# 保存 IFS 原本的值
+ORIGINAL_IFS="$IFS"
+IFS='|'
+
+string="abcdefg|higklmn|opqrst|uvwxyz"
+strings=($string)
+for iterm in ${strings[*]}; do
+    echo "iterm: $iterm"
+done
+
+# 恢复 IFS 的值
+IFS="$ORIGINAL_IFS"
+```
+
+此外，还要特别说明一下该怎么正确的使用不可见字符作为字符串的分隔符，以换行符为例：
+
+```bash
+#!/bin/bash
+
+ORIGINAL_IFS="$IFS"
+
+# 在 shell 中 \n 所代表的只是一个字符串 \n，而不是换行符，只有加上 $，shell 才会把 \n 转义为换行符
+IFS=$'\n'
+# 把本文件夹下所有文件的文件名中的所有空格替换为“-”，包括子文件夹
+for iterm in $(find -type f); do
+	mov "$iterm" "${iterm// /-}"
+done
+
+IFS="$ORIGINAL_IFS"
 ```
 

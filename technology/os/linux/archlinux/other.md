@@ -24,13 +24,13 @@ $ sudo pacman-mirrors -c China
 
 更新软件源并导入公钥
 
-```zsh
-sudo pacman -Syy && sudo pacman -S archlinuxcn-keyring
+```bash
+$ sudo pacman -Syy && sudo pacman -S archlinuxcn-keyring
 ```
 
 # 打开控制台，出现以下问题
 
-```zsh
+```bash
 _p9k_init_params:72: character not in range
 manjaro% 
 ```
@@ -39,9 +39,9 @@ manjaro%
 
 解决方法：
 
-```zsh
+```bash
 # 打开语言环境配置文件
-sudo gedit /etc/locale.gen
+$ sudo gedit /etc/locale.gen
 ```
 
 ```txt
@@ -49,36 +49,36 @@ sudo gedit /etc/locale.gen
 zh_CN.UTF-8 UTF-8
 ```
 
-```zsh
+```bash
 # 执行指令
-sudo locale-gen
-``` 
+$ sudo locale-gen
+```
 
 # 清理垃圾
 
 清理系统中无用的包
 
-```zsh
+```bash
 # 由于不少软件有依赖关系，建议多执行几次，直到指令出错为止
-sudo pacman -R $(pacman -Qdtq)
+$ sudo pacman -R $(pacman -Qdtq)
 ```
 
 清除已下载的安装包
 
-```zsh
-sudo pacman -Scc
+```bash
+$ sudo pacman -Scc
 ```
 
 查看日志文件
 
-```zsh
-du -t 100M /var
+```bash
+$ du -t 100M /var
 # 或
-journalctl --disk-usage
+$ journalctl --disk-usage
 ```
 
 删除历史操作记录
 
-```zsh
-sudo journalctl --vacuum-size=50M
+```bash
+$ sudo journalctl --vacuum-size=50M
 ```
