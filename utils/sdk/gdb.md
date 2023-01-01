@@ -17,7 +17,9 @@ clear 20
 # 设置程序的运行参数
 set args [arg...]
 # 运行程序
-(gdb) run [arg...]
+run [arg...]
+# 运行程序，并且将程序的 stdin 重定向到文件
+run < /dev/shm/demo.txt
 # 查看当前运行所在位置的源代码
 list
 # 查看函数源码
