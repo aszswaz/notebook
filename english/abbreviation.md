@@ -1,6 +1,6 @@
 # Introduction
 
-This document is intended to introduice commonly used abbreviations in English.
+This document is intended to introduce commonly used abbreviations in English.
 
 # I.e.
 
