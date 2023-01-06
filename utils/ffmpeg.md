@@ -85,7 +85,7 @@ $ rm 兄弟抱一下.mp3 && mv 兄弟抱一下-backup.mp3 兄弟抱一下.mp3
 $ ffmpeg -i 兄弟抱一下.mp3 -metadata TYER="" backup.mp3 -metadata track="" && rm 兄弟抱一下.mp3 && mv backup.mp3 兄弟抱一下.mp3
 ```
 
-# 使用ffmpeg录音
+# 使用 ffmpeg 录音
 
 ```bash
 $ ffmpeg -y -f alsa -ar 41000 -ac 2 -i hw:0,0 out.wav -loglevel info
@@ -105,7 +105,7 @@ $ ffplay -nodisp -autoexit -i demo.mp3
 
 -nodisp：不显示窗口，-autoexit：播放完毕自动退出
 
-# 把m4s的音频和图像整合为单个mp4文件
+# 把 m4s 的音频和图像整合为单个 mp4 文件
 
 ```bash
 $ ffmpeg -i audio.m4s -i video.m4s -codec copy demo.mp4
