@@ -1,6 +1,61 @@
 # 简介
 
-命令行的常用工具文档
+CLI 的常用工具文档，都是可执行或脚本，不是某个 shell 的内置函数
+
+# sed
+
+对字符串进行正则表达式操作，如下：
+
+```bash
+# 把多个空格替换为单个空格
+$ echo "Hello  World" | sed 's/\s\s*/ /g'
+Hello World
+```
+
+s/:正则表达式的替换操作
+
+/g:对所有文本进行匹配，不仅仅是第一个
+
+# echo
+
+```bash
+# 打印字符串并换行
+$ echo "demo"
+# 不换行打印字符串
+$ echo -n "demo"
+# 结合 read 使用
+$ echo -n "please input: " && read demo
+please input: demo
+$ echo $demo
+demo
+```
+
+# seq
+
+seq 用于生成指定范围内的所有数字，它通常应用于脚本当中：
+
+```bash
+for index in $(seq 0 10); do
+	echo $index
+done
+```
+
+seq 默认从1开始，如果想要从 0 开始，则需要显式指定
+
+# crontab
+
+crontab 用于执行定时任务，它的cron表达式格式为：分、时、天、月、周
+
+```bash
+# 编辑当前用户的定时任务，一分钟执行一次echo "Hello World"
+$ crontab -e
+* * * * * echo "Hello World"
+# 查看定时任务执行日志
+$ sudo vim /var/log/cron
+# 可以给别的用户创建定时任务
+$ sudo crontab -u root -e
+* * * * * echo "Hello World"
+```
 
 # tidy
 
