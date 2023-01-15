@@ -129,3 +129,24 @@ Usage: demo.sh [options...]
     -b [num]             设置变量 b
 ```
 
+# declare
+
+declare 的用途有很多，我最常用的是它的两个功能：获取函数源代码和声明数据结构。示例如下：
+
+```bash
+# 通过 declare 获取函数的源代码，并且以 root 用户运行该函数
+function demo() {
+    if [ $USER == "root" ]; then
+        echo "success"
+    else
+        # sudo 的 -E 选项可以继承除了 HOME、USER 之外的环境变量
+        sudo -E bash -o errexit -o nounset -c "$(declare -f demo);demo"
+    fi
+}
+demo
+
+# 创建一个字典
+declare -A demo_dict
+demo_dict["key"]="value"
+```
+

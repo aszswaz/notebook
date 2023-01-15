@@ -18,7 +18,7 @@ $ ssh-copy-id -i ${HOME}/.ssh/id_rsa example@example.com
 ```bash
 # 登陆服务器，
 $ ssh example@example
-# 修改服务器的/etc/ssh/sshd_config文件，关闭用户名和密码登陆，把PasswordAuthentication yes改为PasswordAuthentication no
+# 修改服务器的 /etc/ssh/sshd_config 文件，关闭用户名和密码登陆，把PasswordAuthentication yes改为PasswordAuthentication no
 $ vim /etc/ssh/sshd_config
 # 重启sshd服务
 $ sudo systemctl restart sshd
@@ -61,8 +61,8 @@ $ chmod -R u+rw /home/example
 如果登陆成功，可以根据需要，选择是否禁止通过ssh登陆root账户，本人不太喜欢root账户的权限过于开放，这对于服务器来说很危险，服务器配置方式如下：
 
 ```bash
-# 用root账户进行操作
-# 首先把新创建的用户，添加到/etc/sudoers文件，这样新的账户就可以在有需要的时候通过sudo命令申请超级权限
+# 用 root 账户进行操作
+# 首先把新创建的用户，添加到 /etc/sudoers 文件，这样新的账户就可以在有需要的时候通过 sudo 命令申请超级权限
 # 文件默认是只读的，临时添加写权限
 $ chmod u+w /etc/sudoers
 $ vim /etc/sudoers
@@ -80,11 +80,13 @@ $ sudo systemctl restart sshd
 ## 使用 SSH 创建隧道
 
 ```bash
-# 本地端口与远程端口绑定
+# 将远程端口映射到本地端口
 $ ssh -NCPf example@example.com -L 8080:localhost:8080
-# 本地socket文件与远程socket文件绑定
+# 本地 socket 文件与远程 socket 文件绑定
 $ ssh -NCPf example@example.com -L example.sock:/home/example/example.sock
+# 将端口映射到远程端口
+$ ssh -R 10808:localhost:10808 -N example@example.com
 ```
 
-`example@example.com`就是服务器的账户和地址，-L 的参数参数的格式为：本地的端口或socket文件:远程地址（IP 或域名 + 端口）或socket文件。
+example@example.com 就是服务器的账户和地址，-L 的参数参数的格式为：本地的端口或 socket 文件: 远程地址（IP 或域名 + 端口）或 socket 文件。
 
