@@ -229,3 +229,9 @@ $ sudo firewall-cmd --reload
 2. 操作 firewalld 进行NAT转发，需要关闭 SELinux 的时候，建议临时关闭就行，因为 Docker 运行容器需要用到 SELinux，如果永久关闭 SELinux，会直接导致 docker 无法启动容器
 2. 本示例中 enp7s0 是网络出口网卡，它的规则区域需要慎重选择，这直接影响到外来流量是否可以访问本机的特定端口，我一般把端口的开放规则配置在 public 区域，所以我把 enp7s0 网卡添加到 public 。
 
+# 设置主机名称
+
+```bash
+$ hostnamectl set-hostname ${hostname}
+```
+
