@@ -1,24 +1,24 @@
 # VIM
 
-由于 VIM 的插件系统非常强大，插件种类很多，这里仅仅只介绍一些比较常用的 vim 命令和插件管理器的安装，我在使用的 vim 配置，直接写在 vim 脚本当中。
+现在比较流行的终端编辑器有 neovim、vim 和 vi，原本 vi 的功能非常少，在绝大多数 Linux 发行版中，它都是 vim 的软连接，因此在本文中不会提到 vi。neovim 是 vim 的衍生版本，它支持 [lua](https://github.com/junegunn/vim-plug)，lua 的执行效率要比 vimscript 要高的多，再加上只有 vim 只有原作者一个人把关，更新迭代是很慢的，neovim 则是由 github 社区管理，更新速度很快，加上 lua 的加持，使得 neovim 逐渐超过了 vim，因此本文如果没有特别指明，稳重出现的单词“vim”都是指 neovim。
 
-[vim 配置脚本](../../../scripts/config/vimrc)
+vim 的插件系统和功能都非常强大，插件种类很多，这里仅仅只介绍一些比较常用的 vim 操作。
 
-## 插件管理器
+# 插件管理器
 
-### vim-plug
+[vim-plug](https://github.com/junegunn/vim-plug)
 
 一款基于 vimscript 的插件管理器，vim-plug 相比于 vunble，它支持异步安装插件，所以建议优先使用它。官方推荐在 neovim 中使用。
 
-[github](https://github.com/junegunn/vim-plug)
+[vundle](https://github.com/VundleVim/Vundle.vim)
 
-### vundle
+这也是一款基于 vimscript 的插件管理器，它已经停止开发，也不支持异步安装插件，不过有些插件仍然只支持通过它进行安装。
 
-这也是一款基于 vimscript 的插件管理器，但是它比较老旧，不过有些插件仍然只支持通过它进行安装。
+[packer.vim](https://github.com/wbthomason/packer.nvim)
 
-[github](https://github.com/VundleVim/Vundle.vim)
+这是一款使用 [lua](https://github.com/junegunn/vim-plug) 编写的插件管理器，支持异步安装插件，与 vim-plug 相比，界面也更加好看，但它只适用于 neovim。
 
-## 常用指令
+# 常用指令
 
 ## Termdebug
 
@@ -56,7 +56,16 @@ ctags 会在当前目录生成一个 tags 文件，在 vim 当中进行加载就
 :set tags+=./tags
 ```
 
-在 vim 当中，使用 `Ctrl + ]` 快捷键就可以跳转到函数当中，`Ctrl + T` 跳转到原来的位置。
+在 vim 当中，使用 Ctrl + ] 快捷键就可以跳转到函数当中，Ctrl + T 跳转到原来的位置。
+
+# 常用功能
 
 
 
+## 批量添加文本
+
+假设要在第 1 行到第 10 行行首插入“//”，操作步骤如下：
+
+1. 按 Ctrl + v 进入 VISUAL BLOCK 模式光标移动到第 10 行，也就是选择要插入的行。VISUAL BLOCK 模式不同于普通的 VISUAL 模式，它可以竖向选择文本。
+2. 按 Shift + i 进入 INSERT 模式，此时光标会回到第 1 行，在第一行行首输入“//”。
+3. 按 esc 退出 INSERT 模式，vim 就会在其他被选中的行插入刚才输入的文本。
