@@ -526,7 +526,7 @@ echo "last: ${demo01[*]}"
 ```bash
 # 声明一个字典变量
 declare -A demo
-# 或
+# 初始化字典
 demo=(['key01']='value01' ['key02']='value02' ['key03']='value03')
 # 打印字典中，指定 key 的 value
 echo "key01=${demo['key01']}"
