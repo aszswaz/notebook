@@ -276,10 +276,10 @@ c: 1
 
 # netcat（nc）
 
-这是一款TCP、UDP代理工具，主要功能是把stdin流发送到目标服务器，archlinux官方仓库没有这个软件包，需要通过yay安装。
+这是一款 TCP、UDP 代理工具，主要功能是把 stdin 流发送到目标服务器。
 
 ```bash
-$ yay -S libressl-netcat
+$ sudo pacman -S openbsd-netcat
 ```
 
 通常用于搭配ssh访问github.com
@@ -323,7 +323,7 @@ $ shfmt -i 4 demo.sh
 
 # valgrind
 
-可用于C和C++程序的内存泄漏检测工具
+可用于 C 和 C++ 程序的内存泄漏检测工具
 
 安装：
 
@@ -460,5 +460,14 @@ notify-send 也是对话框程序，它和 [zenity](zenity) 的不同之处是�
 
 ```bash
 $ notify-send "Hello World" "Hello World"
+```
+
+# scrcpy
+
+scrcpy 可以通过 adb 协议将手机的屏幕映射到电脑。
+
+```bash
+$ sudo pacman -S scrcpy
+$ scrcpy
 ```
 
