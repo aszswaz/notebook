@@ -10,7 +10,7 @@ include_directories(/thirdparty/comm/include)
 message(STATUS "JDK: $ENV{JAVA_HOME}")
 ```
 
-## 编译动态链接库
+# 编译动态链接库
 
 ```cmake
 # 设置so文件输出文件夹
@@ -27,7 +27,7 @@ add_library(JniDemo SHARED zhong_jni_JniDemo.h zhong_jni_JniDemo.c)
 | SHARED | 库被动态链接并在运行时加载。                                 |
 | MODULE | 库是未链接到其他目标的插件，但可以使用类似 dlopen 的功能在运行时动态加载。 |
 
-## 添加模块
+# 添加模块
 
 以ALSA为例
 
@@ -115,7 +115,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ```
 
-## 设置代码中的字符串所使用的编码
+# 设置代码中的字符串所使用的编码
 
 在windows中，如果源代码文件是UTF-8编码的，使用 printf 等函数输出中文，会出现乱码，需要配置 cmake 把源码中的中文转换为 GBK。
 
@@ -126,16 +126,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fexec-charset=GBK")
 ```
 
-## cmake 编译项目
+# cmake 编译项目
 
 ```bash
 # 先生成 Make 文件
 $ mkdir builder && cd builder && cmake ../
 # 构建项目
 $ make
+# 或者
+$ cmake -S . -B build && cmake --build build
 ```
 
-## 传递宏参数
+# 传递宏参数
 
 ```cmake
 cmake_minimum_required(VERSION 3.21)
@@ -183,5 +185,54 @@ $ make
 $ PATH="$PATH:$PWD/build"
 $ cdemo
 profile == pro
+```
+
+# CMakeLists.txt 模板
+
+```cmake
+cmake_minimum_required(VERSION 3.22.2)
+project("libgit2.nvim")
+
+message(STATUS "cmake binary directory: ${CMAKE_BINARY_DIR}")
+
+# 编译命令输出到“compile_commands.json”，以便“ccls”等工具提供帮助。
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# 设置 gcc 编译选项。
+set(CMAKE_C_FLAGS_DEBUG "$ENV{CFLAGS} -Wall -g3 -ggdb")
+set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} -O3 -Wall")
+# 设置动态库的前缀
+set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
+# 设置动态库的输出路径
+set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test")
+
+# 设置源码文件
+set(
+    SRC_FILES
+    src/libgit2.c
+    src/api/repository.c
+    src/util/util.c
+)
+
+# 编译的动态库
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+# 设置动态库的文件名称
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_NAME git2)
+
+# 使用 pkg-config 查找动态库
+find_package(PkgConfig REQUIRED)
+if (PKG_CONFIG_FOUND)
+    pkg_check_modules(LIBGIT2 REQUIRED libgit2)
+    # 设置头文件的目录
+    include_directories(${LIBGIT2_INCLUDE_DIRS})
+    # 连接动态库
+    target_link_libraries(${PROJECT_NAME} ${LIBGIT2_LIBRARIES})
+
+    pkg_check_modules(LUAJIT REQUIRED luajit)
+    include_directories(${LUAJIT_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${LUAJIT_LIBRARIES})
+endif(PKG_CONFIG_FOUND)
+
+# 通过 install 指定要安装的模块，并设置安装路径，如果是相对路径，那么是相对于 ${CMAKE_INSTALL_PREFIX}
+install(TARGETS ${PROJECT_NAME} DESTINATION "${PROJECT_SOURCE_DIR}/lua")
 ```
 
