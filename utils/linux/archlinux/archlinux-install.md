@@ -1,16 +1,16 @@
 # arch linux安装教程
 
-## 1. 从官网下载iso镜像
+## 1. 从官网下载 iso 镜像
 
 [archlinux.iso](https://archlinux.org/download/)
 
 本教程使用的iso: archlinux-2021.02.01-x86_64.iso
 
-## 2. 制作一个U盘启动盘(本教程是使用linux的工具制作，windows需要自行下载Rufus软件，该软件操作很简单，这里不做说明)
+## 2. 制作一个 U 盘启动盘(本教程是使用 linux 的工具制作，windows 需要自行下载 Rufus 软件，该软件操作很简单，这里不做说明)
 
-1. 将U盘插入电脑
+1. 将 U 盘插入电脑
 
-2. 查询U盘的驱动器代号
+2. 查询 U 盘的驱动器代号
 
 ```bash
 $ sudo fdisk -l
@@ -598,13 +598,13 @@ username ALL=(ALL) ALL
 后期加载 在启动后生效，有时这个时间太晚了，因为 CPU 可能已经执行了有问题的指令集。即使已经启用了早加载，晚加载依然有价值，可以让系统不重启的时候也应用到最新的微代码更新。
 内置微代码 可以编译到内核中，在启动的早期阶段应用。.
 
-1. 根据cpu厂商安装对应微码包（以intel为例）
+1. 根据 cpu 厂商安装对应微码包（以 intel 为例）
 
 ```bash
 $ pacman -Sy intel-ucode
 ```
 
-2. 重新生成grub.cfg
+2. 重新生成 grub.cfg
 
 grub-mkconfig 会自动发现微码更新并更新 GRUB 配置信息。安装微码软件包后，重新生成GRUB 配置以激活更新：
 
@@ -612,9 +612,9 @@ grub-mkconfig 会自动发现微码更新并更新 GRUB 配置信息。安装微
 $ grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-## 13. 安装gnome图形界面
+## 13. 安装 gnome 图形界面
 
-X.Org 项目提供了 X 窗口系统的开源实现。开发工作实在 freedesktop.org 社区的通力合作下完成。Xorg （通常简称为 X）在 Linux 用户中非常流行，已经成为图形用户程序的必备条件，所以大部分发行版都提供了它。
+X.Org 项目提供了 X 窗口系统的开源实现。开发工作是在 freedesktop.org 社区的通力合作下完成。Xorg （通常简称为 X）在 Linux 用户中非常流行，已经成为图形用户程序的必备条件，所以大部分发行版都提供了它。
 
 1. 显卡驱动安装
 
