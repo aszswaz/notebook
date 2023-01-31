@@ -105,8 +105,10 @@ $ luajit
 $ sudo ln -s /usr/bin/luajit /usr/bin/lua5.1
 # luafilesystem 是使用 C 语言编写而成，luarocks 安装它时需要头文件进行编译
 $ sudo ln -s /usr/include/luajit-2.1 /usr/include/lua5.1
+# 设置 luarocks 默认使用的 lua 版本
+$ sudo luarocks config lua_version '5.1'
 # 安装 luafilesystem
-$ sudo luarocks ----lua-version 5.1 luafilesystem
+$ sudo luarocks install luafilesystem
 ```
 
 测试 luafilesystem：
