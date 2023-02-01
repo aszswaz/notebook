@@ -10,6 +10,12 @@ CLI 的常用工具文档，都是可执行或脚本，不是某个 shell 的内
 # 把多个空格替换为单个空格
 $ echo "Hello  World" | sed 's/\s\s*/ /g'
 Hello World
+# 将文件中第一个匹配的字符串替换为指定的字符串
+$ sed -e 's/demo/hello world/g' demo.txt
+# 将文件所有匹配的字符串替换为指定的内容
+$ sed -i 's/demo/hello world/g' demo.txt
+# 和 find、xargs 结合使用
+$ find src/ -type f | xargs sed -i 's/demo/hello world/g'
 ```
 
 s/:正则表达式的替换操作
