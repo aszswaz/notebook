@@ -15,7 +15,7 @@ $ mvn archetype:generate \
 -DarchetypeArtifactId=maven-archetype-quickstart
 ```
 
-## maven指令介绍
+## maven 指令介绍
 
 ```bash
 $ mvn clean # 清理项目, 主要是删除项目的target文件夹, 如果里面的文件被其他程序使用, 会导致删除失败
@@ -32,24 +32,24 @@ $ mvn clean compile -P test # 组合指令, 同上. 不过默认不会进行单�
 $ mvn exec:java -Dexec.mainClass="com.vineetmanohar.module.Main" -P test # 通过maven来启动java程序, maven会自动将项目中依赖的jar包添加到classpath, 不过在执行该指令前需要先执行compile编译代码, 也不能缺少指定的环境, 编译时用的什么环境, 运行时也得什么环境
 ```
 
-### maven dependency依赖树分析
+### maven dependency 依赖树分析
 
 使用 `mvn dependency:tree` 即可展示全部的
 
-可以加上Dincludes或者Dexcludes进行筛选格式 groupId:artifactId:version的方式进行过滤
+可以加上Dincludes或者Dexcludes进行筛选格式 groupId:artifactId:version 的方式进行过滤
 例如
 
 ```bash
 $ mvn dependency:tree -Dverbose -Dincludes=com.google.guava:guava
 ```
 
-maven打印依赖树到文件中：
+maven 打印依赖树到文件中：
 
 ```shell
 $ mvn dependency:tree >> tree.txt
 ```
 
-### 寻找依赖树中的groupId
+### 寻找依赖树中的 groupId
 
 ```shell
 $ mvn dependency:tree -Dverbose -Dincludes=org.slf4j
@@ -75,7 +75,7 @@ $ mvn dependency:tree -Dverbose -Dincludes=org.slf4j
 [INFO] ------------------------------------------------------------------------
 ```
 
-## 把项目发布到本地maven仓库
+## 把项目发布到本地 maven 仓库
 
 ### install:install-file
 
