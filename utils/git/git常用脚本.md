@@ -1,4 +1,4 @@
-### 本地禁止提交(commit)到master分支
+### 本地禁止提交到 master 分支
 
 在git项目目录下添加 **.git/hooks/pre-commit** 文件
 
