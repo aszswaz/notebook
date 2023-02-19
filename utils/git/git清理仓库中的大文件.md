@@ -48,7 +48,7 @@
     # 切换回到原项目
     cd demo
     # 查找文件
-    $ git rev-list --objects --all | grep "$(git verify-pack -v .git/objects/pack/*.idx | sort -k 3 -n | tail -5 | awk '{print$1}')"
+    $ git rev-list --objects --all | grep "$(git verify-pack -v .git/objects/pack/*.idx | sort -k 3 -n | tail -5 | awk '{ print $1 }')"
     ```
 
     ```txt
@@ -60,17 +60,17 @@
 
     <span style="background-color: yellow">网友博客看到的指令，据说是可以使用的，但是不知道为什么到我这行不通，不过找不出来文件也不要紧，直接跳过该步骤就行</span>
 
-3.  重写commit，删除大文件
+3.  重写 commit，删除大文件
 
     ```bash
     # 首先删除文件
     $ rm file.jar
-    $ git commit -a -m "rm file.jar"
-    # 因为git似乎会保护仓库，不允许commit当中一个文件都没有，所以为了确保file.jar的commit历史能够被删除成功，新建一个demo.md文件
+    $ git commit -am "rm file.jar"
+    # 因为 git 似乎会保护仓库，不允许 commit 当中一个文件都没有，所以为了确保 file.jar 的 commit 历史能够被删除成功，新建一个 demo.md 文件
     $ touch demo.md
     $ git add demo.md
     $ git commit -m "add demo.md file"
-    # 清理commit中的文件（注意该文件必须已被删除才有效）
+    # 清理 commit 中的文件（注意该文件必须已被删除才有效）
     $ git filter-branch --force --index-filter 'git rm -rf --cached --ignore-unmatch [filepath]' --prune-empty --tag-name-filter cat -- --all
     WARNING: git-filter-branch has a glut of gotchas generating mangled history
              rewrites.  Hit Ctrl-C before proceeding to abort, then use an

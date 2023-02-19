@@ -40,7 +40,7 @@ git init
     *.class
     ```
 
-## git lfs的使用
+## git lfs 的使用
 
 git lfs可以避免二进制文件的提交问题，同时可以避免版本库过大的问题
 
@@ -127,7 +127,7 @@ git config --global core.autocrlf false
 git config --global core.autocrlf input
 ```
 
-## git回滚到上一个版本操作
+## git 回滚到上一个版本操作
 
 1. 还没有push远程仓库，本地回滚
 
@@ -142,7 +142,7 @@ git config --global core.autocrlf input
     git push origin HEAD --force //重新push到你的远程仓库
     ```
 
-## git从远程仓库更新代码
+## git 从远程仓库更新代码
 
 ```bash
 git pull <远程主机名> <远程分支名>:<本地分支名>
@@ -230,9 +230,9 @@ $ git push origin <tagname>
 $ git push origin --tags
 ```
 
-## git证书库配置
+## git 证书库配置
 
-在windows的git是不会使用windows的证书库验证https证书的办法者，这样在使用自签名的https证书的时候就会出现无法clone库的问题，所以需要手动的配置git的证书库为使用windows的证书库
+在 windows 的 git 是不会使用 windows 的证书库验证 https 证书的办法者，这样在使用自签名的 https 证书的时候就会出现无法 clone 库的问题，所以需要手动的配置 git 的证书库为使用 windows 的证书库
 
 ````bash
 git config --global http.sslBackend schannel

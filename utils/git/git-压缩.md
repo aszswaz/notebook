@@ -14,15 +14,9 @@
     $ git rebase -i 99ee41316a215a359756e813d9007b28f5b68b48
     ```
 
-    ![image-20201230215345437](image/git-压缩/image-20201230215345437.png)
-
     **第一个版本保留，作为压缩基准，其余版本全部把`pick`修改为`squash`，表示该版本需要压缩**
 
-    ![image-20201230215902047](image/git-压缩/image-20201230215902047.png)
-
 3.  再次编辑commit信息
-
-![image-20201230220000775](image/git-压缩/image-20201230220000775.png)
 
 <span style="color: red">如果出现文件冲突，需要先处理冲突文件: [git版本冲突处理](./git-help.md)</span>，处理完毕后执行以下指令
 
