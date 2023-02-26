@@ -11,5 +11,5 @@ if [ "master" == "$branch" ]; then
 fi
 ```
 
-<span style="background-color: yellow">这里是防止意外提交和开发者随意提交到master分支，一般master分支只能从其他分支合并代码。</span>
+<span style="background-color: yellow">这里是防止意外提交和开发者随意提交到 master 分支，一般 master 分支只能从其他分支合并代码。</span>
 
