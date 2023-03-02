@@ -477,3 +477,13 @@ $ sudo pacman -S scrcpy
 $ scrcpy
 ```
 
+# chromium
+
+## Create shurtcut
+
+给网页或者插件的页面创建一个快捷方式，它的最终效果类似于将网页作为本地应用程序，在桌面双击图标就可以打开，窗口中没有地址栏、搜索栏和工具栏，只有页面内容，除了这些，和普通浏览网页没有什么区别，网页依旧是不能直接调用本地 API。具体使用方式如下：
+
+1. 打开目标网页或插件
+2. 点击 More $\rightarrow$ Create Shortcut
+
+已创建的快捷方式可以在 chrome://apps 进行管理
