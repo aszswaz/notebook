@@ -485,5 +485,6 @@ $ scrcpy
 
 1. 打开目标网页或插件
 2. 点击 More $\rightarrow$ Create Shortcut
+3. 勾选 Open as window
 
 已创建的快捷方式可以在 chrome://apps 进行管理
