@@ -58,6 +58,21 @@ ctags 会在当前目录生成一个 tags 文件，在 vim 当中进行加载就
 
 在 vim 当中，使用 Ctrl + ] 快捷键就可以跳转到函数当中，Ctrl + T 跳转到原来的位置。
 
+## Substiute
+
+substiute 指令将匹配的文本替换为指定内容
+
+指令格式：:[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+
+```vimscript
+" 查看帮助文档
+:help :s
+" 第 10 行到第 20 行中的 demo 替换为 Hello World
+:10,20s/demo/Hello World
+" 所有的 demo 都替换为 Hello World
+:%s/demo/Hello World
+```
+
 # 常用功能
 
 ## 批量添加文本
@@ -91,7 +106,13 @@ ctags 会在当前目录生成一个 tags 文件，在 vim 当中进行加载就
 
 ## 在多个连续行的末尾添加字符
 
+第一种：
+
 指令格式：\<start\>,\<end\>normal A\<char\>
+
+第二种：
+
+指令格式：\<start\>,\<end\>s/$/\<char\>
 
 | 指令参数 | 说明         |
 | -------- | ------------ |
@@ -103,6 +124,8 @@ ctags 会在当前目录生成一个 tags 文件，在 vim 当中进行加载就
 
 ```vimscript
 :10,20normal A;
+" 或者
+:10,20s/$/;
 ```
 
 ## 删除多个连续行指定列到行首的文本
