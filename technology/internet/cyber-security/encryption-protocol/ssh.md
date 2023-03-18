@@ -85,7 +85,11 @@ $ ssh -NCPf example@example.com -L 8080:localhost:8080
 # 本地 socket 文件与远程 socket 文件绑定
 $ ssh -NCPf example@example.com -L example.sock:/home/example/example.sock
 # 将端口映射到远程端口
-$ ssh -R 10808:localhost:10808 -N example@example.com
+# 如果要将服务器上的端口暴露给外部网络，需要在 /etc/ssh/sshd_config 中打开以下选项
+# AllowTcpForwarding yes
+# GatewayPorts yes
+# 如果不写绑定地址，默认是绑定到 localhost
+$ ssh -R 0.0.0.0:10808:localhost:10808 -N example@example.com
 ```
 
 example@example.com 就是服务器的账户和地址，-L 的参数参数的格式为：本地的端口或 socket 文件: 远程地址（IP 或域名 + 端口）或 socket 文件。
