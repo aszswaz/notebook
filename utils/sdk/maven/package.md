@@ -1,4 +1,4 @@
-### maven打包时的文件编码设置
+### maven 打包时的文件编码设置
 
 ```xml
 <properties>
@@ -8,7 +8,7 @@
 </properties>
 ```
 
-### maven打包插件的引入和配置
+### maven 打包插件的引入和配置
 
 ```xml
 <build>
@@ -21,7 +21,7 @@
 </build>
 ```
 
-#### 上面的spring-boot插件的打包方式, 使用apache的插件打包也可以达到相同的目的
+#### 上面的 spring-boot 插件的打包方式, 使用apache的插件打包也可以达到相同的目的
 
 ```xml
 <build>
