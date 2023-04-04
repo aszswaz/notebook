@@ -22,6 +22,8 @@ $ ffmpeg -i input.wav -f mp3 -acodec libmp3lame -y output.mp3
 $ ffmpeg -i example.m4a -acodec copy example.aac
 # 添加自定义标签
 $ ffmpeg -i demo.m4a -movflags use_metadata_tags -metdata tag="Hello World" output.m4a
+# 通过 m3u8 文件下载视频
+$ ffmpeg -i 'https://www.example.com/demo.m3u8' -codec copy demo.mp4
 ```
 
 # 针对mp3的歌曲信息（IDV3 tag）进行修复
