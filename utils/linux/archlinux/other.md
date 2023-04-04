@@ -1,4 +1,4 @@
-# 去除ls指令的文件夹背景色，防止文件夹名称无法看清楚
+# 去除 ls 指令的文件夹背景色，防止文件夹名称无法看清楚
 
 ```zsh
 $ echo "OTHER_WRITABLE 01;33" >> $HOME/.dir_colors
