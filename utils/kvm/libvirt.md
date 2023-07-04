@@ -1,13 +1,13 @@
 # libvirt
 
-libvirt是一套用于管理硬件虚拟化的开源API、守护进程与管理工具。此套组可用于管理KVM、Xen、VMware ESXi、QEMU及其他虚拟化技术。libvirt内置的API广泛用于云解决方案开发中的虚拟机监视器编排层（Orchestration Layer）。
+libvirt 是一套用于管理硬件虚拟化的开源 API、守护进程与管理工具。此套组可用于管理 KVM、Xen、VMware ESXi、QEMU 及其他虚拟化技术。libvirt 内置的 API 广泛用于云解决方案开发中的虚拟机监视器编排层（Orchestration Layer）。
 
 ## 安装
 
 ```bash
 $ sudo pacman libvirt virt-manager
 $ sudo systemctl enable libvirtd && sudo systemctl start libvirtd
-# 为了避免文件权限和设备独占权限问题，需要将 qemu 配置为 root 用户启动
+# 为了避免文件权限和设备独占权限问题，需要配置用于运行 qemu 的用户
 $ sudo nvim /etc/libvirt/qemu.conf
 user = "aszswaz"
 group = "aszswaz"
