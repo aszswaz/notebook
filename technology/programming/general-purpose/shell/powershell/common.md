@@ -2,6 +2,13 @@
 
 powershell 常用的指令与函数
 
+# 权限管理
+
+```powershell
+# 允许直接执行本地脚本，执行远程脚本时要验证脚本签名
+$ Set-ExecutionPolicy RemoteSigned
+```
+
 ## 服务管理
 
 ```powershell
