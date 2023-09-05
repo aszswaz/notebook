@@ -146,3 +146,38 @@ int main() {
 }
 ```
 
+## 串口通信
+
+树莓派的操作系统提供两个串口设备（UART）用于在 GPIO 针脚上进行串口通信，一种是 mini UART，另一种是 PL011，在[一些树莓派](https://www.raspberrypi.com/documentation/computers/configuration.html#primary-and-secondary-uart)中，PL011 映射给了蓝牙设备，mini UART 则用于 CLI 交互，并且以 mini UART 作为主 UART。mini UART 的可用功能少于 PL011，因此需要把 PL011 映射到第 8 和第 10（TXD 和 RXD）引脚，并且作为主串口使用，操作步骤如下：
+
+1. 执行指令 `sudo raspi-config`
+2. 进入 `Interface Options`
+3. 进入 `Serial Port`
+4. `Would you like a login shell to be accessible over serial?` 选择 `No`
+5. `Would you like the serial port hardware to be enable?` 选择 `Yes`
+6. 重启树莓派
+
+调试串口通信步骤如下：
+
+1. 电脑端安装[串口调试助手](https://apps.microsoft.com/store/detail/%E4%B8%B2%E5%8F%A3%E8%B0%83%E8%AF%95%E5%8A%A9%E6%89%8B/9NBLGGH43HDM?hl=zh-cn&gl=cn)
+
+2. 将树莓派的引脚 8（TXD）连接到 USB 串口设备[^1]的 RXD 引脚，将引脚 10（RXD）连接到 USB 串口的 TXD，将引脚 6（GND）连接到 USB 串口的 GND
+
+3. 执行如下代码：
+    ```python
+    #!/bin/python3
+    
+    import serial
+    
+    ser = serial.Serial('/dev/serial0', 9600)
+    if not ser.isOpen:
+        ser.open()
+    
+    ser.write(b"Hello World")
+    ser.close()
+    ```
+
+    
+
+[^1]: USB 串口设备，USB 接口转 TTL 串口的设备
+
