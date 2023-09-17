@@ -2,7 +2,7 @@
 
 [树莓派](https://zh.wikipedia.org/zh-cn/%E6%A0%91%E8%8E%93%E6%B4%BE)，英国树莓派基金会开发的微型单板计算机，目的是以低价硬件及自由软件促进学校的基本计算机科学教育。
 
-树莓派系列计算机每一代均使用[博通](https://zh.wikipedia.org/wiki/博通)（Broadcom）出产的[ARM架构](https://zh.wikipedia.org/wiki/ARM架構)处理器，如今生产的机型（树莓派 4B）[内存](https://zh.wikipedia.org/wiki/内存)在 2GB 和 8GB 之间，以[TF卡](https://zh.wikipedia.org/wiki/TF卡)作为系统存储媒体（初代使用 [SD](https://zh.wikipedia.org/wiki/SD卡) 卡），配备 [USB](https://zh.wikipedia.org/wiki/USB) 接口和[HDMI](https://zh.wikipedia.org/wiki/HDMI)的视频输出（支持声音输出），内置 [Ethernet](https://zh.wikipedia.org/wiki/Ethernet)/[WLAN](https://zh.wikipedia.org/wiki/WLAN)/[Bluetooth](https://zh.wikipedia.org/wiki/Bluetooth) 网络链接的方式（依据型号决定），并且可使用多种操作系统。产品线型号分为A型、B型、Zero型和ComputeModule计算卡。
+树莓派系列计算机每一代均使用[博通](https://zh.wikipedia.org/wiki/博通)（Broadcom）出产的 [ARM 架构](https://zh.wikipedia.org/wiki/ARM架構)处理器，如今生产的机型（树莓派 4B）[内存](https://zh.wikipedia.org/wiki/内存)在 2GB 和 8GB 之间，以 [TF 卡](https://zh.wikipedia.org/wiki/TF卡)作为系统存储媒体（初代使用 [SD](https://zh.wikipedia.org/wiki/SD卡) 卡），配备 [USB](https://zh.wikipedia.org/wiki/USB) 接口和 [HDMI](https://zh.wikipedia.org/wiki/HDMI) 的视频输出（支持声音输出），内置 [Ethernet](https://zh.wikipedia.org/wiki/Ethernet)/[WLAN](https://zh.wikipedia.org/wiki/WLAN)/[Bluetooth](https://zh.wikipedia.org/wiki/Bluetooth) 网络链接的方式（依据型号决定），并且可使用多种操作系统。产品线型号分为 A型、B型、Zero型和 ComputeModule 计算卡。
 
 [Raspberry Pi OS](https://zh.wikipedia.org/wiki/Raspberry_Pi_OS) 是官方推出的操作系统，适用于所有型号的树莓派，树莓派基金会网站也提供了 [Ubuntu MATE](https://zh.wikipedia.org/wiki/Ubuntu_MATE)、Ubuntu Core、Ubuntu Server、OSMC 等第三方系统供大众下载
 
