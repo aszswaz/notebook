@@ -2,7 +2,7 @@
 
 ## 简介
 
-curses 是一个[程序库](https://zh.wikipedia.org/wiki/库_(计算机))，它提供了[API](https://zh.wikipedia.org/wiki/应用程序接口)，可以允许程序员编写独立于终端的[基于文本的用户界面](https://zh.wikipedia.org/w/index.php?title=基于文本的用户界面&action=edit&redlink=1)。它是一个[虚拟终端](https://zh.wikipedia.org/wiki/虚拟终端)中的“类[GUI](https://zh.wikipedia.org/wiki/图形用户界面)”[应用软件](https://zh.wikipedia.org/wiki/应用软件)工具箱。它还优化了屏幕刷新方法，以减少使用远程[shell](https://zh.wikipedia.org/wiki/Unix_shell)时遇到的[延迟](https://zh.wikipedia.org/wiki/延迟_(工程学))。
+curses 是一个[程序库](https://zh.wikipedia.org/wiki/库_(计算机))，它提供了[API](https://zh.wikipedia.org/wiki/应用程序接口)，可以允许程序员编写独立于终端的[基于文本的用户界面](https://zh.wikipedia.org/w/index.php?title=基于文本的用户界面&action=edit&redlink=1)。它是一个[虚拟终端](https://zh.wikipedia.org/wiki/虚拟终端)中的“类 [GUI](https://zh.wikipedia.org/wiki/图形用户界面)”[应用软件](https://zh.wikipedia.org/wiki/应用软件)工具箱。它还优化了屏幕刷新方法，以减少使用远程[shell](https://zh.wikipedia.org/wiki/Unix_shell)时遇到的[延迟](https://zh.wikipedia.org/wiki/延迟_(工程学))。
 
 ## 示例
 

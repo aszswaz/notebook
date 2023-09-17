@@ -1,8 +1,8 @@
 # GO
 
-## GO简介
+## GO 简介
 
-**Go**（又称**Golang**[[4\]](https://zh.wikipedia.org/wiki/Go#cite_note-4)）是[Google](https://zh.wikipedia.org/wiki/Google)开发的一种[静态](https://zh.wikipedia.org/wiki/静态类型)[强类型](https://zh.wikipedia.org/wiki/強類型)、[编译型](https://zh.wikipedia.org/wiki/編譯語言)、[并发型](https://zh.wikipedia.org/wiki/並行計算)，并具有[垃圾回收功能](https://zh.wikipedia.org/wiki/垃圾回收_(計算機科學))的[编程语言](https://zh.wikipedia.org/wiki/编程语言)。
+**Go**（又称**Golang**[[4\]](https://zh.wikipedia.org/wiki/Go#cite_note-4)）是 [Google](https://zh.wikipedia.org/wiki/Google) 开发的一种[静态](https://zh.wikipedia.org/wiki/静态类型)[强类型](https://zh.wikipedia.org/wiki/強類型)、[编译型](https://zh.wikipedia.org/wiki/編譯語言)、[并发型](https://zh.wikipedia.org/wiki/並行計算)，并具有[垃圾回收功能](https://zh.wikipedia.org/wiki/垃圾回收_(計算機科學))的[编程语言](https://zh.wikipedia.org/wiki/编程语言)。
 
 [罗伯特·格瑞史莫](https://zh.wikipedia.org/w/index.php?title=羅伯特·格瑞史莫&action=edit&redlink=1)、[罗勃·派克](https://zh.wikipedia.org/wiki/羅勃·派克)及[肯·汤普逊](https://zh.wikipedia.org/wiki/肯·汤普逊)于2007年9月开始设计Go，[[3\]](https://zh.wikipedia.org/wiki/Go#cite_note-langfaq-3)稍后伊恩·兰斯·泰勒（Ian Lance Taylor）、拉斯·考克斯（Russ Cox）加入项目。Go是基于[Inferno](https://zh.wikipedia.org/wiki/Inferno)操作系统所开发的。[[5\]](https://zh.wikipedia.org/wiki/Go#cite_note-5)Go于2009年11月正式宣布推出，成为[开放源代码](https://zh.wikipedia.org/wiki/開放原始碼)项目，支持[Linux](https://zh.wikipedia.org/wiki/Linux)、[macOS](https://zh.wikipedia.org/wiki/MacOS)、[Windows](https://zh.wikipedia.org/wiki/Windows)等操作系统。[[6\]](https://zh.wikipedia.org/wiki/Go#cite_note-6)
 
@@ -14,7 +14,7 @@ Go的语法接近[C语言](https://zh.wikipedia.org/wiki/C语言)，但对于[�
 
 与C++相比，Go并不包括如[枚举](https://zh.wikipedia.org/wiki/枚举)、[异常处理](https://zh.wikipedia.org/wiki/异常处理)、[继承](https://zh.wikipedia.org/wiki/繼承_(計算機科學))、[泛型](https://zh.wikipedia.org/wiki/泛型)、[断言](https://zh.wikipedia.org/wiki/斷言_(程式))、[虚函数](https://zh.wikipedia.org/wiki/虚函数)等功能，但增加了 切片(Slice) 型、并发、管道、[垃圾回收功能](https://zh.wikipedia.org/wiki/垃圾回收_(計算機科學))、[接口](https://zh.wikipedia.org/wiki/介面_(資訊科技))等特性的语言级支持[[3\]](https://zh.wikipedia.org/wiki/Go#cite_note-langfaq-3)。Go 2.0版本将支持泛型[[9\]](https://zh.wikipedia.org/wiki/Go#cite_note-9)，对于[断言](https://zh.wikipedia.org/wiki/斷言_(程式))的存在，则持负面态度，同时也为自己不提供类型[继承](https://zh.wikipedia.org/wiki/繼承_(計算機科學))来辩护。
 
-不同于[Java](https://zh.wikipedia.org/wiki/Java)，Go原生提供了[关联数组](https://zh.wikipedia.org/wiki/关联数组)（也称为[哈希表](https://zh.wikipedia.org/wiki/哈希表)（Hashes）或字典（Dictionaries））。
+不同于 [Java](https://zh.wikipedia.org/wiki/Java)，Go原生提供了[关联数组](https://zh.wikipedia.org/wiki/关联数组)（也称为[哈希表](https://zh.wikipedia.org/wiki/哈希表)（Hashes）或字典（Dictionaries））。
 
 2007年，[Google](https://zh.wikipedia.org/wiki/Google)设计Go，目的在于提高在[多核](https://zh.wikipedia.org/wiki/多核心處理器)、网络机器（networked machines）、大型[代码库](https://zh.wikipedia.org/wiki/代码库)（codebases）的情况下的开发效率。[[12\]](https://zh.wikipedia.org/wiki/Go#cite_note-12)当时在Google，设计师们想要解决其他语言使用中的缺点，但是仍保留他们的优点。[[13\]](https://zh.wikipedia.org/wiki/Go#cite_note-13)
 
