@@ -1,6 +1,8 @@
+
+
 # SOCKS
 
-**SOCKS**是一种[网络传输协议](https://zh.wikipedia.org/wiki/网络传输协议)，主要用于客户端与外网服务器之间通讯的中间传递。SOCKS是"SOCKet Secure"的[缩写](https://zh.wikipedia.org/wiki/缩写)[[注 1\]](https://zh.wikipedia.org/zh-cn/SOCKS#cite_note-1)。
+**SOCKS** 是一种[网络传输协议](https://zh.wikipedia.org/wiki/网络传输协议)，主要用于客户端与外网服务器之间通讯的中间传递。SOCKS 是"SOCKet Secure"的[缩写](https://zh.wikipedia.org/wiki/缩写)[[注 1\]](https://zh.wikipedia.org/zh-cn/SOCKS#cite_note-1)。
 
 当[防火墙](https://zh.wikipedia.org/wiki/防火墙_(网络))后的客户端要访问外部的服务器时，就跟SOCKS[代理服务器](https://zh.wikipedia.org/wiki/代理服务器)连接。这个代理服务器控制客户端访问外网的资格，允许的话，就将客户端的请求发往外部的服务器。
 
@@ -10,7 +12,7 @@
 
 ## 版本分支
 
-下面是客户端向SOCKS 4代理[服务器](https://zh.wikipedia.org/wiki/服务器)，发送的连接请求包的格式（以[字节](https://zh.wikipedia.org/wiki/字节)为单位）：
+下面是客户端向 SOCKS 4 代理[服务器](https://zh.wikipedia.org/wiki/服务器)，发送的连接请求包的格式（以[字节](https://zh.wikipedia.org/wiki/字节)为单位）：
 
 | VN   | CD   | DSTPORT | DSTIP | USERID   | NULL |
 | ---- | ---- | ------- | ----- | -------- | ---- |
@@ -185,4 +187,3 @@ $ curl -x socks5://localhost:8080 https://example.com
 | 1            | 1        |
 
 其中鉴定状态 0x00 表示成功，0x01 表示失败。
-

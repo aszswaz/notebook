@@ -1,4 +1,4 @@
-# ffmpeg项目源码解析笔记
+# ffmpeg 项目源码解析笔记
 
 ffmpeg 版本：
 
@@ -20,7 +20,7 @@ libpostproc    56.  3.100 / 56.  3.100
 
 # 编译并启动程序
 
-首先从 [ffmpeg官网](https://ffmpeg.org/download.html) 下载源码，然后开始编译
+首先从 [ffmpeg 官网](https://ffmpeg.org/download.html) 下载源码，然后开始编译
 
 ```bash
 # 编译时启用mp3模块，启用debug模式（编译时加入调试需要的代码行号等信息），注意一定要加--disable-stripping， 如果不加此选项，ffmpeg在编译时，会使用strip去掉符号信息。

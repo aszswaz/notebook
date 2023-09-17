@@ -109,7 +109,7 @@ public class Demo {
 }
 ```
 
-运行代码，从SpringBoot中获得的响应如下：
+运行代码，从 SpringBoot 中获得的响应如下：
 
 ```txt
 HTTP/1.1 200 
