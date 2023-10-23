@@ -188,3 +188,25 @@ int main() {
 
 [^1]: USB 串口设备，USB 接口转 TTL 串口的设备
 
+# ACT 指示灯
+
+raspberry pi 4 mode b 自带一个 ACT 指示灯，默认情况下用于指示 SD 的读写情况和 CPU 的忙碌状态。这个指示灯的控制方式如下：
+
+```bash
+$ sudo -i
+$ cd '/sys/class/leds/ACT'
+# 设置 ACT LED 的控制模式为手动模式
+$ echo 'none' >> trigger
+# 打开或关闭 ACT LED
+$ echo '1' >> brightness
+# 定时闪烁
+$ echo 'timer' >> trigger
+# 设置闪烁频率，单位：ms
+$ echo '500' >> delay_on
+$ echo '500' >> delay_off
+# 模仿心跳闪烁
+$ echo 'heartbeat' >> trigger
+# 常亮
+$ echo 'default-on' >> trigger
+```
+
