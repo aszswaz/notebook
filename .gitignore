@@ -52,6 +52,7 @@ venv
 *.tln
 *.auxlock
 *.md5
+*.syncctx
 
 # Compressed file
 *.zip

@@ -1,0 +1,31 @@
+\documentclass{ctexart}
+
+% circuitikz 用于绘制电路图，支持的电路图符号有 american 和 european
+\usepackage [american] {circuitikz}
+
+\begin{document}
+NPN 三极管的接线电路图：
+    \begin{center}
+        \begin{circuitikz}
+            \def\showcoord(#1){coordinate(#1) node[circle, red, draw, inner sep=1pt,
+                pin={[red, overlay, inner sep=0.5pt, font=\tiny, pin distance=0.1cm,
+                pin edge={red, overlay}]45:#1}](){}}
+        
+            % 5V 和 3.3V 电源
+            \draw (0, 0) to[isource, v = $5V$] (0, 6) -- (2, 6);
+            \draw (2.77, 0) to[isource, v = $3.3V$] (2.77, 3);
+            % 3.3V 电源的电阻
+            \draw (2.77, 3) to[R = $10KR$] (2.77, 5.5);
+            \draw (0, 0) -- (2.77, 0);
+            
+            % 三极管
+            \draw (2.77, 6) node[npn, rotate = 90](NPN){};
+            \path (NPN.C) \showcoord(C) (NPN.B) \showcoord(B) (NPN.E) \showcoord(E);
+            
+            % 发光二极管
+            \draw (3.5, 6) -- (6, 6);
+            \draw (6, 6) to[full led, i = $20MA$] (6, 4) -- (6, 3);
+            \draw (6, 3) to[R = $150R$] (6, 0) -- (2.77, 0);
+        \end{circuitikz}
+    \end{center}
+\end{document}
