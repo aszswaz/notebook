@@ -26,7 +26,7 @@ $ ffmpeg -i demo.m4a -movflags use_metadata_tags -metdata tag="Hello World" outp
 $ ffmpeg -i 'https://www.example.com/demo.m3u8' -codec copy demo.mp4
 ```
 
-# 针对mp3的歌曲信息（IDV3 tag）进行修复
+# 针对 mp3 的歌曲信息（IDV3 tag）进行修复
 
 针对网上下载的《兄弟抱一下》歌曲为例：
 
