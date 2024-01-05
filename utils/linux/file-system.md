@@ -1,52 +1,4 @@
-# 简介
-
-Linux 的文件相关内容，比如：文件系统介绍、外部磁盘设备挂载等
-
-# linux 的文件系统介绍
-
-对于 linux 操作系统来说，一切都是文件。进程是文件，进程的相关信息都保存在`/proc`文件夹下。设备是文件，所有的设备在`/dev`文件夹下有对应的文件描述符。TCP、UDP socket 也是文件，读写都通过 sydio库的 read 和 write 函数进行。
-
-## 特殊文件夹和文件
-
-/dev/shm
-
-这个文件夹不存在于硬盘，它只在内存当中，它的大小默认是可用物理内存的一半。
-
-/dev/stdin、/dev/stdout、/dev/stderr
-
-它们分别是程序的输入流、输出流、错误输出流，它们作用就是让当前进程，与父进程进行交互。
-
-## 文件链接
-
-硬链接和软链接都是文件的另一个入口，它的主要区别在于：
-
-当一个文件存在它的硬链接时，删除源文件，文件实体并未被删除，只有把文件原入口和硬链接入口都删除，文件的实体才会被删除。
-
-当一个文件存在它的软链接时，删除源文件，文件实体会被删除，软链接会失效。
-
-```bash
-# 创建一个硬链接，然后删除原文件，尝试是否可以读取硬链接
-content=$RANDOM
-echo "content: $content"
-echo $content > link-demo.txt
-ln link-demo.txt link-demo-fl.txt
-rm link-demo.txt
-< link-demo-fl.txt
-
-# 创建一个软链接，然后删除原文件，尝试是否可以通过软链接读取文件
-content=$RANDOM
-echo "content: " $content
-echo $content > link-demo.txt
-ln -s link-demo.txt link-demo-sl.txt
-rm link-demo.txt
-< link-demo-sl.txt
-```
-
-<font color="green">无论是软链接还是硬链接，删除链接本身并不会删除文件。</font>
-
-# 相关工具使用
-
-## 查找文件所在路径
+# 查找文件所在路径
 
 ```bash
 $ find ${path} -type f -iname '*.log'
@@ -58,7 +10,7 @@ path：查找的目录
 
 -iname：使用正在表达式匹配文件名，同时忽略大小写，-name 也是查找文件名，但是不忽略大小写
 
-## 搜索文件内容
+# 搜索文件内容
 
 ```bash
 $ grep 'demo' demo.log
@@ -66,7 +18,7 @@ $ grep 'demo' demo.log
 
 grep可使用正则表达式搜索文件的内存
 
-## find 和 grep 搭配使用
+# find 和 grep 搭配使用
 
 ```bash
 $ find ${path} -type f | xargs grep 'demo'
@@ -82,7 +34,7 @@ $ find ${path} -type f -print0 | xargs -0 grep 'demo'
 
 find 把空格替换为 null，xargs 对 null 进行处理
 
-## 展示文件目录结构
+# 展示文件目录结构
 
 ```bash
 # 安装软件包，tree，这里以archlinux为例
@@ -97,7 +49,7 @@ src
 2 directories, 2 files
 ```
 
-## 查看指定的文件或者文件夹的磁盘使用空间
+# 查看指定的文件或者文件夹的磁盘使用空间
 
 ```bash
 $ du -h --max-depth=1 ${path}
