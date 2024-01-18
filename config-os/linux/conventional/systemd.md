@@ -12,6 +12,7 @@ We can use the following command to create a service file in `/etc/systemd/syste
 
 ```bash
 # "--full" means that the original service file is copied exactly.
+# "--force" means to create the v2ray.service file if it does not exist.
 $ sudo systemctl edit --full v2ray
 ```
 
