@@ -2,7 +2,7 @@
 
 systemd is a system and service manager for Linux operating systems.
 
-**manual**: `man systemd`,  `systemd.syntax`, `man systemd.unit`, `man systemd.service`
+**manual**: `man systemd`,  `systemd.syntax`, `systemd.unit`, `systemd.service`, `systemd.special`
 
 # service
 
@@ -36,7 +36,8 @@ Restart=on-failure
 RestartSec=30s
 
 [Install]
-WantedBy=multe-user.target
+# see man:systemd.special
+WantedBy=default.target
 ```
 
 # sysctl
