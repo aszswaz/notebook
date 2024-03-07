@@ -2,7 +2,7 @@
 
 This document is an analysis note of an English conversation.
 
-# Article 1
+# Dialogue 1
 
 ```text
 Excuse me!
@@ -61,3 +61,31 @@ Thank you very much!
         对我来讲，这都不是问题。
     * Sure thing.
         这有啥。
+
+# Dialogue 2
+
+```txt
+My coat and my umbrella please.
+请把我的大衣和伞给我。
+Here is my ticket.
+这是我的手牌。
+Thank you, sir. Number five.
+谢谢您先生，五号柜子。
+Here is your umbrella and your coat.
+这是您的雨伞和大衣。
+This is not my umbrella.
+这不是我的雨伞。
+Sorry, sir. Is this your umbrella?
+抱歉，先生。那这把伞是您的吗？
+No, it isn't.
+不，也不是。
+Is this it?
+那这把呢？
+Yes, it is. Thank you very much.
+是的，这是我的伞，谢谢。
+```
+
+* Here is my ticket.
+    句式：here is + sth，可缩写为 here's。
+    `here it is.` 等于 `here you are.`，前者常用于单数物品，后者用于复数物品。
+    `here is it.` 为倒装结构，常用于收银员找零的场景。
