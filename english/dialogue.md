@@ -89,3 +89,49 @@ Yes, it is. Thank you very much.
     句式：here is + sth，可缩写为 here's。
     `here it is.` 等于 `here you are.`，前者常用于单数物品，后者用于复数物品。
     `here is it.` 为倒装结构，常用于收银员找零的场景。
+
+# Dialogue 3
+
+```txt
+Good morning.
+早上好！
+Good morining, Mr. Blake.
+早上好，布莱克先生。
+This is Miss Sophie.
+这是索菲小姐。
+Spohie is a new student.
+她是新来的学生。
+She is a French.
+她是法国人。
+Spohie, this is Hans.
+索菲，这位是汉斯。
+He is German.
+他是德国人。
+Nice to meet you.
+很高兴见到你。
+And this is Misa.
+这位是美莎。
+She's Japanese.
+她是日本人。
+Nice to meet you.
+很高兴见到你。
+And this is Kim.
+这位是金。
+He's Korean.
+他是韩国人。
+Nice to meet you.
+很高兴见到你。
+And this is Luming,
+这位是路名。
+He's Chinese.
+他是中国人。
+Nice to meet you.
+很高兴见到你。
+And this is Xiaohui.
+这位是小慧。
+She's Chinese, too.
+她也是中国人。
+Nice to meet you.
+很高兴见到你。
+```
+

@@ -210,3 +210,17 @@ $ echo 'heartbeat' >> trigger
 $ echo 'default-on' >> trigger
 ```
 
+# 开启 Type-c 接口的数据传输功能
+
+raspberry pi 4B 的 Type-c 具有 USB 2.0 的数据传输功能，但是 OS 默认禁用该功能，需要手动开启，方法如下：
+
+```bash
+$ sudo vim /boot/config.txt
+...
+# 开启 Type-c 接口的数据传输功能
+dtoverlay=dwc2,dr_mode=host
+
+[all]
+...
+```
+
