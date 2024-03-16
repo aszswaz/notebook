@@ -210,17 +210,52 @@ $ echo 'heartbeat' >> trigger
 $ echo 'default-on' >> trigger
 ```
 
-# 开启 Type-c 接口的数据传输功能
+# Type-c 接口
 
-raspberry pi 4B 的 Type-c 具有 USB 2.0 的数据传输功能，但是 OS 默认禁用该功能，需要手动开启，方法如下：
+raspberry pi 4B 的 Type-c 具有 OTG 功能，支持 USB 2.0。
+
+但是 OS 默认禁用该功能，需要手动开启，方法如下：
 
 ```bash
 $ sudo vim /boot/config.txt
 ...
-# 开启 Type-c 接口的数据传输功能
+# 以主机模式开启 Type-c OTG 功能
 dtoverlay=dwc2,dr_mode=host
 
 [all]
 ...
+
+$ sudo reboot
 ```
 
+## 将树莓派作为以太网卡
+
+```bash
+$ sudo vim /boot/config.txt
+...
+dtoverlay=dwc2,dr_mode=peripheral
+...
+
+# 加载 OTG 以太网卡驱动
+$ sudo vim /boot/cmdline.txt
+console=serial0,115200 ... rootwait modules-load=dwc2,g_ether ...
+
+# 让操作系统和 NetworkManager 管理 gadget 设备
+$ sudo cp /usr/lib/udev/rules.d/85-nm-unmanaged.rules /etc/udev/rules.d/85-nm-unmanaged.rules
+$ sudo vim /etc/udev/rules.d/85-nm-unmanaged.rules
+...
+ENV{DEVTYPE}=="gadget", ENV{NM_UNMANAGED}="0"
+...
+
+$ sudo reboot
+
+# 配置 NetworkManager
+$ sudo nmcli con add type ethernet ifname usb0 con-name usb0 connection.autoconnect yes \
+    ipv4.method manual \
+    ipv4.addr '192.168.11.2' \
+    ipv4.gateway '192.168.11.1' \
+    ipv4.dns '114.114.114.114,8.8.8.8'
+$ sudo nmcli con up eth0
+```
+
+将数据线的一端插入树莓派的 type-c 接口，另一端插入电脑 USB 接口，如果是电脑是 windows 系统，电脑会将它识别为 <font color="red">USB 串行设备</font>，此时需要安装 [RNDIS 驱动](https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a075v/install_drivers.html)，驱动安装成功后，OS 将它识别为 <font color="green">USB Ethernet/RNDIS Gadget</font> 设备，至此大功告成。
