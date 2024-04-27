@@ -38,7 +38,7 @@ WiringPI 编码：WiringPI 这个库对于 GPIO 针脚的编码
 $ GPIO=27
 # 输出所有的 GPIO 针脚
 $ pinout
-# raspi-gpio 方式
+# raspi-gpio 方式，适用于 raspberry pi 4b 和更早的版本
 # 读取 GPIO 状态，27 是 GPIO 寄存器的编号，也称为 BCM 编码，和该针脚所处位置无关
 $ raspi-gpio get $GPIO
 # 设置针脚为输出模式
@@ -48,13 +48,23 @@ $ raspi-gpio set $GPIO dh
 # 设置针脚输出低电平
 $ raspi-gpio set $GPIO dl
 
-# 使用 WiringPI 控制 GPIO
+# 使用 WiringPI 控制 GPIO，适用于 raspberry pi 4b 和更早的版本
 # -g：使用 BCM 编码，默认是 WiringPI 编码
 $ gpio -g mode $GPIO out
 $ gpio -g read $GPIO
 # 输出低电平和高电平
 $ gpio -g write $GPIO 0
 $ gpio -g write $GPIO 1
+
+# pinctrl 适用于 raspberry pi 4b 和 raspberry pi 5 之后的版本
+$ pinctrl set $GPIO op dh
+$ pinctrl set $GPIO op dl
+
+# libgpiod 适用于 Linux 4.8 以上的系统
+# gpioset <chip> <line=value>
+# chip 可以看作是 gpio 分组，常用的 GPIO 端口都在 chip 4 当中
+$ gpioset 4 $GPIO=0
+$ gpioset 4 $GPIO=1
 
 # 通过文件系统控制 GPIO
 $ cd /sys/class/gpio
@@ -70,6 +80,8 @@ $ echo 0 >> value
 ```
 
 ## 通过程序控制 GPIO
+
+### RPi.GPIO
 
 ```python
 #!/bin/python3
@@ -105,6 +117,9 @@ while True:
     GPIO.output(green, GPIO.LOW)
     time.sleep(wait_time)
 ```
+
+### WiringPi
+
 
 ```c
 #include <wiringPi.h>
@@ -144,6 +159,52 @@ int main() {
     }
     return 0;
 }
+```
+
+### python3-libgpiod
+
+Raspberry Pi 5 不再支持 RPi.GPIO 和 WiringPi，只有 python3-libgpiod 依然可用，它是 [libgpio](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/) 的 python 绑定。
+
+```bash
+$ sudo apt install python3-libgpiod
+```
+
+示例代码如下：
+
+```python
+import time
+
+import gpiod
+
+
+"""
+定时启停风扇
+"""
+
+
+LINE = 45
+
+# 获得 GPIO 切片，可以理解为 Raspberry Pi 5 将 GPIO 进行了分组，比较常用的 GPIO 端口都在 chip 4 当中。
+chip = gpiod.Chip("4")
+power = chip.get_line(LINE)
+power.request(consumer = "motor_movement", type = gpiod.LINE_REQ_DIR_OUT)
+
+def run():
+    delay = 5
+    try:
+        while True:
+            power.set_value(1)
+            time.sleep(delay)
+            power.set_value(0)
+            time.sleep(delay)
+    finally:
+        cleanup()
+
+def cleanup():
+    power.release()
+
+if __name__ == "__main__":
+    run()
 ```
 
 ## 串口通信
@@ -187,6 +248,25 @@ int main() {
 下拉电阻：端口连接到接地的内部电阻，端口悬空或外部输入低电平时，寄存器中的值为 0
 
 [^1]: USB 串口设备，USB 接口转 TTL 串口的设备
+
+# 特殊的 GPIO 端口
+
+通过 `gpioinfo` 指令可以查看树莓派上所有的 GPIO 端口包括但不限于 40pin 的 GPIO，比如 raspberry pi 5 新增了风扇控制端口，其 GPIO 信息如下：
+
+```bash
+# 或 pinctrl FAN_PWM
+$ gpioinfo | grep FAN_PWM
+        line  45:    "FAN_PWM"       unused  output  active-high
+```
+
+可以看到风扇的 PWM GPIO 端口为 45，要控制风扇只需如下操作：
+
+```bash
+# 开启风扇，或 pinctrl FAN_PWM dl
+$ pinctrl set 45 op dl
+# 关闭风扇，或 pinctrl FAN_PWM dh
+$ pinctrl set 45 op dh
+```
 
 # ACT 指示灯
 
@@ -259,3 +339,20 @@ $ sudo nmcli con up eth0
 ```
 
 将数据线的一端插入树莓派的 type-c 接口，另一端插入电脑 USB 接口，如果是电脑是 windows 系统，电脑会将它识别为 <font color="red">USB 串行设备</font>，此时需要安装 [RNDIS 驱动](https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a075v/install_drivers.html)，驱动安装成功后，OS 将它识别为 <font color="green">USB Ethernet/RNDIS Gadget</font> 设备，至此大功告成。
+
+# LCD 彩色显示屏
+
+LCD（液晶显示屏），可以通过 SPI 来传输图像数据，本文所采用的显示屏参数如下：
+
+```txt
+尺寸：2 英寸
+分辨率：240 * 320
+显示颜色：262K 彩色
+通信接口：SPI
+驱动芯片：ST7789VW
+```
+
+购买地址：https://item.taobao.com/item.htm?_u=r2pfas9be10a&id=607500389198&spm=a1z09.2.0.0.91322e8d3T8lvM&skuId=5222086214082
+
+附带教程：https://www.waveshare.net/wiki/2inch_LCD_Module
+
