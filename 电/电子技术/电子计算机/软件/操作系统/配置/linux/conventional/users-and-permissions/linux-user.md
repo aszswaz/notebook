@@ -23,7 +23,11 @@ $ userdel -r username
 
 个人用户的权限只可以在本 home 下有完整权限，其他目录要看别人授权。而经常需要 root 用户的权限，这时候 sudo 可以化身为 root 来操作。我记得我曾经 sudo 创建了文件，然后发现自己并没有读写权限，因为查看权限是 root 创建的。新创建的用户并不能使用 sudo 命令，需要给它添加授权。
 
-给用户添加 sudo 的使用权限有两种办法，第一种是修改 /etc/sudoers，直接在该文件中添加用户的权限配置：
+给用户添加 sudo 的使用权限有三种办法：
+
+**第一种**
+
+修改 /etc/sudoers，直接在该文件中添加用户的权限配置：
 
 ```bash
 # /etc/sudoers 默认是只读的，需要给 root 用户添加可写权限
@@ -38,7 +42,11 @@ username ALL=(ALL)           ALL
 $ sudo chmod a-w /etc/sudoers
 ```
 
-第二种是在 /etc/sudoers.d/ 目录中添加配置文件：
+<font color="red">直接修改 /etc/sudoers 存在一些风险，如果 /etc/sudoers 中的语法不正确，会导致 sudo 无法使用。如果 /etc/sudoers 出现语法错误，可以使用其它能够获取超级用户权限的工具，对 /etc/sudoers 进行修复，比如 su 或 pkexec。</font>
+
+**第二种**
+
+在 /etc/sudoers.d/ 目录中添加配置文件：
 
 ```bash
 # 查看 /etc/sudoers 中是否配置了 includedir /etc/sudoers.d
@@ -48,7 +56,23 @@ $ grep 'includedir /etc/sudoers.d' /etc/sudoers
 $ echo "username ALL=(ALL) ALL" >> /etc/sudoers.d/10-installer
 ```
 
-<font color="green">直接修改 /etc/sudoers 存在一些风险，如果 /etc/sudoers 中的语法不正确，会导致 sudo 无法使用，因此使用第二种方式会更好。如果 /etc/sudoers 出现语法错误，可以使用其它能够获取超级用户权限的工具，对 /etc/sudoers 进行修复，比如 su 或 pkexec。</font>
+**第三种**
+
+一般 Linux 发行版操作系统中，/etc/sudoers 都会指定一个可以使用 sudo 的用户组，比如 CentOS 中的 /etc/sudoers 就存在如下配置：
+
+```
+......
+%wheel  ALL=(ALL)       ALL
+......
+```
+
+这个 `%wheel` 的意思就是加入 `wheel` 组的用户可以使用 sudo，所以我们只需要将目标用户加入 `wheel` 组就行：
+
+```bash
+$ sudo usermod -aG wheel $USER
+# 重新登录用户
+$ exit
+```
 
 # 设置用户的登陆 shell
 
