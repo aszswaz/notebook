@@ -141,9 +141,21 @@ $ ffmpeg -ss '00:03:00' -i demo.mp4 -t 30 -c:v copy -c:a copy demo-out.mp4
 
 -c:a copy：不解码，直接复制音频
 
-# 修改视频大小
+# 修改视频分辨率
 
 ```bash
 $ ffmpeg -i demo.mp4 -vf 'scale=320:240' demo-out.mp4
+# 或
+$ ffmpeg -i demo.mp4 -s '320x240' demo-out.mp4
+# 按比例修改视频分辨率
+$ ffmpeg -i demo.mp4 -vf 'scale=iw/2:ih/2' demo-out.mp4
+$ ffmpeg -i demo.mp4 -vf 'scale=iw*1.5:ih*1.5' demo-out.mp4
+```
+
+# 使用 NVIDIA GPU 处理视频流
+
+```bash
+# 将 ts 文件转换为 mp4 文件
+$ ffmpeg -hwaccel_output_format cuda -c:v h264_cuvid -i demo.ts -c:a copy -c:v h264_nvenc -b:v 5M demo-out.mp4
 ```
 
