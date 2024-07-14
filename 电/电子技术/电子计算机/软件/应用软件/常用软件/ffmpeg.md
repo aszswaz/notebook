@@ -156,6 +156,16 @@ $ ffmpeg -i demo.mp4 -vf 'scale=iw*1.5:ih*1.5' demo-out.mp4
 
 ```bash
 # 将 ts 文件转换为 mp4 文件
-$ ffmpeg -hwaccel_output_format cuda -c:v h264_cuvid -i demo.ts -c:a copy -c:v h264_nvenc -b:v 5M demo-out.mp4
+# -hwaccel：启用硬件加速，-hwaccels 输出可用的赢家加速方式，比如 OpenGL、directx 12 等
+# -hwaccel_output_format：解码得到的数据保存在显存中，以供编码器使用，默认会复制到内存中
+# -c:v：设置视频流的编解码器
+$ ffmpeg \
+    -hwaccel cuda \
+    -hwaccel_output_format cuda \
+    -c:v h264_cuvid \
+    -i demo.ts \
+    -c:v h264_nvenc \
+    -b:v 5M \
+    demo-out.mp4
 ```
 

@@ -290,6 +290,21 @@ $ echo 'heartbeat' >> trigger
 $ echo 'default-on' >> trigger
 ```
 
+# 通过 GPIO 进行开机或关机
+
+树莓派使用 GPIO3 作为开机命令，在关机状态下，只需要短接 GPIO3 和 GND 就可以让树莓派开机，因此只需要开启 GPIO3 的关机功能即可：
+
+```bash
+$ sudo nano /boot/firmware/config.txt
+...
+# 如果 GPIO3 输入低电平，则进行关机
+dtoverlay=gpio-shutdown
+...
+$ sudo reboot
+```
+
+现在，关机状态下 GPIO3 输入低电平就可以开机，关机状态下，GPIO3 输入高电平就可以关机。
+
 # Type-c 接口
 
 raspberry pi 4B 的 Type-c 具有 OTG 功能，支持 USB 2.0。
@@ -339,6 +354,27 @@ $ sudo nmcli con up eth0
 ```
 
 将数据线的一端插入树莓派的 type-c 接口，另一端插入电脑 USB 接口，如果是电脑是 windows 系统，电脑会将它识别为 <font color="red">USB 串行设备</font>，此时需要安装 [RNDIS 驱动](https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a075v/install_drivers.html)，驱动安装成功后，OS 将它识别为 <font color="green">USB Ethernet/RNDIS Gadget</font> 设备，至此大功告成。
+
+## 通过 OTG 进行串口通信
+
+```bash
+$ sudo vim /boot/config.txt
+...
+dtoverlay=dwc2
+...
+
+# 加载 OTG 驱动和 g_serial 驱动
+$ echo "dwc2" | sudo tee -a /etc/modules
+$ echo "g_serial" | sudo tee -a /etc/modules
+$ sudo reboot
+
+# 此时应该能够看到 /dev/ttyGS0 设备，表示配置成功
+$ ls -fl /dev/ttyGS0
+# 使用 minicom 测试串口
+$ minicom -D /dev/ttyGS0
+# 将 tty 转发到 ttyGS0
+$ sudo systemctl start getty@ttyGS0.service
+```
 
 # LCD 彩色显示屏
 
