@@ -1,0 +1,7 @@
+\usepackage{graphicx}
+
+% 外部资源存放路径：文章所在目录/assets/文章名称
+\def\ASSETS{assets/\jobname}
+
+% 导入 ASSETS 目录下的图片
+\newcommand{\ADDPICTURE}[2]{\begin{center}\includegraphics[#1]{\ASSETS/#2}\end{center}}

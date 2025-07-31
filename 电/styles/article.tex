@@ -1,6 +1,7 @@
 % latex 论文样式
 \documentclass{ctexart}
 
+\usepackage{xcolor}
 % 使用超链接宏包
 \usepackage{hyperref}
 % 设置纸张的宏包
@@ -19,12 +20,14 @@
 \geometry{a4paper, scale=0.95}
 % 定义超链接样式
 \hypersetup{
-	CJKbookmarks=true, % 支持中文书签
+	% 支持中文书签
+	CJKbookmarks=true, 
 	colorlinks=true,
 	citecolor=black,
 	linkcolor=black,
-	urlcolor=black,
-	breaklinks=true % 允许链接中的换行
+	urlcolor=blue,
+	% 允许链接中的换行
+	breaklinks=true
 }
 
 % 设置字体

@@ -1,0 +1,61 @@
+\input{styles/article.tex}
+
+% 公式排版
+\usepackage{amsmath}
+% 数学符号
+\usepackage{amssymb}
+% SI 制单位
+\usepackage{siunitx}
+
+\title{电的物理性质}
+\date{2024-08-11}
+
+\begin{document}
+% 生成标题和目录
+\maketitle\newpage
+\tableofcontents\newpage
+
+\section{电流}
+
+\textbf{电流}（electric current）是电荷在电场或（半）导体内的平均定向移动。\textbf{电路的方向定义为正电荷移动的方向}，电路的大小则称为电流强度，是指单位时间内通过导线某一截面的电荷净转移量，每秒通过 1 库伦的电荷量称为 1 安培。“电流强度”也常直接简称为“电流”或称为“电流量”。
+{\color{red}电流的方向被定义为与正电荷在电路中的移动方向相同，但实际上并不是正电荷移动，而是负电荷移动。}\textbf{电子流}是自由电子（不受原子束缚的负电子）在电路中的移动，其方向为电流的反向。
+
+\section{电阻}
+
+\subsection{欧姆定律}
+
+电导体的两端电压 $U$ 与通过导体的电流 $I$ 成正比，表达式为：$U \propto I$，电阻 $R$ 与电压 $U$ 和电流 $I$ 的关系为：$R = \frac{U}{I}$，以此类推：$U = IR$。
+
+\subsection{电阻率}
+
+设导体的电阻为 $R$，电阻率为 $p$，横截面积为 $S$，长度为 $L$，它们的关系如下：
+
+\begin{align*}
+% &= 表示等号对齐
+p &= R \times S \div L \\
+R &= p\frac{L}{S}
+\end{align*}
+
+导体的电阻率一般会随着温度的变化而变化，可能会升高，也可能会减小。
+
+以铜为例，在 \SI{20}{\degreeCelsius} 下，铜的电阻率为 \SI{1.7e-8}{\ohm/\square\metre}，那么长度为 \SI{100}{\square\metre}，横截面积为 \SI{0.8}{\square\milli\metre} 的铜线的电阻是多少？
+\begin{align*}
+R &= 1.7\times10^{-8}\times\frac{100}{0.8\times10^{-8}} \\
+&= 0.000000017\times12500000000 \\
+&= \SI{212.5}{\ohm}
+\end{align*}
+
+\section{电的其它物理量}
+\subsection{电能量}
+\SI{1}{\joule} 等于 \SI{1}{\watt/\second}，\SI{1}{\kWh} = \SI{3.6e6}{\joule}。
+
+\subsection{电功率}
+电功率 $P = U \times I$，其它相关公式如下：
+\begin{align*}
+&\because P = U \times I, U = I \times R \\
+&\therefore P = (I \times R) \times I = I^2 \times R \\
+&\because I = U \div R \\
+&\therefore P = U \times (U \div R) = U^2 \div R
+\end{align*}
+
+\end{document}
